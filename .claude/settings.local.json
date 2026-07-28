@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git worktree *)",
+      "Bash(flutter pub *)",
+      "Bash(ls \"C:\\\\Users\\\\anast\\\\.claude\\\\plugins\\\\cache\\\\superpowers-marketplace\\\\superpowers\\\\6.2.0\\\\skills\\\\subagent-driven-development\\\\scripts\\\\\" 2>&1)",
+      "Read(//c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/**)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/sdd-workspace\" docs/superpowers/plans/2026-07-26-warenannahme-app.md)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/task-brief\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 1)",
+      "Bash(flutter test *)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/review-package\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 140104da992f0acc6ebe226ef78a2d6a1085d22e HEAD)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/task-brief\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 2)",
+      "Bash(flutter analyze *)",
+      "Bash(git -C \"/c/myProjects/BikeDrop/bikedrop/.worktrees/warenannahme-app\" status)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/review-package\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 200e400f3188f6a29552103f35977969a63210a9 HEAD)",
+      "Bash(find / -iname \"supabase.dart\" -path \"*supabase_flutter*\" 2>/dev/null | head -20)",
+      "Read(//c//**)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/task-brief\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 3)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/review-package\" docs/superpowers/plans/2026-07-26-warenannahme-app.md e3b9c51b39157b2554b215796b52c14c1938b36b HEAD)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/task-brief\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 4)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/review-package\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 81c62a3015feff5390de63f053b994a16604ee7f HEAD)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/review-package\" docs/superpowers/plans/2026-07-26-warenannahme-app.md a604c98046f4bd98a8f15324370a06e6541346d3 HEAD)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/review-package\" docs/superpowers/plans/2026-07-26-warenannahme-app.md a871a718363790bf50eeb54c1d43f95497a47f8c HEAD)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/task-brief\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 7)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/review-package\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 01ee3f472c1bce71ee76c51d5142168d8f98b5c1 HEAD)",
+      "Bash(bash \"/c/Users/anast/.claude/plugins/cache/superpowers-marketplace/superpowers/6.2.0/skills/subagent-driven-development/scripts/review-package\" docs/superpowers/plans/2026-07-26-warenannahme-app.md 12ce26f HEAD)"
+    ]
+  }
+}
