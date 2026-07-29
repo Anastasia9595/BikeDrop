@@ -59,4 +59,11 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     fontSize: 14,
   );
+
+  static const TextStyle categoryBadgeLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w700,
+    fontSize: 10,
+    letterSpacing: 0.4,
+  );
 }

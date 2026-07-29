@@ -36,5 +36,9 @@ void main() {
 
     expect(AppTypography.secondaryButtonLabel.fontWeight, FontWeight.w700);
     expect(AppTypography.secondaryButtonLabel.fontSize, 14);
+
+    expect(AppTypography.categoryBadgeLabel.fontWeight, FontWeight.w700);
+    expect(AppTypography.categoryBadgeLabel.fontSize, 10);
+    expect(AppTypography.categoryBadgeLabel.letterSpacing, closeTo(0.4, 0.001));
   });
 }
