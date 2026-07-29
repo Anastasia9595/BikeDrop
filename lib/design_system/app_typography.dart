@@ -66,4 +66,10 @@ class AppTypography {
     fontSize: 10,
     letterSpacing: 0.4,
   );
+
+  static const TextStyle columnHeaderLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w700,
+    fontSize: 11,
+  );
 }

@@ -40,5 +40,8 @@ void main() {
     expect(AppTypography.categoryBadgeLabel.fontWeight, FontWeight.w700);
     expect(AppTypography.categoryBadgeLabel.fontSize, 10);
     expect(AppTypography.categoryBadgeLabel.letterSpacing, closeTo(0.4, 0.001));
+
+    expect(AppTypography.columnHeaderLabel.fontWeight, FontWeight.w700);
+    expect(AppTypography.columnHeaderLabel.fontSize, 11);
   });
 }
