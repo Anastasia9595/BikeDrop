@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../app_colors.dart';
 import '../app_spacing.dart';
+import '../app_typography.dart';
 
 class AppSecondaryButton extends StatelessWidget {
   const AppSecondaryButton({required this.label, required this.onPressed, super.key});
@@ -24,7 +25,7 @@ class AppSecondaryButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          style: AppTypography.secondaryButtonLabel,
         ),
       ),
     );

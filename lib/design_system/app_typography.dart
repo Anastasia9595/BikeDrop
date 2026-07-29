@@ -53,4 +53,10 @@ class AppTypography {
     fontWeight: FontWeight.w800,
     fontSize: 18,
   );
+
+  static const TextStyle secondaryButtonLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w700,
+    fontSize: 14,
+  );
 }

@@ -33,5 +33,8 @@ void main() {
 
     expect(AppTypography.listNumber.fontWeight, FontWeight.w800);
     expect(AppTypography.listNumber.fontSize, 18);
+
+    expect(AppTypography.secondaryButtonLabel.fontWeight, FontWeight.w700);
+    expect(AppTypography.secondaryButtonLabel.fontSize, 14);
   });
 }
