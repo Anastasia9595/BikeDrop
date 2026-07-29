@@ -1,0 +1,14 @@
+name: design_system_lint
+description: Custom analyzer lints enforcing BikeDrop's design system tokens.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.8.0-0 <4.0.0'
+
+dependencies:
+  analyzer: ^6.4.0
+  custom_lint_builder: ^0.6.7
+
+dev_dependencies:
+  lints: ^4.0.0

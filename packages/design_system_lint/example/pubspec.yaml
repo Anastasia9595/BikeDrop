@@ -1,0 +1,15 @@
+name: design_system_lint_example
+description: Fixture app used to verify design_system_lint rules fire as expected.
+publish_to: none
+
+environment:
+  sdk: '>=3.8.0-0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  custom_lint: ^0.6.7
+  design_system_lint:
+    path: ../
