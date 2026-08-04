@@ -472,12 +472,16 @@ rmdir lib/screens
 
 Change:
 ```dart
+import 'package:bikedrop/design_system/app_theme.dart';
 import 'package:bikedrop/screens/login_screen.dart';
 ```
 to:
 ```dart
+import 'package:bikedrop/design_system/tokens/app_theme.dart';
 import 'package:bikedrop/features/login_screen.dart';
 ```
+
+(`main.dart` imports `app_theme.dart` directly rather than through the `design_system.dart` barrel, so it needs its own path fix in addition to the screens-path rename — this was missed in Task 1 and only surfaces when `flutter test` tries to compile `test/widget_test.dart`, which pulls in `main.dart`.)
 
 - [ ] **Step 3: Move the screen test file**
 
@@ -492,7 +496,7 @@ The file is empty — no content edit needed.
 - [ ] **Step 4: Run the full test suite to verify nothing broke**
 
 Run: `flutter test`
-Expected: PASS for every existing test (the design-system suite from Tasks 1–4, plus `test/widget_test.dart`, which is unrelated to this rename and was already failing/passing independently before this plan — do not fix it as part of this task, it's the stock Flutter counter smoke test).
+Expected: the design-system suite from Tasks 1–4 PASSes. Three pre-existing failures, confirmed present in the baseline run *before* this plan started and unrelated to this rename, are expected to remain exactly as they were: `test/repository/supabase_repository_test.dart` (empty file, no `main()` — `repository/` is out of scope), `test/features/capture_screen_test.dart` (same — empty file, no `main()`, moved from `test/screens/` in Step 3 of this task but still empty so still fails to compile), and `test/widget_test.dart` (stock Flutter counter smoke test, doesn't match the real login screen). Do not fix any of these three as part of this task.
 
 - [ ] **Step 5: Commit**
 
@@ -515,7 +519,7 @@ Expected: No errors. (Pre-existing warnings unrelated to this refactor, if any, 
 - [ ] **Step 2: Run the full test suite**
 
 Run: `flutter test`
-Expected: All tests under `test/design_system/` (tokens/atoms/molecules/organisms) and `test/features/` PASS.
+Expected: All tests under `test/design_system/` (tokens/atoms/molecules/organisms) PASS. The same three pre-existing failures noted in Task 5 Step 4 (`test/repository/supabase_repository_test.dart`, `test/features/capture_screen_test.dart`, `test/widget_test.dart`) are expected to still fail — confirmed present in the baseline before this plan started, unrelated to the restructure.
 
 - [ ] **Step 3: Confirm no stray references to the old paths remain**
 
