@@ -1,5 +1,5 @@
-import 'package:bikedrop/design_system/app_theme.dart';
-import 'package:bikedrop/screens/login_screen.dart';
+import 'package:bikedrop/design_system/tokens/app_theme.dart';
+import 'package:bikedrop/features/login_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
