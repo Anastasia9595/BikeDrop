@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../app_colors.dart';
-import '../app_typography.dart';
+import '../tokens/app_colors.dart';
+import '../tokens/app_typography.dart';
 
 class CategoryBadge extends StatelessWidget {
   const CategoryBadge({required this.category, super.key});

@@ -1,8 +1,8 @@
 // lib/design_system/widgets/app_text_field.dart
 import 'package:flutter/material.dart';
-import '../app_colors.dart';
-import '../app_spacing.dart';
-import '../app_typography.dart';
+import '../tokens/app_colors.dart';
+import '../tokens/app_spacing.dart';
+import '../tokens/app_typography.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({

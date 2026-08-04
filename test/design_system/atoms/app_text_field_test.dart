@@ -1,7 +1,7 @@
 // test/design_system/widgets/app_text_field_test.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bikedrop/design_system/widgets/app_text_field.dart';
+import 'package:bikedrop/design_system/atoms/app_text_field.dart';
 
 void main() {
   testWidgets('shows label above the field and forwards input', (tester) async {

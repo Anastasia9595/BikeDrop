@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bikedrop/design_system/widgets/app_secondary_button.dart';
+import 'package:bikedrop/design_system/atoms/app_secondary_button.dart';
 
 void main() {
   testWidgets('renders label and calls onPressed when tapped', (tester) async {
