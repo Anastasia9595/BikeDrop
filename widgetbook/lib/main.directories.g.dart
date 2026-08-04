@@ -22,6 +22,8 @@ import 'package:bikedrop_widgetbook/use_cases/molecules/app_snackbar.dart'
     as _bikedrop_widgetbook_use_cases_molecules_app_snackbar;
 import 'package:bikedrop_widgetbook/use_cases/molecules/list_column_header.dart'
     as _bikedrop_widgetbook_use_cases_molecules_list_column_header;
+import 'package:bikedrop_widgetbook/use_cases/organisms/delete_confirmation_dialog.dart'
+    as _bikedrop_widgetbook_use_cases_organisms_delete_confirmation_dialog;
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 
 final directories = <_widgetbook.WidgetbookNode>[
@@ -126,6 +128,22 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _bikedrop_widgetbook_use_cases_molecules_list_column_header
                         .listColumnHeaderDefault,
+              ),
+            ],
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookFolder(
+        name: 'organisms',
+        children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'DeleteConfirmationDialog',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder:
+                    _bikedrop_widgetbook_use_cases_organisms_delete_confirmation_dialog
+                        .deleteConfirmationDialogDefault,
               ),
             ],
           ),
