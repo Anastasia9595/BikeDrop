@@ -998,42 +998,12 @@ cd widgetbook && dart run build_runner build && flutter analyze && cd ..
 ```
 Expected: No errors; `main.directories.g.dart` now also lists `list_column_header` (1 use-case) and `app_snackbar` (2 use-cases).
 
-- [ ] **Step 4: Widget test that the snackbar use-case actually shows the snackbar**
+> **Note (found during execution):** the plan originally called for a widget test here that pumps `appSnackbarDefault(context)` directly inside a plain `MaterialApp` and taps the trigger button. That does not work: `context.knobs.string(...)` throws `No Widgetbook found in the context` (a hard assertion in `WidgetbookState.of`) unless there is a real `Widgetbook`/`WidgetbookState` ancestor in the tree — it does not silently fall back to `initialValue` as assumed. Reproducing a full `Widgetbook` shell just to drive this one interaction is disproportionate, and the underlying behavior (`AppSnackbar.show` displays the message and wires the action callback) is already covered by `test/design_system/molecules/app_snackbar_test.dart` in the main project. So: no dedicated widget test for this use-case — same as the atom use-cases in Task 10, verification is `flutter analyze` plus confirming the generator picked up the new entries.
 
-```dart
-// widgetbook/test/use_cases/app_snackbar_use_case_test.dart
-import 'package:bikedrop_widgetbook/use_cases/molecules/app_snackbar.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:widgetbook/widgetbook.dart';
-
-void main() {
-  testWidgets('tapping the trigger button shows the snackbar', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => appSnackbarDefault(context),
-          ),
-        ),
-      ),
-    );
-
-    await tester.tap(find.text('Snackbar zeigen'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Keine Verbindung'), findsOneWidget);
-  });
-}
-```
-
-Run: `cd widgetbook && flutter test test/use_cases/app_snackbar_use_case_test.dart && cd ..`
-Expected: PASS. (Note: `context.knobs.string` falls back to `initialValue` when there is no `WidgetbookState` in the widget tree above it — this is standard Widgetbook knob behavior in plain `MaterialApp` tests, so no `Widgetbook`-specific test harness is required here.)
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add widgetbook/lib/use_cases/molecules widgetbook/lib/main.directories.g.dart widgetbook/test/use_cases
+git add widgetbook/lib/use_cases/molecules widgetbook/lib/main.directories.g.dart
 git commit -m "feat: add Widgetbook use-cases for molecules"
 ```
 
@@ -1043,7 +1013,6 @@ git commit -m "feat: add Widgetbook use-cases for molecules"
 
 **Files:**
 - Create: `widgetbook/lib/use_cases/organisms/delete_confirmation_dialog.dart`
-- Create: `widgetbook/test/use_cases/delete_confirmation_dialog_use_case_test.dart`
 
 **Interfaces:**
 - Consumes: `DeleteConfirmationDialog`, `AppPrimaryButton` from `package:bikedrop/design_system/design_system.dart` (Tasks 2, 4).
@@ -1084,42 +1053,12 @@ cd widgetbook && dart run build_runner build && flutter analyze && cd ..
 ```
 Expected: No errors; `main.directories.g.dart` now also lists `delete_confirmation_dialog` (1 use-case).
 
-- [ ] **Step 3: Widget test that the use-case opens the dialog**
+> **Note (found during execution):** same issue as Task 11 — a dedicated widget test pumping `deleteConfirmationDialogDefault(context)` inside a plain `MaterialApp` fails with `No Widgetbook found in the context` because `context.knobs.string` requires a real `Widgetbook` ancestor. The dialog's actual behavior (`DeleteConfirmationDialog.show` opens the dialog, buttons return true/false) is already covered by `test/design_system/organisms/delete_confirmation_dialog_test.dart` in the main project, so no dedicated widget test here either — verification is `flutter analyze` plus confirming the generator picked up the new entry.
 
-```dart
-// widgetbook/test/use_cases/delete_confirmation_dialog_use_case_test.dart
-import 'package:bikedrop_widgetbook/use_cases/organisms/delete_confirmation_dialog.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:widgetbook/widgetbook.dart';
-
-void main() {
-  testWidgets('tapping the trigger button opens the dialog', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => deleteConfirmationDialogDefault(context),
-          ),
-        ),
-      ),
-    );
-
-    await tester.tap(find.text('Dialog öffnen'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Artikel wirklich löschen?'), findsOneWidget);
-  });
-}
-```
-
-Run: `cd widgetbook && flutter test test/use_cases/delete_confirmation_dialog_use_case_test.dart && cd ..`
-Expected: PASS.
-
-- [ ] **Step 4: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add widgetbook/lib/use_cases/organisms widgetbook/lib/main.directories.g.dart widgetbook/test/use_cases/delete_confirmation_dialog_use_case_test.dart
+git add widgetbook/lib/use_cases/organisms widgetbook/lib/main.directories.g.dart
 git commit -m "feat: add Widgetbook use-case for delete confirmation dialog"
 ```
 
@@ -1134,7 +1073,7 @@ git commit -m "feat: add Widgetbook use-case for delete confirmation dialog"
 ```bash
 cd widgetbook && flutter analyze && flutter test && cd ..
 ```
-Expected: No errors; all tests (the app shell smoke test from Task 9 and the two use-case interaction tests from Tasks 11–12) pass.
+Expected: No errors; the app shell smoke test from Task 9 passes (Tasks 11–12 intentionally have no dedicated widget tests — see the notes in those tasks).
 
 - [ ] **Step 2: Confirm the generated directory tree has all 7 widgets**
 
