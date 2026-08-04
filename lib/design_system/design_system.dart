@@ -6,6 +6,5 @@ export 'atoms/app_primary_button.dart';
 export 'atoms/app_secondary_button.dart';
 export 'atoms/app_text_field.dart';
 export 'atoms/category_badge.dart';
-export 'widgets/app_snackbar.dart';
-export 'widgets/delete_confirmation_dialog.dart';
-export 'widgets/list_column_header.dart';
+export 'molecules/app_snackbar.dart';
+export 'molecules/list_column_header.dart';
