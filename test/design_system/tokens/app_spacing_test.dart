@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bikedrop/design_system/app_spacing.dart';
+import 'package:bikedrop/design_system/tokens/app_spacing.dart';
 
 void main() {
   test('spacing tokens match design doc values', () {

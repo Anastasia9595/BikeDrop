@@ -1,8 +1,8 @@
 // test/design_system/app_typography_test.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bikedrop/design_system/app_colors.dart';
-import 'package:bikedrop/design_system/app_typography.dart';
+import 'package:bikedrop/design_system/tokens/app_colors.dart';
+import 'package:bikedrop/design_system/tokens/app_typography.dart';
 
 void main() {
   test('text styles match design doc weights/sizes/spacing', () {

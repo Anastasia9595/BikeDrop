@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bikedrop/design_system/app_colors.dart';
-import 'package:bikedrop/design_system/app_spacing.dart';
-import 'package:bikedrop/design_system/app_theme.dart';
+import 'package:bikedrop/design_system/tokens/app_colors.dart';
+import 'package:bikedrop/design_system/tokens/app_spacing.dart';
+import 'package:bikedrop/design_system/tokens/app_theme.dart';
 
 void main() {
   test('AppTheme.light wires tokens into ThemeData', () {

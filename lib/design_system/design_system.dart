@@ -1,7 +1,7 @@
-export 'app_colors.dart';
-export 'app_typography.dart';
-export 'app_spacing.dart';
-export 'app_theme.dart';
+export 'tokens/app_colors.dart';
+export 'tokens/app_typography.dart';
+export 'tokens/app_spacing.dart';
+export 'tokens/app_theme.dart';
 export 'widgets/app_primary_button.dart';
 export 'widgets/app_secondary_button.dart';
 export 'widgets/app_text_field.dart';

@@ -21,7 +21,7 @@ class AvoidHardcodedColors extends DartLintRule {
   /// works identically on Windows (`\`) and POSIX (`/`) paths.
   bool _isAllowedFile(String path) {
     final normalized = path.replaceAll('\\', '/');
-    return normalized.endsWith('lib/design_system/app_colors.dart');
+    return normalized.endsWith('lib/design_system/tokens/app_colors.dart');
   }
 
   @override
