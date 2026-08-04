@@ -717,7 +717,6 @@ Expected: Generates `widgetbook/lib/main.directories.g.dart` exporting a `direct
 ```dart
 // widgetbook/test/widgetbook_app_test.dart
 import 'package:bikedrop_widgetbook/main.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
