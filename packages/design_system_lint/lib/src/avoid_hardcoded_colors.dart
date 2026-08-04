@@ -3,7 +3,7 @@ import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Flags direct `Color(...)` construction and `Colors.*` usage outside of
-/// `lib/design_system/app_colors.dart`, where the design system's color
+/// `lib/design_system/tokens/app_colors.dart`, where the design system's color
 /// tokens are defined. Everywhere else should reference `AppColors` instead
 /// of hardcoding colors.
 class AvoidHardcodedColors extends DartLintRule {
