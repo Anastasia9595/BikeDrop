@@ -1,6 +1,6 @@
 targets:
   $default:
     builders:
-      widgetbook_generator:
+      widgetbook_generator:use_case_builder:
         generate_for:
           - lib/**
