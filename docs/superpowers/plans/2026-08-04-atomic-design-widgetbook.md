@@ -614,10 +614,12 @@ Keep the `flutter:` section (assets/`uses-material-design: true`) that `flutter 
 targets:
   $default:
     builders:
-      widgetbook_generator:
+      widgetbook_generator:use_case_builder:
         generate_for:
           - lib/**
 ```
+
+(The builder that scans for `@UseCase` and benefits from `generate_for` scoping is registered as `widgetbook_generator:use_case_builder`, not bare `widgetbook_generator` — the package defines four separate builders (`use_case_builder`, `app_builder`, `telemetry`, `addons_configs_builder`); using the bare package name as the key causes `dart run build_runner build` to print `Ignoring options for unknown builder` and silently skip the config.)
 
 - [ ] **Step 3: Fetch dependencies**
 
@@ -637,6 +639,8 @@ git commit -m "chore: add widgetbook dependencies and codegen config"
 
 ### Task 9: Write the Widgetbook app shell
 
+> **Note on sequencing (found during execution, not obvious upfront):** `widgetbook_generator`'s `app_builder` only emits `main.directories.g.dart` for an element annotated `@widgetbook.App()` — bare `lib/main.dart` naming is not enough, and even with the annotation present, running codegen with **zero** `@UseCase`-annotated files anywhere in `lib/` produces no output at all (a true no-op, not an empty file). That means Step 3 below (first codegen run) can't produce a working, importable `main.directories.g.dart` in isolation — it only starts producing output once at least one `@UseCase` exists. In practice, do Task 10 (atom use-cases) *before* Step 3 of this task, i.e.: write `main.dart` (Step 1) and delete the stock test (Step 2) here, then jump to Task 10 Steps 1–4 to write the four atom use-case files, then come back and run codegen (this task's Step 3) — at that point it has real content to generate from. The step order below is kept as originally written for reference; just mentally interleave Task 10's file-writing before this task's Step 3.
+
 **Files:**
 - Modify: `widgetbook/lib/main.dart` (replace generated counter app entirely)
 - Delete: `widgetbook/test/widget_test.dart` (stock counter test, no longer applicable)
@@ -644,7 +648,7 @@ git commit -m "chore: add widgetbook dependencies and codegen config"
 
 **Interfaces:**
 - Consumes: `AppTheme` from `package:bikedrop/design_system/design_system.dart` (Task 1).
-- Produces: `WidgetbookApp` (StatelessWidget) in `widgetbook/lib/main.dart`, the root widget every use-case in Tasks 10–12 gets cataloged under. Also produces `lib/main.directories.g.dart` once codegen runs (Step 3), imported by `main.dart`.
+- Produces: `WidgetbookApp` (StatelessWidget) in `widgetbook/lib/main.dart`, the root widget every use-case in Tasks 10–12 gets cataloged under. Also produces `lib/main.directories.g.dart` once codegen runs (Step 3, after Task 10's use-cases exist — see note above), imported by `main.dart`.
 
 - [ ] **Step 1: Replace `widgetbook/lib/main.dart`**
 
@@ -652,6 +656,7 @@ git commit -m "chore: add widgetbook dependencies and codegen config"
 import 'package:bikedrop/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
+import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 import 'main.directories.g.dart';
 
@@ -659,6 +664,7 @@ void main() {
   runApp(const WidgetbookApp());
 }
 
+@widgetbook.App()
 class WidgetbookApp extends StatelessWidget {
   const WidgetbookApp({super.key});
 
@@ -667,8 +673,8 @@ class WidgetbookApp extends StatelessWidget {
     return Widgetbook.material(
       directories: directories,
       addons: [
-        DeviceFrameAddon(
-          devices: [Devices.ios.iPhone13, Devices.android.samsungGalaxyA50],
+        ViewportAddon(
+          [IosViewports.iPhone13, AndroidViewports.samsungGalaxyA50],
         ),
         TextScaleAddon(min: 1, max: 2),
         ThemeAddon<ThemeData>(
@@ -686,6 +692,8 @@ class WidgetbookApp extends StatelessWidget {
 }
 ```
 
+The `@widgetbook.App()` annotation on the `WidgetbookApp` class is what tells `app_builder` where to generate `main.directories.g.dart` — without it, codegen silently produces nothing (no error, no file, "no-op" in the build log). `ViewportAddon` (not `DeviceFrameAddon`, which is deprecated in widgetbook 3.19) takes a `List<ViewportData>`, populated here from the `IosViewports`/`AndroidViewports` preset classes.
+
 - [ ] **Step 2: Delete the stock counter test**
 
 ```bash
@@ -694,10 +702,15 @@ rm widgetbook/test/widget_test.dart
 
 - [ ] **Step 3: Run codegen so `main.directories.g.dart` exists**
 
+Only do this after Task 10's four atom use-case files exist (see the sequencing note above) — otherwise there is nothing for the generator to produce output from.
+
 ```bash
-cd widgetbook && dart run build_runner build --delete-conflicting-outputs && cd ..
+cd widgetbook && dart run build_runner build && cd ..
 ```
-Expected: Generates `widgetbook/lib/main.directories.g.dart` exporting a `directories` list (empty, since no `@UseCase` exists yet — Tasks 10–12 add them).
+
+(No `--delete-conflicting-outputs` flag — the installed `build_runner` version removed that option; passing it prints a harmless warning but otherwise does nothing, so just omit it.)
+
+Expected: Generates `widgetbook/lib/main.directories.g.dart` exporting a `directories` list populated with entries for every `@UseCase` found so far (the four atom use-cases from Task 10 at this point).
 
 - [ ] **Step 4: Write a smoke test for the app shell**
 
@@ -726,10 +739,12 @@ Expected: No analyzer errors; the smoke test passes.
 
 - [ ] **Step 6: Commit**
 
+Since Task 10's use-case files had to be written before Step 3 could succeed (see the sequencing note), it's simplest to commit this task's shell files together with Task 10's use-case files in one commit rather than forcing an artificial split:
+
 ```bash
-git add widgetbook/lib/main.dart widgetbook/lib/main.directories.g.dart widgetbook/test/widgetbook_app_test.dart
+git add widgetbook/lib/main.dart widgetbook/lib/main.directories.g.dart widgetbook/test/widgetbook_app_test.dart widgetbook/lib/use_cases/atoms
 git rm widgetbook/test/widget_test.dart
-git commit -m "feat: add Widgetbook app shell with theme/device/text-scale addons"
+git commit -m "feat: add Widgetbook app shell and atom use-cases"
 ```
 
 ---
@@ -874,7 +889,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(name: 'Default', type: CategoryBadge)
 Widget categoryBadgeDefault(BuildContext context) {
-  final category = context.knobs.list<Category>(
+  final category = context.knobs.object.dropdown<Category>(
     label: 'Kategorie',
     options: Category.values,
     labelBuilder: (category) => category.name,
@@ -884,19 +899,20 @@ Widget categoryBadgeDefault(BuildContext context) {
 }
 ```
 
+(`context.knobs.list` is deprecated in widgetbook 3.19 in favor of `context.knobs.object.dropdown`, which has the same shape.)
+
 - [ ] **Step 5: Regenerate and verify**
 
+As covered in Task 9's sequencing note, this is the point where Task 9 Steps 3–6 (first codegen run, smoke test, combined commit) actually execute — these four files need to exist before `dart run build_runner build` produces any output. If you're following the tasks in strict written order and already ran Task 9 Steps 3–6 after writing these four files, this step is already done; otherwise run it now:
+
 ```bash
-cd widgetbook && dart run build_runner build --delete-conflicting-outputs && flutter analyze && cd ..
+cd widgetbook && dart run build_runner build && flutter analyze && cd ..
 ```
-Expected: No errors; `widgetbook/lib/main.directories.g.dart` now contains entries for all 8 atom use-cases (3 + 2 + 3) plus `category_badge`'s.
+Expected: No errors; `widgetbook/lib/main.directories.g.dart` now contains entries for all 9 atom use-cases (3 + 2 + 3 + 1).
 
 - [ ] **Step 6: Commit**
 
-```bash
-git add widgetbook/lib/use_cases/atoms widgetbook/lib/main.directories.g.dart
-git commit -m "feat: add Widgetbook use-cases for atoms"
-```
+Combined with Task 9's shell files — see Task 9 Step 6's commit command, which already includes `widgetbook/lib/use_cases/atoms`. Nothing further to commit here.
 
 ---
 
@@ -979,7 +995,7 @@ Widget appSnackbarWithAction(BuildContext context) {
 - [ ] **Step 3: Regenerate and verify**
 
 ```bash
-cd widgetbook && dart run build_runner build --delete-conflicting-outputs && flutter analyze && cd ..
+cd widgetbook && dart run build_runner build && flutter analyze && cd ..
 ```
 Expected: No errors; `main.directories.g.dart` now also lists `list_column_header` (1 use-case) and `app_snackbar` (2 use-cases).
 
@@ -1065,7 +1081,7 @@ Widget deleteConfirmationDialogDefault(BuildContext context) {
 - [ ] **Step 2: Regenerate and verify**
 
 ```bash
-cd widgetbook && dart run build_runner build --delete-conflicting-outputs && flutter analyze && cd ..
+cd widgetbook && dart run build_runner build && flutter analyze && cd ..
 ```
 Expected: No errors; `main.directories.g.dart` now also lists `delete_confirmation_dialog` (1 use-case).
 
