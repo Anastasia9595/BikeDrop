@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../app_colors.dart';
-import '../app_spacing.dart';
-import '../app_typography.dart';
-import 'app_primary_button.dart';
-import 'app_secondary_button.dart';
+import '../tokens/app_colors.dart';
+import '../tokens/app_spacing.dart';
+import '../tokens/app_typography.dart';
+import '../atoms/app_primary_button.dart';
+import '../atoms/app_secondary_button.dart';
 
 class DeleteConfirmationDialog {
   const DeleteConfirmationDialog._();

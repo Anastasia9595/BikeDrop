@@ -1,7 +1,7 @@
 // test/design_system/widgets/delete_confirmation_dialog_test.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bikedrop/design_system/widgets/delete_confirmation_dialog.dart';
+import 'package:bikedrop/design_system/organisms/delete_confirmation_dialog.dart';
 
 void main() {
   testWidgets('returns true when Löschen is tapped', (tester) async {

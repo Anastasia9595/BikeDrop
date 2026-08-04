@@ -8,3 +8,4 @@ export 'atoms/app_text_field.dart';
 export 'atoms/category_badge.dart';
 export 'molecules/app_snackbar.dart';
 export 'molecules/list_column_header.dart';
+export 'organisms/delete_confirmation_dialog.dart';
