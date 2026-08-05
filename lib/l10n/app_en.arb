@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "loginWelcomeBack": "Welcome back!",
+  "loginEmailLabel": "Email",
+  "loginPasswordLabel": "Password",
+  "loginButtonLabel": "Log in"
+}

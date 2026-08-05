@@ -1,0 +1,19 @@
+{
+  "@@locale": "de",
+  "loginWelcomeBack": "Willkommen zurück!",
+  "@loginWelcomeBack": {
+    "description": "Greeting shown above the login form"
+  },
+  "loginEmailLabel": "Email",
+  "@loginEmailLabel": {
+    "description": "Label for the email input field on the login screen"
+  },
+  "loginPasswordLabel": "Passwort",
+  "@loginPasswordLabel": {
+    "description": "Label for the password input field on the login screen"
+  },
+  "loginButtonLabel": "Anmelden",
+  "@loginButtonLabel": {
+    "description": "Label for the login submit button"
+  }
+}
