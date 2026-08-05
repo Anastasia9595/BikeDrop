@@ -17,8 +17,14 @@ class LoginScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('BikeDrop', style: AppTypography.loginWordmark),
-                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Text('BikeDrop', style: AppTypography.loginWordmark),
+                    const SizedBox(width: 32),
+                    Image.asset('assets/images/bicycle.png', height: 42),
+                  ],
+                ),
+
                 Text(
                   l10n.loginWelcomeBack,
                   style: AppTypography.body.copyWith(
@@ -38,13 +44,15 @@ class LoginScreen extends StatelessWidget {
                 AppTextField(
                   label: l10n.loginPasswordLabel,
                   obscureText: true,
+                  suffixIcon: Icon(Icons.visibility),
                   onChanged: (value) {
                     // Handle password input change
                   },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 42),
                 AppPrimaryButton(
                   label: l10n.loginButtonLabel,
+                  icon: Icons.arrow_forward,
                   onPressed: () {
                     // Handle login action
                   },

@@ -12,6 +12,7 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.onChanged,
+    this.suffixIcon,
     super.key,
   });
 
@@ -21,6 +22,7 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
+  final Widget? suffixIcon;
 
   bool get _hasError => errorText != null && errorText!.isNotEmpty;
 
@@ -43,6 +45,7 @@ class AppTextField extends StatelessWidget {
             style: AppTypography.body.copyWith(color: AppColors.textPrimary),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.screenPaddingH),
+              suffixIcon: suffixIcon,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
                 borderSide: BorderSide(color: borderColor, width: AppSpacing.fieldBorderWidth),

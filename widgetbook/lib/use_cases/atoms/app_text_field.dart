@@ -6,7 +6,10 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 @widgetbook.UseCase(name: 'Interactive', type: AppTextField)
 Widget appTextFieldInteractive(BuildContext context) {
   final errorText = context.knobs.string(label: 'Fehlertext', initialValue: '');
-  final obscureText = context.knobs.boolean(label: 'Obscured', initialValue: false);
+  final obscureText = context.knobs.boolean(
+    label: 'Obscured',
+    initialValue: false,
+  );
 
   return Center(
     child: Padding(
@@ -15,6 +18,13 @@ Widget appTextFieldInteractive(BuildContext context) {
         label: context.knobs.string(label: 'Label', initialValue: 'Name'),
         errorText: errorText.isEmpty ? null : errorText,
         obscureText: obscureText,
+        suffixIcon:
+            context.knobs.boolean(
+                  label: 'Show Suffix Icon',
+                  initialValue: false,
+                )
+                ? Icon(Icons.visibility)
+                : null,
       ),
     ),
   );
