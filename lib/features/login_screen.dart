@@ -39,7 +39,7 @@ class LoginScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 AppPrimaryButton(
-                  label: 'Login',
+                  label: 'Anmelden',
                   onPressed: () {
                     // Handle login action
                   },
