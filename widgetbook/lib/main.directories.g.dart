@@ -37,19 +37,9 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'AppPrimaryButton',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'Default',
+                name: 'Interactive',
                 builder: _bikedrop_widgetbook_use_cases_atoms_app_primary_button
-                    .appPrimaryButtonDefault,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Disabled',
-                builder: _bikedrop_widgetbook_use_cases_atoms_app_primary_button
-                    .appPrimaryButtonDisabled,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'With icon',
-                builder: _bikedrop_widgetbook_use_cases_atoms_app_primary_button
-                    .appPrimaryButtonWithIcon,
+                    .appPrimaryButtonInteractive,
               ),
             ],
           ),
@@ -57,16 +47,10 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'AppSecondaryButton',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'Default',
+                name: 'Interactive',
                 builder:
                     _bikedrop_widgetbook_use_cases_atoms_app_secondary_button
-                        .appSecondaryButtonDefault,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Disabled',
-                builder:
-                    _bikedrop_widgetbook_use_cases_atoms_app_secondary_button
-                        .appSecondaryButtonDisabled,
+                        .appSecondaryButtonInteractive,
               ),
             ],
           ),
@@ -74,19 +58,9 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'AppTextField',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'Default',
+                name: 'Interactive',
                 builder: _bikedrop_widgetbook_use_cases_atoms_app_text_field
-                    .appTextFieldDefault,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Error',
-                builder: _bikedrop_widgetbook_use_cases_atoms_app_text_field
-                    .appTextFieldError,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'Obscured',
-                builder: _bikedrop_widgetbook_use_cases_atoms_app_text_field
-                    .appTextFieldObscured,
+                    .appTextFieldInteractive,
               ),
             ],
           ),
@@ -109,14 +83,9 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'AppSnackbar',
             useCases: [
               _widgetbook.WidgetbookUseCase(
-                name: 'Default',
+                name: 'Interactive',
                 builder: _bikedrop_widgetbook_use_cases_molecules_app_snackbar
-                    .appSnackbarDefault,
-              ),
-              _widgetbook.WidgetbookUseCase(
-                name: 'With action',
-                builder: _bikedrop_widgetbook_use_cases_molecules_app_snackbar
-                    .appSnackbarWithAction,
+                    .appSnackbarInteractive,
               ),
             ],
           ),

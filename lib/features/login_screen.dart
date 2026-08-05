@@ -13,12 +13,29 @@ class LoginScreen extends StatelessWidget {
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
+              children: [
                 Text('BikeDrop', style: AppTypography.loginWordmark),
                 const SizedBox(height: 16),
                 Text(
                   'Willkommen zurück!',
+                
                   style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 32),
+                AppTextField(
+                  label: 'Email',
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) {
+                    // Handle email input change
+                  },
+                ),
+                const SizedBox(height: 16),
+                AppTextField(
+                  label: 'Passwort',
+                  obscureText: true,
+                  onChanged: (value) {
+                    // Handle password input change
+                  },
                 ),
                 const SizedBox(height: 32),
                 AppPrimaryButton(
