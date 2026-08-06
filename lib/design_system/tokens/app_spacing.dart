@@ -17,4 +17,7 @@ class AppSpacing {
   static const double listRowGap = 12.0;
   static const double snackbarBottomOffset = 136.0;
   static const double dividerWeight = 2.0;
+  static const double iconButtonSize = 48.0;
+  static const double screenSpacingV = 16.0;
+  static const double screenSpacingH = 16.0;
 }

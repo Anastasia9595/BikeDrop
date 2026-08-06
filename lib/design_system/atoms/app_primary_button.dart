@@ -4,7 +4,12 @@ import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
 class AppPrimaryButton extends StatelessWidget {
-  const AppPrimaryButton({required this.label, required this.onPressed, this.icon, super.key});
+  const AppPrimaryButton({
+    required this.label,
+    required this.onPressed,
+    this.icon,
+    super.key,
+  });
 
   final String label;
   final VoidCallback? onPressed;
@@ -17,18 +22,20 @@ class AppPrimaryButton extends StatelessWidget {
     return Opacity(
       opacity: disabled ? 0.45 : 1.0,
       child: Container(
+        width: double.infinity,
         height: AppSpacing.primaryButtonHeight,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-          boxShadow: disabled
-              ? const []
-              : [
-                  BoxShadow(
-                    color: AppColors.accent.withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 9),
-                  ),
-                ],
+          boxShadow:
+              disabled
+                  ? const []
+                  : [
+                    BoxShadow(
+                      color: AppColors.accent.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 9),
+                    ),
+                  ],
         ),
         child: ElevatedButton(
           onPressed: onPressed,
@@ -40,14 +47,26 @@ class AppPrimaryButton extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             ),
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.screenPaddingH),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPaddingH,
+            ),
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: AppTypography.buttonLabel.copyWith(color: AppColors.white)),
-              if (icon != null) Icon(icon, color: AppColors.white),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTypography.buttonLabel.copyWith(
+                    color: AppColors.white,
+                  ),
+                ),
+              ),
+              if (icon != null)
+                Icon(
+                  icon,
+                  size: AppTypography.buttonLabel.fontSize! * 1.5,
+                  color: AppColors.white,
+                ),
             ],
           ),
         ),
