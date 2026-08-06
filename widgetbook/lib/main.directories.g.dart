@@ -20,6 +20,8 @@ import 'package:bikedrop_widgetbook/use_cases/atoms/category_badge.dart'
     as _bikedrop_widgetbook_use_cases_atoms_category_badge;
 import 'package:bikedrop_widgetbook/use_cases/molecules/app_snackbar.dart'
     as _bikedrop_widgetbook_use_cases_molecules_app_snackbar;
+import 'package:bikedrop_widgetbook/use_cases/molecules/item_list_tile.dart'
+    as _bikedrop_widgetbook_use_cases_molecules_item_list_tile;
 import 'package:bikedrop_widgetbook/use_cases/molecules/list_column_header.dart'
     as _bikedrop_widgetbook_use_cases_molecules_list_column_header;
 import 'package:bikedrop_widgetbook/use_cases/organisms/delete_confirmation_dialog.dart'
@@ -86,6 +88,16 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Interactive',
                 builder: _bikedrop_widgetbook_use_cases_molecules_app_snackbar
                     .appSnackbarInteractive,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'ItemListTile',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder: _bikedrop_widgetbook_use_cases_molecules_item_list_tile
+                    .itemListTileDefault,
               ),
             ],
           ),
