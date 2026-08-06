@@ -9,7 +9,7 @@ class AppTypography {
   static const TextStyle screenTitle = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w800,
-    fontSize: 24,
+    fontSize: 32,
     letterSpacing: -0.48,
   );
 
@@ -25,6 +25,14 @@ class AppTypography {
     fontWeight: FontWeight.w400,
     fontSize: 15,
     height: 1.5,
+  );
+
+  static const TextStyle heading = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w800,
+    fontSize: 20,
+    height: 1.3,
+    letterSpacing: -0.3,
   );
 
   static const TextStyle fieldLabel = TextStyle(
@@ -45,7 +53,13 @@ class AppTypography {
   static const TextStyle buttonLabel = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w800,
-    fontSize: 17,
+    fontSize: 20,
+  );
+
+  static const TextStyle iconButtonLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w900,
+    fontSize: 20,
   );
 
   static const TextStyle listNumber = TextStyle(
