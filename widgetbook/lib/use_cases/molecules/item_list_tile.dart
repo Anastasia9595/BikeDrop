@@ -20,13 +20,15 @@ Widget itemListTileDefault(BuildContext context) {
       ),
       quantity: context.knobs.int.input(label: 'Menge', initialValue: 12),
       category: category,
-      timestampLabel: context.knobs.string(
-        label: 'Zeitstempel',
-        initialValue: 'vor 4 Min',
+      status: context.knobs.object.dropdown<ItemStatus>(
+        label: 'Status',
+        options: ItemStatus.values,
+        labelBuilder: (status) => status.name,
       ),
-      onTap: context.knobs.boolean(label: 'Tippbar', initialValue: true)
-          ? () {}
-          : null,
+      onTap:
+          context.knobs.boolean(label: 'Tippbar', initialValue: true)
+              ? () {}
+              : null,
     ),
   );
 }

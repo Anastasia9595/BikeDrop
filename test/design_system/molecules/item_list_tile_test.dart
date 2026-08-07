@@ -13,8 +13,19 @@ final _onePixelPng = base64Decode(
   '42YAAAAASUVORK5CYII=',
 );
 
+Color? _statusDotColor(WidgetTester tester) {
+  final container = tester.widget<Container>(
+    find.byWidgetPredicate(
+      (widget) =>
+          widget is Container &&
+          (widget.decoration as BoxDecoration?)?.shape == BoxShape.circle,
+    ),
+  );
+  return (container.decoration as BoxDecoration).color;
+}
+
 void main() {
-  testWidgets('renders title, quantity and timestamp', (tester) async {
+  testWidgets('renders title, quantity and status label', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -22,7 +33,7 @@ void main() {
             title: 'Shimano XT Scheibe 203',
             quantity: 12,
             category: Category.bremsen,
-            timestampLabel: 'vor 4 Min',
+            status: ItemStatus.imShop,
           ),
         ),
       ),
@@ -30,10 +41,56 @@ void main() {
 
     expect(find.text('Shimano XT Scheibe 203'), findsOneWidget);
     expect(find.text('12'), findsOneWidget);
-    expect(find.text('vor 4 Min'), findsOneWidget);
+    expect(find.text('Im Shop'), findsOneWidget);
   });
 
-  testWidgets('shows placeholder icon when no image is provided', (tester) async {
+  for (final entry in {
+    ItemStatus.imShop: 'Im Shop',
+    ItemStatus.fehlt: 'Fehlt',
+    ItemStatus.bestellt: 'Bestellt',
+  }.entries) {
+    testWidgets('renders label "${entry.value}" for ${entry.key}', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ItemListTile(
+              title: 'Kettenöl',
+              quantity: 3,
+              category: Category.pflege,
+              status: entry.key,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text(entry.value), findsOneWidget);
+    });
+
+    testWidgets('shows the ${entry.key} status color on the dot', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ItemListTile(
+              title: 'Kettenöl',
+              quantity: 3,
+              category: Category.pflege,
+              status: entry.key,
+            ),
+          ),
+        ),
+      );
+
+      expect(_statusDotColor(tester), AppColors.statusColors[entry.key]);
+    });
+  }
+
+  testWidgets('shows placeholder icon when no image is provided', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -41,7 +98,7 @@ void main() {
             title: 'Kettenöl',
             quantity: 3,
             category: Category.pflege,
-            timestampLabel: 'vor 1 Std',
+            status: ItemStatus.fehlt,
           ),
         ),
       ),
@@ -51,7 +108,9 @@ void main() {
     expect(find.byType(Image), findsNothing);
   });
 
-  testWidgets('shows the image instead of the placeholder when provided', (tester) async {
+  testWidgets('shows the image instead of the placeholder when provided', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -59,7 +118,7 @@ void main() {
             title: 'Kettenöl',
             quantity: 3,
             category: Category.pflege,
-            timestampLabel: 'vor 1 Std',
+            status: ItemStatus.fehlt,
             image: MemoryImage(_onePixelPng),
           ),
         ),
@@ -81,7 +140,7 @@ void main() {
             title: 'Bremsbelag',
             quantity: 8,
             category: Category.bremsen,
-            timestampLabel: 'vor 2 Min',
+            status: ItemStatus.bestellt,
             onTap: () => tapped = true,
           ),
         ),
@@ -100,7 +159,7 @@ void main() {
             title: 'Bremsbelag',
             quantity: 8,
             category: Category.bremsen,
-            timestampLabel: 'vor 2 Min',
+            status: ItemStatus.bestellt,
           ),
         ),
       ),

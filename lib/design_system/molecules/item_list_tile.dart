@@ -10,18 +10,24 @@ class ItemListTile extends StatelessWidget {
     required this.title,
     required this.quantity,
     required this.category,
-    required this.timestampLabel,
     this.image,
     this.onTap,
+    required this.status,
     super.key,
   });
 
   final String title;
   final int quantity;
   final Category category;
-  final String timestampLabel;
   final ImageProvider? image;
   final VoidCallback? onTap;
+  final ItemStatus status;
+
+  String get _statusLabel => switch (status) {
+    ItemStatus.imShop => 'Im Shop',
+    ItemStatus.fehlt => 'Fehlt',
+    ItemStatus.bestellt => 'Bestellt',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +48,13 @@ class ItemListTile extends StatelessWidget {
               height: AppSpacing.iconButtonSize,
               color: AppColors.surface,
               alignment: Alignment.center,
-              child: thumbnailImage != null
-                  ? Image(image: thumbnailImage, fit: BoxFit.cover)
-                  : Icon(Symbols.image, color: AppColors.textQuaternaryLight),
+              child:
+                  thumbnailImage != null
+                      ? Image(image: thumbnailImage, fit: BoxFit.cover)
+                      : Icon(
+                        Symbols.image,
+                        color: AppColors.textQuaternaryLight,
+                      ),
             ),
           ),
           SizedBox(width: AppSpacing.listRowGap),
@@ -69,32 +79,50 @@ class ItemListTile extends StatelessWidget {
                   children: [
                     CategoryBadge(category: category),
                     const SizedBox(width: 8),
-                    Text(
-                      timestampLabel,
-                      style: AppTypography.body.copyWith(
-                        fontSize: 12,
-                        color: AppColors.textTertiary,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: AppColors.statusColors[status]!,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _statusLabel,
+                          style: AppTypography.body.copyWith(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          SizedBox(width: AppSpacing.listRowGap),
-          Column(
+          Row(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 '$quantity',
-                style: AppTypography.listNumber.copyWith(color: AppColors.textPrimary),
+                style: AppTypography.listNumber.copyWith(
+                  color: AppColors.textPrimary,
+                ),
               ),
-              const SizedBox(height: 4),
-              Icon(
-                Symbols.visibility,
-                size: AppTypography.listNumber.fontSize,
-                color: AppColors.accent,
+              const SizedBox(width: 4),
+              Text(
+                'Stk.',
+                style: AppTypography.listNumber.copyWith(
+                  fontSize: 12,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ],
           ),
@@ -109,12 +137,13 @@ class ItemListTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
       ),
       clipBehavior: Clip.antiAlias,
-      child: onTap != null
-          ? Material(
-              type: MaterialType.transparency,
-              child: InkWell(onTap: onTap, child: content),
-            )
-          : content,
+      child:
+          onTap != null
+              ? Material(
+                type: MaterialType.transparency,
+                child: InkWell(onTap: onTap, child: content),
+              )
+              : content,
     );
   }
 }

@@ -61,7 +61,7 @@ class OverviewScreen extends StatelessWidget {
                 ),
               ),
               AppPrimaryButton(
-                label: 'Get Started',
+                label: 'Warenbestand erfassen',
                 icon: Symbols.add,
                 onPressed: () {
                   // Handle get started action

@@ -65,6 +65,7 @@ class AppPrimaryButton extends StatelessWidget {
                 Icon(
                   icon,
                   size: AppTypography.buttonLabel.fontSize! * 1.5,
+                  weight: 700,
                   color: AppColors.white,
                 ),
             ],
