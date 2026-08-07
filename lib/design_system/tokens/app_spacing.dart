@@ -20,4 +20,5 @@ class AppSpacing {
   static const double iconButtonSize = 48.0;
   static const double screenSpacingV = 16.0;
   static const double screenSpacingH = 16.0;
+  static const double iconItemListTileSize = 20.0;
 }
