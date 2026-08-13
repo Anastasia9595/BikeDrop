@@ -1,6 +1,7 @@
 // lib/design_system/molecules/quantity_stepper.dart
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import '../atoms/app_icon_button.dart';
 import '../tokens/app_colors.dart';
 import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
@@ -35,7 +36,7 @@ class QuantityStepper extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _StepperButton(
+          AppIconButton(
             icon: Symbols.remove,
             tooltip: 'Menge verringern',
             onPressed: _canDecrement ? () => onChanged(quantity - 1) : null,
@@ -50,40 +51,12 @@ class QuantityStepper extends StatelessWidget {
               ),
             ),
           ),
-          _StepperButton(
+          AppIconButton(
             icon: Symbols.add,
             tooltip: 'Menge erhöhen',
             onPressed: _canIncrement ? () => onChanged(quantity + 1) : null,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _StepperButton extends StatelessWidget {
-  const _StepperButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onPressed,
-      tooltip: tooltip,
-      icon: Icon(icon),
-      iconSize: AppSpacing.iconItemListTileSize,
-      color: AppColors.textPrimary,
-      disabledColor: AppColors.textQuaternaryLight,
-      constraints: const BoxConstraints(
-        minWidth: AppSpacing.minTapTarget,
-        minHeight: AppSpacing.minTapTarget,
       ),
     );
   }

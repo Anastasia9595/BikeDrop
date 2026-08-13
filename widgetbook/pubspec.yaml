@@ -13,6 +13,8 @@ dependencies:
     path: ../
   widgetbook: ^3.0.0
   widgetbook_annotation: ^3.0.0
+  # Direkt benoetigt, weil Use-Cases Symbols.* als Knob-Werte setzen.
+  material_symbols_icons: ^4.2960.0
 
 dev_dependencies:
   flutter_test:

@@ -44,8 +44,8 @@ class ItemListTile extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(AppSpacing.photoTileRadius),
             child: Container(
-              width: AppSpacing.iconButtonSize,
-              height: AppSpacing.iconButtonSize,
+              width: AppSpacing.listThumbnailSize,
+              height: AppSpacing.listThumbnailSize,
               color: AppColors.surface,
               alignment: Alignment.center,
               child:

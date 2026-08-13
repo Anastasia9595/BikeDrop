@@ -19,5 +19,8 @@ void main() {
     expect(AppSpacing.listRowGap, 12.0);
     expect(AppSpacing.snackbarBottomOffset, 136.0);
     expect(AppSpacing.dividerWeight, 2.0);
+    expect(AppSpacing.iconSize, 20.0);
+    expect(AppSpacing.iconSizeLarge, 48.0);
+    expect(AppSpacing.listThumbnailSize, 48.0);
   });
 }

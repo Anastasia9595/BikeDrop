@@ -12,6 +12,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_dropdown_field.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_dropdown_field;
+import 'package:bikedrop_widgetbook/use_cases/atoms/app_icon_button.dart'
+    as _bikedrop_widgetbook_use_cases_atoms_app_icon_button;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_primary_button.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_primary_button;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_secondary_button.dart'
@@ -46,6 +48,16 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Interactive',
                 builder: _bikedrop_widgetbook_use_cases_atoms_app_dropdown_field
                     .appDropdownFieldInteractive,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'AppIconButton',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder: _bikedrop_widgetbook_use_cases_atoms_app_icon_button
+                    .appIconButtonDefault,
               ),
             ],
           ),
