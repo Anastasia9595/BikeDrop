@@ -10,4 +10,5 @@ export 'atoms/category_badge.dart';
 export 'molecules/app_snackbar.dart';
 export 'molecules/item_list_tile.dart';
 export 'molecules/list_column_header.dart';
+export 'molecules/quantity_stepper.dart';
 export 'organisms/delete_confirmation_dialog.dart';

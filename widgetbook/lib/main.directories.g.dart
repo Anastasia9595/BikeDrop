@@ -26,6 +26,8 @@ import 'package:bikedrop_widgetbook/use_cases/molecules/item_list_tile.dart'
     as _bikedrop_widgetbook_use_cases_molecules_item_list_tile;
 import 'package:bikedrop_widgetbook/use_cases/molecules/list_column_header.dart'
     as _bikedrop_widgetbook_use_cases_molecules_list_column_header;
+import 'package:bikedrop_widgetbook/use_cases/molecules/quantity_stepper.dart'
+    as _bikedrop_widgetbook_use_cases_molecules_quantity_stepper;
 import 'package:bikedrop_widgetbook/use_cases/organisms/delete_confirmation_dialog.dart'
     as _bikedrop_widgetbook_use_cases_organisms_delete_confirmation_dialog;
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
@@ -121,6 +123,17 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _bikedrop_widgetbook_use_cases_molecules_list_column_header
                         .listColumnHeaderDefault,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'QuantityStepper',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder:
+                    _bikedrop_widgetbook_use_cases_molecules_quantity_stepper
+                        .quantityStepperDefault,
               ),
             ],
           ),
