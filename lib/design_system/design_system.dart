@@ -4,6 +4,7 @@ export 'tokens/app_spacing.dart';
 export 'tokens/app_theme.dart';
 export 'atoms/app_primary_button.dart';
 export 'atoms/app_secondary_button.dart';
+export 'atoms/app_dropdown_field.dart';
 export 'atoms/app_text_field.dart';
 export 'atoms/category_badge.dart';
 export 'molecules/app_snackbar.dart';

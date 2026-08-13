@@ -33,6 +33,11 @@ migrate_working_dir/
 .pub/
 /build/
 
+# pubspec.lock nur fuer Apps committen. packages/ enthaelt Library-Pakete
+# (design_system_lint), dort empfiehlt Dart, die lock-Datei nicht zu versionieren.
+packages/*/pubspec.lock
+packages/*/example/pubspec.lock
+
 # Symbolication related
 app.*.symbols
 

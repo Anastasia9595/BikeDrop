@@ -17,6 +17,10 @@ class WidgetbookApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Widgetbook.material(
       directories: directories,
+      // BikeDrop ist eine reine Light-App: Widgetbook-Oberfläche fest auf Light,
+      // sonst rendert der Workbench bei System-Dark-Mode einen dunklen
+      // Hintergrund hinter die Use-Cases und die Schrift verschwindet.
+      themeMode: ThemeMode.light,
       addons: [
         ViewportAddon(
           [IosViewports.iPhone13, AndroidViewports.samsungGalaxyA50],
