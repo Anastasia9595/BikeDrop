@@ -23,12 +23,6 @@ class ItemListTile extends StatelessWidget {
   final VoidCallback? onTap;
   final ItemStatus status;
 
-  String get _statusLabel => switch (status) {
-    ItemStatus.imShop => 'Im Shop',
-    ItemStatus.fehlt => 'Fehlt',
-    ItemStatus.bestellt => 'Bestellt',
-  };
-
   @override
   Widget build(BuildContext context) {
     final thumbnailImage = image;
@@ -93,7 +87,7 @@ class ItemListTile extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _statusLabel,
+                          status.label,
                           style: AppTypography.body.copyWith(
                             fontSize: 12,
                             color: AppColors.textSecondary,

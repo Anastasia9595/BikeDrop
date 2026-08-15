@@ -1,7 +1,8 @@
 class AppSpacing {
   const AppSpacing._();
 
-  static const double screenPaddingH = 20.0;
+  static const double screenPaddingH = 16.0;
+  static const double screenPaddingV = 16.0;
   static const double cardRadius = 14.0;
   static const double buttonRadius = 14.0;
   static const double dialogRadius = 22.0;

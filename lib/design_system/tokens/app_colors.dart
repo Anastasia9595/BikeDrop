@@ -14,6 +14,14 @@ extension CategoryLabel on Category {
 
 enum ItemStatus { imShop, fehlt, bestellt }
 
+extension ItemStatusLabel on ItemStatus {
+  String get label => switch (this) {
+    ItemStatus.imShop => 'Im Shop',
+    ItemStatus.bestellt => 'Bestellt',
+    ItemStatus.fehlt => 'Fehlt',
+  };
+}
+
 class CategoryColorPair {
   const CategoryColorPair(this.background, this.text);
 

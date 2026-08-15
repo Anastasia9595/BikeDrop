@@ -18,12 +18,18 @@ import 'package:bikedrop_widgetbook/use_cases/atoms/app_primary_button.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_primary_button;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_secondary_button.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_secondary_button;
+import 'package:bikedrop_widgetbook/use_cases/atoms/app_segment.dart'
+    as _bikedrop_widgetbook_use_cases_atoms_app_segment;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_text_field.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_text_field;
 import 'package:bikedrop_widgetbook/use_cases/atoms/category_badge.dart'
     as _bikedrop_widgetbook_use_cases_atoms_category_badge;
+import 'package:bikedrop_widgetbook/use_cases/molecules/app_segmented_control.dart'
+    as _bikedrop_widgetbook_use_cases_molecules_app_segmented_control;
 import 'package:bikedrop_widgetbook/use_cases/molecules/app_snackbar.dart'
     as _bikedrop_widgetbook_use_cases_molecules_app_snackbar;
+import 'package:bikedrop_widgetbook/use_cases/molecules/app_toggle_card.dart'
+    as _bikedrop_widgetbook_use_cases_molecules_app_toggle_card;
 import 'package:bikedrop_widgetbook/use_cases/molecules/item_list_tile.dart'
     as _bikedrop_widgetbook_use_cases_molecules_item_list_tile;
 import 'package:bikedrop_widgetbook/use_cases/molecules/list_column_header.dart'
@@ -83,6 +89,16 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'AppSegment',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder: _bikedrop_widgetbook_use_cases_atoms_app_segment
+                    .appSegmentDefault,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'AppTextField',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -108,12 +124,34 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'molecules',
         children: [
           _widgetbook.WidgetbookComponent(
+            name: 'AppSegmentedControl',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Interactive',
+                builder:
+                    _bikedrop_widgetbook_use_cases_molecules_app_segmented_control
+                        .appSegmentedControlInteractive,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'AppSnackbar',
             useCases: [
               _widgetbook.WidgetbookUseCase(
                 name: 'Interactive',
                 builder: _bikedrop_widgetbook_use_cases_molecules_app_snackbar
                     .appSnackbarInteractive,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'AppToggleCard',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Interactive',
+                builder:
+                    _bikedrop_widgetbook_use_cases_molecules_app_toggle_card
+                        .appToggleCardInteractive,
               ),
             ],
           ),

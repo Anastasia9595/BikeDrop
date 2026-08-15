@@ -1,5 +1,5 @@
 import 'package:bikedrop/design_system/tokens/app_theme.dart';
-import 'package:bikedrop/features/overview_screen.dart';
+import 'package:bikedrop/features/item_detail_screen.dart';
 import 'package:bikedrop/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('de'),
-      home: const OverviewScreen(),
+      home: const ItemDetailScreen(),
     );
   }
 }
