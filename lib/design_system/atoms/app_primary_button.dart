@@ -56,6 +56,7 @@ class AppPrimaryButton extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
+                  textAlign: icon == null ? TextAlign.center : TextAlign.start,
                   style: AppTypography.buttonLabel.copyWith(
                     color: AppColors.white,
                   ),
