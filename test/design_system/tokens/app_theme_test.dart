@@ -25,5 +25,8 @@ void main() {
     );
 
     expect(theme.snackBarTheme.backgroundColor, AppColors.snackbarBg);
+
+    expect(theme.appBarTheme.scrolledUnderElevation, 0);
+    expect(theme.appBarTheme.surfaceTintColor, Colors.transparent);
   });
 }
