@@ -45,4 +45,17 @@ void main() {
 
     expect(find.byIcon(Icons.check), findsOneWidget);
   });
+
+  testWidgets('centers the label when no icon is provided', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AppPrimaryButton(label: 'Speichern', onPressed: () {}),
+        ),
+      ),
+    );
+
+    final text = tester.widget<Text>(find.text('Speichern'));
+    expect(text.textAlign, TextAlign.center);
+  });
 }

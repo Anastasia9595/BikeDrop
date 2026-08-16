@@ -13,6 +13,7 @@ class AppTextField extends StatelessWidget {
     this.keyboardType,
     this.onChanged,
     this.suffixIcon,
+    this.placeholder,
     super.key,
   });
 
@@ -23,6 +24,7 @@ class AppTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
   final Widget? suffixIcon;
+  final String? placeholder;
 
   bool get _hasError => errorText != null && errorText!.isNotEmpty;
 
@@ -33,7 +35,12 @@ class AppTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: AppTypography.fieldLabel),
+        Text(
+          label.toUpperCase(),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTypography.fieldLabel,
+        ),
         const SizedBox(height: 6),
         SizedBox(
           height: AppSpacing.fieldHeight,
@@ -44,15 +51,24 @@ class AppTextField extends StatelessWidget {
             onChanged: onChanged,
             style: AppTypography.body.copyWith(color: AppColors.textPrimary),
             decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.screenPaddingH),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPaddingH,
+              ),
+              hintText: placeholder,
               suffixIcon: suffixIcon,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                borderSide: BorderSide(color: borderColor, width: AppSpacing.fieldBorderWidth),
+                borderSide: BorderSide(
+                  color: borderColor,
+                  width: AppSpacing.fieldBorderWidth,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-                borderSide: BorderSide(color: borderColor, width: AppSpacing.fieldBorderWidth),
+                borderSide: BorderSide(
+                  color: borderColor,
+                  width: AppSpacing.fieldBorderWidth,
+                ),
               ),
             ),
           ),
@@ -61,7 +77,10 @@ class AppTextField extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             errorText!,
-            style: AppTypography.body.copyWith(color: AppColors.accentPressed, fontSize: 12),
+            style: AppTypography.body.copyWith(
+              color: AppColors.accentPressed,
+              fontSize: 12,
+            ),
           ),
         ],
       ],

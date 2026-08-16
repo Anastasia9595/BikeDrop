@@ -36,7 +36,7 @@ class OverviewScreen extends StatelessWidget {
                         ),
                         child: Icon(
                           Symbols.package_2,
-                          size: AppSpacing.iconButtonSize,
+                          size: AppSpacing.iconSizeLarge,
                           color: AppColors.textSecondary,
                         ),
                       ),

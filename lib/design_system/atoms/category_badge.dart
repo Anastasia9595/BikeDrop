@@ -7,14 +7,6 @@ class CategoryBadge extends StatelessWidget {
 
   final Category category;
 
-  String get _label => switch (category) {
-        Category.bremsen => 'BREMSEN',
-        Category.reifen => 'REIFEN',
-        Category.eBike => 'E-BIKE',
-        Category.zubehoer => 'ZUBEHÖR',
-        Category.pflege => 'PFLEGE',
-      };
-
   @override
   Widget build(BuildContext context) {
     final pair = AppColors.categoryColors[category]!;
@@ -26,7 +18,7 @@ class CategoryBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        _label,
+        category.label.toUpperCase(),
         style: AppTypography.categoryBadgeLabel.copyWith(color: pair.text),
       ),
     );

@@ -21,6 +21,10 @@ class AppTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.surface,
       fontFamily: AppTypography.fontFamily,
+      appBarTheme: const AppBarTheme(
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
       textTheme: const TextTheme(
         titleLarge: AppTypography.screenTitle,
         displayLarge: AppTypography.loginWordmark,

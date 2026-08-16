@@ -2,7 +2,25 @@ import 'package:flutter/material.dart';
 
 enum Category { bremsen, reifen, eBike, zubehoer, pflege }
 
+extension CategoryLabel on Category {
+  String get label => switch (this) {
+    Category.bremsen => 'Bremsen',
+    Category.reifen => 'Reifen',
+    Category.eBike => 'E-Bike',
+    Category.zubehoer => 'Zubehör',
+    Category.pflege => 'Pflege',
+  };
+}
+
 enum ItemStatus { imShop, fehlt, bestellt }
+
+extension ItemStatusLabel on ItemStatus {
+  String get label => switch (this) {
+    ItemStatus.imShop => 'Im Shop',
+    ItemStatus.bestellt => 'Bestellt',
+    ItemStatus.fehlt => 'Fehlt',
+  };
+}
 
 class CategoryColorPair {
   const CategoryColorPair(this.background, this.text);

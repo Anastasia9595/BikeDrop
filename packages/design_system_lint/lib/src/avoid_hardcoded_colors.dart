@@ -33,15 +33,17 @@ class AvoidHardcodedColors extends DartLintRule {
     if (_isAllowedFile(resolver.path)) return;
 
     context.registry.addInstanceCreationExpression((node) {
-      final typeName = node.staticType?.getDisplayString();
+      final typeName = node.staticType?.getDisplayString(
+        withNullability: false,
+      );
       if (typeName == 'Color') {
-        reporter.atNode(node, _code);
+        reporter.reportErrorForNode(_code, node);
       }
     });
 
     context.registry.addPrefixedIdentifier((node) {
       if (node.prefix.name == 'Colors') {
-        reporter.atNode(node, _code);
+        reporter.reportErrorForNode(_code, node);
       }
     });
   }

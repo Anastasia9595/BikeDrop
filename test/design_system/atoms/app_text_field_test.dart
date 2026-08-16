@@ -22,6 +22,22 @@ void main() {
     expect(changed, 'Kettenöl');
   });
 
+  testWidgets('keeps the label on a single line instead of wrapping', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AppTextField(label: 'Mindestbestand', onChanged: (_) {}),
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('MINDESTBESTAND'));
+    expect(label.maxLines, 1);
+    expect(label.overflow, TextOverflow.ellipsis);
+  });
+
   testWidgets('shows error text when provided', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
