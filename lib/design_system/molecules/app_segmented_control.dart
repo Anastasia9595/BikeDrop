@@ -27,7 +27,12 @@ class AppSegmentedControl<T> extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null) ...[
-          Text(label!.toUpperCase(), style: AppTypography.fieldLabel),
+          Text(
+            label!.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.fieldLabel,
+          ),
           const SizedBox(height: 6),
         ],
         Container(

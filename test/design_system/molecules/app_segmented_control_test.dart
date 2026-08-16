@@ -92,6 +92,26 @@ void main() {
     expect(find.text('STATUS'), findsOneWidget);
   });
 
+  testWidgets('keeps the label on a single line instead of wrapping', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        AppSegmentedControl<_Status>(
+          label: 'Mindestbestand',
+          options: _Status.values,
+          labelBuilder: (s) => s.name,
+          value: _Status.imShop,
+          onChanged: (_) {},
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('MINDESTBESTAND'));
+    expect(label.maxLines, 1);
+    expect(label.overflow, TextOverflow.ellipsis);
+  });
+
   testWidgets('renders no label when not set', (tester) async {
     await tester.pumpWidget(
       _wrap(

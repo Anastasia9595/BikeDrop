@@ -17,6 +17,7 @@ Widget quantityStepperDefault(BuildContext context) {
         width: 220,
         child: StatefulBuilder(
           builder: (context, setState) => QuantityStepper(
+            label: 'Menge',
             quantity: quantity,
             min: min,
             max: max,

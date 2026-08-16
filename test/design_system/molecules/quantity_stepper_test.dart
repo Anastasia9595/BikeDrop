@@ -12,17 +12,37 @@ final _increment = find.byTooltip('Menge erhöhen');
 void main() {
   testWidgets('shows the current quantity', (tester) async {
     await tester.pumpWidget(
-      _wrap(QuantityStepper(quantity: 12, onChanged: (_) {})),
+      _wrap(QuantityStepper(label: 'Menge', quantity: 12, onChanged: (_) {})),
     );
 
     expect(find.text('12'), findsOneWidget);
+  });
+
+  testWidgets('keeps the label on a single line instead of wrapping', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        QuantityStepper(label: 'Mindestbestand', quantity: 1, onChanged: (_) {}),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('MINDESTBESTAND'));
+    expect(label.maxLines, 1);
+    expect(label.overflow, TextOverflow.ellipsis);
   });
 
   testWidgets('increments by one', (tester) async {
     int? changed;
 
     await tester.pumpWidget(
-      _wrap(QuantityStepper(quantity: 12, onChanged: (value) => changed = value)),
+      _wrap(
+        QuantityStepper(
+          label: 'Menge',
+          quantity: 12,
+          onChanged: (value) => changed = value,
+        ),
+      ),
     );
     await tester.tap(_increment);
 
@@ -33,7 +53,13 @@ void main() {
     int? changed;
 
     await tester.pumpWidget(
-      _wrap(QuantityStepper(quantity: 12, onChanged: (value) => changed = value)),
+      _wrap(
+        QuantityStepper(
+          label: 'Menge',
+          quantity: 12,
+          onChanged: (value) => changed = value,
+        ),
+      ),
     );
     await tester.tap(_decrement);
 
@@ -46,6 +72,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         QuantityStepper(
+          label: 'Menge',
           quantity: 0,
           onChanged: (value) => changed = value,
         ),
@@ -62,6 +89,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         QuantityStepper(
+          label: 'Menge',
           quantity: 5,
           max: 5,
           onChanged: (value) => changed = value,
@@ -81,6 +109,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         QuantityStepper(
+          label: 'Menge',
           quantity: 9999,
           onChanged: (value) => changed = value,
         ),
@@ -97,6 +126,7 @@ void main() {
     await tester.pumpWidget(
       _wrap(
         QuantityStepper(
+          label: 'Menge',
           quantity: 1,
           min: 1,
           onChanged: (value) => changed = value,

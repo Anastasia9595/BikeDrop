@@ -35,7 +35,12 @@ class AppTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(), style: AppTypography.fieldLabel),
+        Text(
+          label.toUpperCase(),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTypography.fieldLabel,
+        ),
         const SizedBox(height: 6),
         SizedBox(
           height: AppSpacing.fieldHeight,

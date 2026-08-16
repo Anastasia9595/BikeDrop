@@ -111,6 +111,25 @@ void main() {
     expect(border.borderSide.color, AppColors.border);
   });
 
+  testWidgets('keeps the label on a single line instead of wrapping', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        AppDropdownField<String>(
+          label: 'Mindestbestand',
+          items: const ['1'],
+          itemLabel: (item) => item,
+          onChanged: (_) {},
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('MINDESTBESTAND'));
+    expect(label.maxLines, 1);
+    expect(label.overflow, TextOverflow.ellipsis);
+  });
+
   testWidgets('renders long item labels without overflowing', (tester) async {
     await tester.pumpWidget(
       _wrap(
