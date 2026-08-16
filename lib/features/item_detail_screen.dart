@@ -26,6 +26,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.screenPaddingH,
+          vertical: AppSpacing.screenSpacingV,
         ),
         child: Column(
           children: [
@@ -115,6 +116,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               onChanged:
                   (value) => setState(() => _visibleForCustomers = value),
             ),
+            const SizedBox(height: AppSpacing.screenSpacingV),
+            AppPrimaryButton(label: 'Artikel speichern', onPressed: () {}),
           ],
         ),
       ),

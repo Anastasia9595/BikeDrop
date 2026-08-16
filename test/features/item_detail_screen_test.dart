@@ -1,6 +1,7 @@
 // test/features/item_detail_screen_test.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:bikedrop/design_system/design_system.dart';
 import 'package:bikedrop/features/item_detail_screen.dart';
 
 void main() {
@@ -14,5 +15,23 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: ItemDetailScreen()));
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('pads the scrollable content on all sides with screen spacing', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: ItemDetailScreen()));
+
+    final scrollView = tester.widget<SingleChildScrollView>(
+      find.byType(SingleChildScrollView),
+    );
+
+    expect(
+      scrollView.padding,
+      const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPaddingH,
+        vertical: AppSpacing.screenSpacingV,
+      ),
+    );
   });
 }
