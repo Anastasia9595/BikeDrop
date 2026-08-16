@@ -29,4 +29,7 @@ class AppSpacing {
 
   /// Kantenlaenge der quadratischen Foto-Kachel in der Listenzeile.
   static const double listThumbnailSize = 48.0;
+
+  /// Hoehe des Bild-Upload-Platzhalters im Artikelformular.
+  static const double imageUploadFieldHeight = 160.0;
 }

@@ -21,7 +21,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {},
         ),
-        title: const Text('Neuer Artikel'),
+        title: const Text('Neuer Artikel', style: AppTypography.screenTitle),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -30,6 +30,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            AppImageUploadField(onTap: () {}),
+            const SizedBox(height: AppSpacing.screenSpacingV),
             const AppTextField(label: 'Artikelnummer'),
             const AppTextField(label: 'Artikelname'),
             Row(
@@ -37,11 +39,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                 Expanded(
                   child: AppDropdownField<String>(
                     label: 'Kategorie',
-                    items: const [
-                      'Kategorie 1',
-                      'Kategorie 2',
-                      'Kategorie 3',
-                    ],
+                    items: const ['Kategorie 1', 'Kategorie 2', 'Kategorie 3'],
                     itemLabel: (item) => item,
                     onChanged: (String? value) {},
                   ),
@@ -50,11 +48,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                 Expanded(
                   child: AppDropdownField<String>(
                     label: 'Lieferant',
-                    items: const [
-                      'Lieferant 1',
-                      'Lieferant 2',
-                      'Lieferant 3',
-                    ],
+                    items: const ['Lieferant 1', 'Lieferant 2', 'Lieferant 3'],
                     itemLabel: (item) => item,
                     onChanged: (String? value) {},
                   ),
@@ -65,6 +59,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               children: [
                 Expanded(
                   child: QuantityStepper(
+                    label: 'Menge',
                     quantity: 1,
                     onChanged: (int value) {},
                     min: 0,
