@@ -23,12 +23,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         ),
         title: const Text('Neuer Artikel', style: AppTypography.screenTitle),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.screenPaddingH,
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AppImageUploadField(onTap: () {}),
             const SizedBox(height: AppSpacing.screenSpacingV),
