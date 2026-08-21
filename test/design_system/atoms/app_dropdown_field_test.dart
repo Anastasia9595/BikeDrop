@@ -1,6 +1,7 @@
 // test/design_system/atoms/app_dropdown_field_test.dart
 import 'package:bikedrop/design_system/atoms/app_dropdown_field.dart';
 import 'package:bikedrop/design_system/tokens/app_colors.dart';
+import 'package:bikedrop/enums/category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -20,9 +20,9 @@ Widget itemListTileDefault(BuildContext context) {
       ),
       quantity: context.knobs.int.input(label: 'Menge', initialValue: 12),
       category: category,
-      status: context.knobs.object.dropdown<ItemStatus>(
+      status: context.knobs.object.dropdown<ArticleStatus>(
         label: 'Status',
-        options: ItemStatus.values,
+        options: ArticleStatus.values,
         labelBuilder: (status) => status.name,
       ),
       onTap:

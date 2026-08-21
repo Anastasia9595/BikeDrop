@@ -7,16 +7,16 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 Widget appSegmentedControlInteractive(BuildContext context) {
   final label = context.knobs.string(label: 'Label', initialValue: 'Status');
 
-  ItemStatus selected = ItemStatus.imShop;
+  ArticleStatus selected = ArticleStatus.inStock;
 
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(24),
       child: StatefulBuilder(
         builder:
-            (context, setState) => AppSegmentedControl<ItemStatus>(
+            (context, setState) => AppSegmentedControl<ArticleStatus>(
               label: label.isEmpty ? null : label,
-              options: ItemStatus.values,
+              options: ArticleStatus.values,
               labelBuilder: (status) => status.label,
               value: selected,
               onChanged: (status) => setState(() => selected = status),
