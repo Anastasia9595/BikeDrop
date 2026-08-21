@@ -53,7 +53,7 @@ class AppTypography {
   static const TextStyle buttonLabel = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w800,
-    fontSize: 20,
+    fontSize: 16,
   );
 
   static const TextStyle iconButtonLabel = TextStyle(

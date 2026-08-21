@@ -60,12 +60,26 @@ class OverviewScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              AppPrimaryButton(
-                label: 'Warenbestand erfassen',
-                icon: Symbols.add,
-                onPressed: () {
-                  // Handle get started action
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: AppPrimaryButton(
+                      label: 'Wareneingang',
+                      onPressed: () {
+                        // Handle get started action
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.screenSpacingH),
+                  Expanded(
+                    child: AppSecondaryButton(
+                      label: 'Artikel anlegen',
+                      onPressed: () {
+                        // Handle get started action
+                      },
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
             ],
