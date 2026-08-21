@@ -1,26 +1,7 @@
 import 'package:flutter/material.dart';
 
-enum Category { bremsen, reifen, eBike, zubehoer, pflege }
-
-extension CategoryLabel on Category {
-  String get label => switch (this) {
-    Category.bremsen => 'Bremsen',
-    Category.reifen => 'Reifen',
-    Category.eBike => 'E-Bike',
-    Category.zubehoer => 'Zubehör',
-    Category.pflege => 'Pflege',
-  };
-}
-
-enum ItemStatus { imShop, fehlt, bestellt }
-
-extension ItemStatusLabel on ItemStatus {
-  String get label => switch (this) {
-    ItemStatus.imShop => 'Im Shop',
-    ItemStatus.bestellt => 'Bestellt',
-    ItemStatus.fehlt => 'Fehlt',
-  };
-}
+import '../../enums/category.dart';
+import '../../enums/article_status.dart';
 
 class CategoryColorPair {
   const CategoryColorPair(this.background, this.text);
@@ -64,9 +45,9 @@ class AppColors {
     Category.pflege: CategoryColorPair(Color(0xFFFDF1CF), Color(0xFF8A5A00)),
   };
 
-  static const Map<ItemStatus, Color> statusColors = {
-    ItemStatus.imShop: statusColorSuccess,
-    ItemStatus.bestellt: statusColorWarning,
-    ItemStatus.fehlt: statusColorError,
+  static const Map<ArticleStatus, Color> statusColors = {
+    ArticleStatus.inStock: statusColorSuccess,
+    ArticleStatus.bestellt: statusColorWarning,
+    ArticleStatus.fehlt: statusColorError,
   };
 }

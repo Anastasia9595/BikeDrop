@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:bikedrop/design_system/molecules/item_list_tile.dart';
 import 'package:bikedrop/design_system/tokens/app_colors.dart';
+import 'package:bikedrop/enums/category.dart';
+import 'package:bikedrop/enums/article_status.dart';
 
 // 1x1 transparent PNG, so `Image`/`MemoryImage` can decode it synchronously
 // in widget tests without needing real asset/network loading.
@@ -33,7 +35,7 @@ void main() {
             title: 'Shimano XT Scheibe 203',
             quantity: 12,
             category: Category.bremsen,
-            status: ItemStatus.imShop,
+            status: ArticleStatus.inStock,
           ),
         ),
       ),
@@ -44,11 +46,12 @@ void main() {
     expect(find.text('Im Shop'), findsOneWidget);
   });
 
-  for (final entry in {
-    ItemStatus.imShop: 'Im Shop',
-    ItemStatus.fehlt: 'Fehlt',
-    ItemStatus.bestellt: 'Bestellt',
-  }.entries) {
+  for (final entry
+      in {
+        ArticleStatus.inStock: 'Im Shop',
+        ArticleStatus.fehlt: 'Fehlt',
+        ArticleStatus.bestellt: 'Bestellt',
+      }.entries) {
     testWidgets('renders label "${entry.value}" for ${entry.key}', (
       tester,
     ) async {
@@ -98,7 +101,7 @@ void main() {
             title: 'Kettenöl',
             quantity: 3,
             category: Category.pflege,
-            status: ItemStatus.fehlt,
+            status: ArticleStatus.fehlt,
           ),
         ),
       ),
@@ -118,7 +121,7 @@ void main() {
             title: 'Kettenöl',
             quantity: 3,
             category: Category.pflege,
-            status: ItemStatus.fehlt,
+            status: ArticleStatus.fehlt,
             image: MemoryImage(_onePixelPng),
           ),
         ),
@@ -140,7 +143,7 @@ void main() {
             title: 'Bremsbelag',
             quantity: 8,
             category: Category.bremsen,
-            status: ItemStatus.bestellt,
+            status: ArticleStatus.bestellt,
             onTap: () => tapped = true,
           ),
         ),
@@ -159,7 +162,7 @@ void main() {
             title: 'Bremsbelag',
             quantity: 8,
             category: Category.bremsen,
-            status: ItemStatus.bestellt,
+            status: ArticleStatus.bestellt,
           ),
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bikedrop/design_system/tokens/app_colors.dart';
+import 'package:bikedrop/enums/category.dart';
 
 void main() {
   test('core palette matches design doc hex values', () {

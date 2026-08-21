@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../design_system/design_system.dart';
 
-class ItemDetailScreen extends StatefulWidget {
-  const ItemDetailScreen({super.key});
+class ArticleFormScreen extends StatefulWidget {
+  const ArticleFormScreen({super.key});
 
   @override
-  State<ItemDetailScreen> createState() => _ItemDetailScreenState();
+  State<ArticleFormScreen> createState() => _ArticleFormScreenState();
 }
 
-class _ItemDetailScreenState extends State<ItemDetailScreen> {
-  ItemStatus _status = ItemStatus.imShop;
+class _ArticleFormScreenState extends State<ArticleFormScreen> {
+  ArticleStatus _status = ArticleStatus.inStock;
   bool _visibleForCustomers = false;
 
   @override
@@ -37,11 +37,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             Row(
               children: [
                 Expanded(
-                  child: AppDropdownField<String>(
+                  child: AppDropdownField<Category>(
                     label: 'Kategorie',
-                    items: const ['Kategorie 1', 'Kategorie 2', 'Kategorie 3'],
-                    itemLabel: (item) => item,
-                    onChanged: (String? value) {},
+                    items: Category.values,
+                    itemLabel: (item) => item.label,
+                    onChanged: (Category? value) {},
                   ),
                 ),
                 const SizedBox(width: AppSpacing.screenSpacingH),
@@ -101,9 +101,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               placeholder: 'z.B. Regal A, Fach 3',
             ),
             const SizedBox(height: AppSpacing.screenSpacingV),
-            AppSegmentedControl<ItemStatus>(
+            AppSegmentedControl<ArticleStatus>(
               label: 'Status',
-              options: ItemStatus.values,
+              options: ArticleStatus.values,
               labelBuilder: (status) => status.label,
               value: _status,
               onChanged: (status) => setState(() => _status = status),

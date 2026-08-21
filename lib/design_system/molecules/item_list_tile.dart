@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import '../../enums/category.dart';
+import '../../enums/article_status.dart';
 import '../atoms/category_badge.dart';
 import '../tokens/app_colors.dart';
 import '../tokens/app_spacing.dart';
@@ -21,7 +23,7 @@ class ItemListTile extends StatelessWidget {
   final Category category;
   final ImageProvider? image;
   final VoidCallback? onTap;
-  final ItemStatus status;
+  final ArticleStatus status;
 
   @override
   Widget build(BuildContext context) {
