@@ -27,6 +27,7 @@ class AppColors {
   static const Color textTertiary = Color(0xFF7D7979);
   static const Color textQuaternary = Color(0xFF9B9797);
   static const Color textQuaternaryLight = Color(0xFFBAB6B6);
+  static const Color textError = Color(0xFFEB5757);
 
   static const Color border = Color(0xFFD7D3D3);
   static const Color divider = Color(0xFFEAE7E7);
@@ -39,8 +40,13 @@ class AppColors {
 
   static const Map<Category, CategoryColorPair> categoryColors = {
     Category.bremsen: CategoryColorPair(Color(0xFFFFE0D9), Color(0xFF7C1405)),
+    Category.antrieb: CategoryColorPair(Color(0xFFFDE8D2), Color(0xFF8A4A00)),
     Category.reifen: CategoryColorPair(Color(0xFFE2EEFC), Color(0xFF1A4A8A)),
     Category.eBike: CategoryColorPair(Color(0xFFE6F0E0), Color(0xFF33591F)),
+    Category.laufraeder: CategoryColorPair(
+      Color(0xFFE2F5F2),
+      Color(0xFF0F6B5C),
+    ),
     Category.zubehoer: CategoryColorPair(Color(0xFFF3E8FB), Color(0xFF5C2A8A)),
     Category.pflege: CategoryColorPair(Color(0xFFFDF1CF), Color(0xFF8A5A00)),
   };

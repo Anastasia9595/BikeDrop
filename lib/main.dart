@@ -1,10 +1,11 @@
 import 'package:bikedrop/design_system/tokens/app_theme.dart';
-import 'package:bikedrop/features/article_for_screen.dart';
+import 'package:bikedrop/features/overview_screen.dart';
 import 'package:bikedrop/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('de'),
-      home: const ArticleFormScreen(),
+      home: const OverviewScreen(),
     );
   }
 }
