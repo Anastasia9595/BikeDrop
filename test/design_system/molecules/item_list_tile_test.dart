@@ -155,6 +155,33 @@ void main() {
   });
 
   testWidgets(
+    'does not overflow with three badges on a narrow screen',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ItemListTile(
+              title: 'Bosch PowerTube 625Wh',
+              quantity: 2,
+              category: Category.eBike,
+              status: ArticleStatus.bestellt,
+              reorderedQuantity: 5,
+              isPublic: false,
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'meta row keeps the same tile height with and without any status',
     (tester) async {
       Future<Size> pumpAndMeasure(ItemListTile tile) async {
@@ -253,7 +280,9 @@ void main() {
     expect(tapped, isTrue);
   });
 
-  testWidgets('has no InkWell when onTap is not provided', (tester) async {
+  testWidgets('does not wrap the row in a tappable Material when onTap is not provided', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -268,6 +297,67 @@ void main() {
       ),
     );
 
-    expect(find.byType(InkWell), findsNothing);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Material && widget.type == MaterialType.transparency,
+      ),
+      findsNothing,
+    );
+  });
+
+  group('Mengenanzeige', () {
+    testWidgets('calls onQuantityTap when the quantity field is tapped', (
+      tester,
+    ) async {
+      var quantityTapped = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ItemListTile(
+              title: 'Bremsbelag',
+              quantity: 8,
+              category: Category.bremsen,
+              status: ArticleStatus.bestellt,
+              reorderedQuantity: 5,
+              onQuantityTap: () => quantityTapped = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('8'));
+      expect(quantityTapped, isTrue);
+    });
+
+    testWidgets(
+      'does not trigger the row onTap when the quantity field is tapped',
+      (tester) async {
+        var rowTapped = false;
+        var quantityTapped = false;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: ItemListTile(
+                title: 'Bremsbelag',
+                quantity: 8,
+                category: Category.bremsen,
+                status: ArticleStatus.bestellt,
+                reorderedQuantity: 5,
+                onTap: () => rowTapped = true,
+                onQuantityTap: () => quantityTapped = true,
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('8'));
+
+        expect(quantityTapped, isTrue);
+        expect(rowTapped, isFalse);
+      },
+    );
   });
 }

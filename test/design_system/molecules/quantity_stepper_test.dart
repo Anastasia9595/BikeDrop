@@ -137,4 +137,177 @@ void main() {
 
     expect(changed, isNull);
   });
+
+  group('editable', () {
+    testWidgets('shows a plain Text instead of a TextField by default', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(QuantityStepper(label: 'Menge', quantity: 12, onChanged: (_) {})),
+      );
+
+      expect(find.byType(TextField), findsNothing);
+    });
+
+    testWidgets('shows an editable TextField when editable is true', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          QuantityStepper(
+            label: 'Menge',
+            quantity: 12,
+            editable: true,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('only accepts digits while typing', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          QuantityStepper(
+            label: 'Menge',
+            quantity: 12,
+            editable: true,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      await tester.enterText(find.byType(TextField), 'a9b9c');
+
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller!.text, '99');
+    });
+
+    testWidgets('calls onChanged with the parsed value on submit', (
+      tester,
+    ) async {
+      int? changed;
+
+      await tester.pumpWidget(
+        _wrap(
+          QuantityStepper(
+            label: 'Menge',
+            quantity: 12,
+            editable: true,
+            onChanged: (value) => changed = value,
+          ),
+        ),
+      );
+
+      await tester.enterText(find.byType(TextField), '42');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      expect(changed, 42);
+    });
+
+    testWidgets('clamps submitted values to min/max', (tester) async {
+      int? changed;
+
+      await tester.pumpWidget(
+        _wrap(
+          QuantityStepper(
+            label: 'Menge',
+            quantity: 5,
+            min: 0,
+            max: 10,
+            editable: true,
+            onChanged: (value) => changed = value,
+          ),
+        ),
+      );
+
+      await tester.enterText(find.byType(TextField), '999');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      expect(changed, 10);
+    });
+
+    testWidgets('reverts to the current quantity when input is empty', (
+      tester,
+    ) async {
+      int? changed;
+
+      await tester.pumpWidget(
+        _wrap(
+          QuantityStepper(
+            label: 'Menge',
+            quantity: 12,
+            editable: true,
+            onChanged: (value) => changed = value,
+          ),
+        ),
+      );
+
+      await tester.enterText(find.byType(TextField), '');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      expect(changed, isNull);
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller!.text, '12');
+    });
+  });
+
+  group('showBorder / showLabel', () {
+    testWidgets('shows the border and label by default', (tester) async {
+      await tester.pumpWidget(
+        _wrap(QuantityStepper(label: 'Menge', quantity: 12, onChanged: (_) {})),
+      );
+
+      expect(find.text('MENGE'), findsOneWidget);
+      final container = tester.widget<Container>(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              (widget.decoration as BoxDecoration?)?.border != null,
+        ),
+      );
+      expect((container.decoration as BoxDecoration).border, isNotNull);
+    });
+
+    testWidgets('hides the border when showBorder is false', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          QuantityStepper(
+            label: 'Menge',
+            quantity: 12,
+            showBorder: false,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              (widget.decoration as BoxDecoration?)?.border != null,
+        ),
+        findsNothing,
+      );
+    });
+
+    testWidgets('hides the label when showLabel is false', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          QuantityStepper(
+            label: 'Menge',
+            quantity: 12,
+            showLabel: false,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+
+      expect(find.text('MENGE'), findsNothing);
+    });
+  });
 }

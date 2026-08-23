@@ -3,6 +3,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../enums/category.dart';
 import '../../enums/article_status.dart';
 import '../atoms/category_badge.dart';
+import '../atoms/quantity_display.dart';
+import '../atoms/status_indicator.dart';
 import '../tokens/app_colors.dart';
 import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
@@ -17,6 +19,7 @@ class ItemListTile extends StatelessWidget {
     required this.status,
     this.reorderedQuantity,
     this.isPublic = true,
+    this.onQuantityTap,
     super.key,
   });
 
@@ -26,6 +29,10 @@ class ItemListTile extends StatelessWidget {
   final ImageProvider? image;
   final VoidCallback? onTap;
   final ArticleStatus status;
+
+  /// Öffnet das Mengen-Bearbeiten-Bottom-Sheet (S2). Der Tap wird vom
+  /// inneren InkWell konsumiert und schlägt nicht auf [onTap] durch.
+  final VoidCallback? onQuantityTap;
 
   /// Nachbestellte Menge, relevant nur bei [ArticleStatus.bestellt].
   final int? reorderedQuantity;
@@ -41,12 +48,12 @@ class ItemListTile extends StatelessWidget {
       case ArticleStatus.inStock:
         return null;
       case ArticleStatus.fehlt:
-        return _StatusIndicator(
+        return StatusIndicator(
           color: AppColors.statusColors[ArticleStatus.fehlt]!,
           label: ArticleStatus.fehlt.label,
         );
       case ArticleStatus.bestellt:
-        return _StatusIndicator(
+        return StatusIndicator(
           color: AppColors.statusColors[ArticleStatus.bestellt]!,
           label: 'Bestellt +${reorderedQuantity ?? 0}',
         );
@@ -56,7 +63,7 @@ class ItemListTile extends StatelessWidget {
   /// Sichtbarkeits-Status-Slot. Null im Normalfall (online sichtbar).
   Widget? _buildVisibilityStatus() {
     if (isPublic) return null;
-    return const _StatusIndicator(
+    return const StatusIndicator(
       icon: Icons.visibility_off_outlined,
       color: AppColors.textSecondary,
       label: 'Nicht online',
@@ -112,9 +119,9 @@ class ItemListTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    runSpacing: 4,
                     children: [
                       CategoryBadge(category: category),
                       if (stockStatus != null) ...[
@@ -130,7 +137,7 @@ class ItemListTile extends StatelessWidget {
                 ],
               ),
             ),
-            _QuantityDisplay(quantity: quantity),
+            QuantityDisplay(quantity: quantity, onTap: onQuantityTap),
           ],
         ),
       ),
@@ -142,78 +149,5 @@ class ItemListTile extends StatelessWidget {
           child: InkWell(onTap: onTap, child: content),
         )
         : content;
-  }
-}
-
-/// Mengenanzeige rechts in der Zeile: Zahl mit tabellarischen Ziffern,
-/// damit die Spalte beim Scrollen nicht durch unterschiedlich breite
-/// Ziffern flimmert, plus kleineres graues Einheiten-Label.
-class _QuantityDisplay extends StatelessWidget {
-  const _QuantityDisplay({required this.quantity});
-
-  final int quantity;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          '$quantity',
-          style: AppTypography.listNumber.copyWith(
-            color: AppColors.textPrimary,
-            fontFeatures: const [FontFeature.tabularFigures()],
-          ),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          'Stk.',
-          style: AppTypography.listNumber.copyWith(
-            fontSize: 11,
-            color: AppColors.textSecondary,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Ein einzelner Status-Slot in der Meta-Zeile: Punkt oder Icon in der
-/// Status-Farbe, Label immer in der bisherigen sekundären Textfarbe.
-/// Farbe ist damit nie der einzige Träger — das Label steht immer daneben.
-class _StatusIndicator extends StatelessWidget {
-  const _StatusIndicator({required this.color, required this.label, this.icon});
-
-  final Color color;
-  final String label;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final marker =
-        icon != null
-            ? Icon(icon, size: 14, color: color)
-            : Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            );
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        marker,
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: AppTypography.body.copyWith(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
-        ),
-      ],
-    );
   }
 }
