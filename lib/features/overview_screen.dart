@@ -3,51 +3,52 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:bikedrop/design_system/design_system.dart';
+import 'package:bikedrop/features/article_form_screen.dart';
 import 'package:bikedrop/models/article.dart';
 import 'package:bikedrop/providers/article_repository_provider.dart';
 
-class OverviewScreen extends ConsumerStatefulWidget {
+Future<void> _editQuantity(
+  BuildContext context,
+  WidgetRef ref,
+  Article article,
+) async {
+  final location = article.storageLocation;
+  final subtitle =
+      location != null
+          ? '$location · aktuell ${article.quantity} Stk.'
+          : 'aktuell ${article.quantity} Stk.';
+
+  final newQuantity = await QuantityEditSheet.show(
+    context,
+    title: article.name,
+    subtitle: subtitle,
+    initialQuantity: article.quantity,
+  );
+
+  if (newQuantity == null || newQuantity == article.quantity) return;
+
+  await ref
+      .read(articleRepositoryProvider)
+      .changeQuantity(article.id, newQuantity);
+  ref.invalidate(filterArticleByName(ref.read(searchQueryProvider)));
+}
+
+void _openArticleForm(BuildContext context, Article article) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (context) => ArticleFormScreen(article: article),
+    ),
+  );
+}
+
+class OverviewScreen extends ConsumerWidget {
   const OverviewScreen({super.key});
 
   @override
-  ConsumerState<OverviewScreen> createState() => _OverviewScreenState();
-}
-
-class _OverviewScreenState extends ConsumerState<OverviewScreen> {
-  final _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _editQuantity(Article article) async {
-    final location = article.storageLocation;
-    final subtitle =
-        location != null
-            ? '$location · aktuell ${article.quantity} Stk.'
-            : 'aktuell ${article.quantity} Stk.';
-
-    final newQuantity = await QuantityEditSheet.show(
-      context,
-      title: article.name,
-      subtitle: subtitle,
-      initialQuantity: article.quantity,
-    );
-
-    if (newQuantity == null || newQuantity == article.quantity) return;
-
-    await ref
-        .read(articleRepositoryProvider)
-        .changeQuantity(article.id, newQuantity);
-    ref.invalidate(filterArticleByName(_searchQuery));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final articlesAsync = ref.watch(filterArticleByName(_searchQuery));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchQuery = ref.watch(searchQueryProvider);
+    final searchController = ref.watch(searchControllerProvider);
+    final articlesAsync = ref.watch(filterArticleByName(searchQuery));
 
     return Scaffold(
       appBar: AppBar(title: Text('Bestand', style: AppTypography.screenTitle)),
@@ -65,23 +66,23 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                   bottom: AppSpacing.screenSpacingV,
                 ),
                 child: AppSearchBar(
-                  controller: _searchController,
+                  controller: searchController,
                   placeholder: 'Artikel suchen...',
                   onChanged: (value) {
-                    setState(() => _searchQuery = value);
+                    ref.read(searchQueryProvider.notifier).state = value;
                   },
                   onClear: () {
-                    setState(() => _searchQuery = '');
+                    ref.read(searchQueryProvider.notifier).state = '';
                   },
                 ),
               ),
               Expanded(
                 child: articlesAsync.when(
                   data: (articles) {
-                    if (articles.isEmpty && _searchQuery.isNotEmpty) {
+                    if (articles.isEmpty && searchQuery.isNotEmpty) {
                       return Center(
                         child: Text(
-                          'Keine Artikel gefunden für „$_searchQuery“.',
+                          'Keine Artikel gefunden für „$searchQuery“.',
                           textAlign: TextAlign.center,
                           style: AppTypography.body.copyWith(
                             color: AppColors.textSecondary,
@@ -116,7 +117,9 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                               status: article.status,
                               reorderedQuantity: article.reorderedQuantity,
                               isPublic: article.isPublic,
-                              onQuantityTap: () => _editQuantity(article),
+                              onTap: () => _openArticleForm(context, article),
+                              onQuantityTap:
+                                  () => _editQuantity(context, ref, article),
                               image:
                                   article.imageUrl != null
                                       ? NetworkImage(article.imageUrl!)
