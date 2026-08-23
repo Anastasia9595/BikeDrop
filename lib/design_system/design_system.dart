@@ -12,6 +12,7 @@ export 'atoms/app_image_upload_field.dart';
 export 'atoms/app_segment.dart';
 export 'atoms/app_text_field.dart';
 export 'atoms/category_badge.dart';
+export 'molecules/app_search_bar.dart';
 export 'molecules/app_snackbar.dart';
 export 'molecules/app_segmented_control.dart';
 export 'molecules/app_toggle_card.dart';

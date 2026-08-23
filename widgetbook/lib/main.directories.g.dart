@@ -14,6 +14,8 @@ import 'package:bikedrop_widgetbook/use_cases/atoms/app_dropdown_field.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_dropdown_field;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_icon_button.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_icon_button;
+import 'package:bikedrop_widgetbook/use_cases/atoms/app_image_upload_field.dart'
+    as _bikedrop_widgetbook_use_cases_atoms_app_image_upload_field;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_primary_button.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_primary_button;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_secondary_button.dart'
@@ -24,6 +26,8 @@ import 'package:bikedrop_widgetbook/use_cases/atoms/app_text_field.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_text_field;
 import 'package:bikedrop_widgetbook/use_cases/atoms/category_badge.dart'
     as _bikedrop_widgetbook_use_cases_atoms_category_badge;
+import 'package:bikedrop_widgetbook/use_cases/molecules/app_search_bar.dart'
+    as _bikedrop_widgetbook_use_cases_molecules_app_search_bar;
 import 'package:bikedrop_widgetbook/use_cases/molecules/app_segmented_control.dart'
     as _bikedrop_widgetbook_use_cases_molecules_app_segmented_control;
 import 'package:bikedrop_widgetbook/use_cases/molecules/app_snackbar.dart'
@@ -64,6 +68,17 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Default',
                 builder: _bikedrop_widgetbook_use_cases_atoms_app_icon_button
                     .appIconButtonDefault,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'AppImageUploadField',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder:
+                    _bikedrop_widgetbook_use_cases_atoms_app_image_upload_field
+                        .appImageUploadFieldDefault,
               ),
             ],
           ),
@@ -123,6 +138,16 @@ final directories = <_widgetbook.WidgetbookNode>[
       _widgetbook.WidgetbookFolder(
         name: 'molecules',
         children: [
+          _widgetbook.WidgetbookComponent(
+            name: 'AppSearchBar',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Interactive',
+                builder: _bikedrop_widgetbook_use_cases_molecules_app_search_bar
+                    .appSearchBarInteractive,
+              ),
+            ],
+          ),
           _widgetbook.WidgetbookComponent(
             name: 'AppSegmentedControl',
             useCases: [
