@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bikedrop/design_system/design_system.dart';
-import 'package:bikedrop/features/article_for_screen.dart';
+import 'package:bikedrop/features/article_form_screen.dart';
 
 void main() {
   testWidgets('does not overflow on a common phone-sized viewport', (
