@@ -6,7 +6,7 @@ class AppSpacing {
   static const double cardRadius = 14.0;
   static const double buttonRadius = 14.0;
   static const double dialogRadius = 22.0;
-  static const double photoTileRadius = 16.0;
+  static const double photoTileRadius = 6.0;
   static const double fieldHeight = 56.0;
   static const double fieldBorderWidth = 1.5;
   static const double primaryButtonHeight = 60.0;
@@ -16,6 +16,7 @@ class AppSpacing {
   static const double switchThumbSize = 28.0;
   static const double listRowPaddingV = 12.0;
   static const double listRowGap = 12.0;
+  static const double listRowMinHeight = 48.0;
   static const double snackbarBottomOffset = 136.0;
   static const double dividerWeight = 2.0;
   static const double screenSpacingV = 16.0;
@@ -28,7 +29,7 @@ class AppSpacing {
   static const double iconSizeLarge = 48.0;
 
   /// Kantenlaenge der quadratischen Foto-Kachel in der Listenzeile.
-  static const double listThumbnailSize = 48.0;
+  static const double listThumbnailSize = 40.0;
 
   /// Hoehe des Bild-Upload-Platzhalters im Artikelformular.
   static const double imageUploadFieldHeight = 160.0;

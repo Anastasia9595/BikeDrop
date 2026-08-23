@@ -15,19 +15,14 @@ final _onePixelPng = base64Decode(
   '42YAAAAASUVORK5CYII=',
 );
 
-Color? _statusDotColor(WidgetTester tester) {
-  final container = tester.widget<Container>(
-    find.byWidgetPredicate(
-      (widget) =>
-          widget is Container &&
-          (widget.decoration as BoxDecoration?)?.shape == BoxShape.circle,
-    ),
-  );
-  return (container.decoration as BoxDecoration).color;
-}
+Finder _statusDotFinder() => find.byWidgetPredicate(
+  (widget) =>
+      widget is Container &&
+      (widget.decoration as BoxDecoration?)?.shape == BoxShape.circle,
+);
 
 void main() {
-  testWidgets('renders title, quantity and status label', (tester) async {
+  testWidgets('renders title and quantity', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -43,53 +38,156 @@ void main() {
 
     expect(find.text('Shimano XT Scheibe 203'), findsOneWidget);
     expect(find.text('12'), findsOneWidget);
-    expect(find.text('Im Shop'), findsOneWidget);
   });
 
-  for (final entry
-      in {
-        ArticleStatus.inStock: 'Im Shop',
-        ArticleStatus.fehlt: 'Fehlt',
-        ArticleStatus.bestellt: 'Bestellt',
-      }.entries) {
-    testWidgets('renders label "${entry.value}" for ${entry.key}', (
-      tester,
-    ) async {
+  group('Bestand-Status', () {
+    testWidgets(
+      'renders no stock status for inStock (Normalfall, Menge reicht)',
+      (tester) async {
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: ItemListTile(
+                title: 'Kettenöl',
+                quantity: 3,
+                category: Category.pflege,
+                status: ArticleStatus.inStock,
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('Im Shop'), findsNothing);
+        expect(_statusDotFinder(), findsNothing);
+      },
+    );
+
+    testWidgets('renders red dot + "Fehlt" for fehlt', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ItemListTile(
               title: 'Kettenöl',
               quantity: 3,
               category: Category.pflege,
-              status: entry.key,
+              status: ArticleStatus.fehlt,
             ),
           ),
         ),
       );
 
-      expect(find.text(entry.value), findsOneWidget);
+      expect(find.text('Fehlt'), findsOneWidget);
+      final dot = tester.widget<Container>(_statusDotFinder());
+      expect(
+        (dot.decoration as BoxDecoration).color,
+        AppColors.statusColors[ArticleStatus.fehlt],
+      );
     });
 
-    testWidgets('shows the ${entry.key} status color on the dot', (
+    testWidgets('renders amber dot + "Bestellt +n" for bestellt', (
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: ItemListTile(
               title: 'Kettenöl',
               quantity: 3,
               category: Category.pflege,
-              status: entry.key,
+              status: ArticleStatus.bestellt,
+              reorderedQuantity: 10,
             ),
           ),
         ),
       );
 
-      expect(_statusDotColor(tester), AppColors.statusColors[entry.key]);
+      expect(find.text('Bestellt +10'), findsOneWidget);
+      final dot = tester.widget<Container>(_statusDotFinder());
+      expect(
+        (dot.decoration as BoxDecoration).color,
+        AppColors.statusColors[ArticleStatus.bestellt],
+      );
     });
-  }
+  });
+
+  group('Sichtbarkeits-Status', () {
+    testWidgets('renders nothing when isPublic is true (Normalfall)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ItemListTile(
+              title: 'Kettenöl',
+              quantity: 3,
+              category: Category.pflege,
+              status: ArticleStatus.inStock,
+              isPublic: true,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Nicht online'), findsNothing);
+      expect(find.byIcon(Icons.visibility_off_outlined), findsNothing);
+    });
+
+    testWidgets('renders icon + "Nicht online" when isPublic is false', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: ItemListTile(
+              title: 'Kettenöl',
+              quantity: 3,
+              category: Category.pflege,
+              status: ArticleStatus.inStock,
+              isPublic: false,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Nicht online'), findsOneWidget);
+      expect(find.byIcon(Icons.visibility_off_outlined), findsOneWidget);
+    });
+  });
+
+  testWidgets(
+    'meta row keeps the same tile height with and without any status',
+    (tester) async {
+      Future<Size> pumpAndMeasure(ItemListTile tile) async {
+        await tester.pumpWidget(
+          MaterialApp(home: Scaffold(body: tile)),
+        );
+        return tester.getSize(find.byType(ItemListTile));
+      }
+
+      final withoutStatus = await pumpAndMeasure(
+        const ItemListTile(
+          title: 'Kettenöl',
+          quantity: 3,
+          category: Category.pflege,
+          status: ArticleStatus.inStock,
+          isPublic: true,
+        ),
+      );
+
+      final withBothStatuses = await pumpAndMeasure(
+        const ItemListTile(
+          title: 'Kettenöl',
+          quantity: 3,
+          category: Category.pflege,
+          status: ArticleStatus.bestellt,
+          reorderedQuantity: 5,
+          isPublic: false,
+        ),
+      );
+
+      expect(withBothStatuses.height, withoutStatus.height);
+    },
+  );
 
   testWidgets('shows placeholder icon when no image is provided', (
     tester,
@@ -144,6 +242,7 @@ void main() {
             quantity: 8,
             category: Category.bremsen,
             status: ArticleStatus.bestellt,
+            reorderedQuantity: 5,
             onTap: () => tapped = true,
           ),
         ),
@@ -163,6 +262,7 @@ void main() {
             quantity: 8,
             category: Category.bremsen,
             status: ArticleStatus.bestellt,
+            reorderedQuantity: 5,
           ),
         ),
       ),

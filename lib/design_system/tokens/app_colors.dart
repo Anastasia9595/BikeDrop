@@ -31,6 +31,9 @@ class AppColors {
 
   static const Color border = Color(0xFFD7D3D3);
   static const Color divider = Color(0xFFEAE7E7);
+
+  /// Trennlinie zwischen Zeilen in der flachen Artikelliste.
+  static const Color listDivider = Color(0xFFE5E5E5);
   static const Color surface = Color(0xFFF8F4F4);
   static const Color surfaceDark = Color(0xFFEAE7E7);
   static const Color white = Color(0xFFFFFFFF);

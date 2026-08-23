@@ -21,6 +21,7 @@ class Article {
     required this.sellingPrice,
     this.storageLocation,
     required this.status,
+    this.reorderedQuantity,
     this.isPublic = false,
     this.imageUrl,
     required this.createdAt,
@@ -51,6 +52,10 @@ class Article {
   final String? storageLocation;
   final ArticleStatus status;
 
+  /// Menge, die bei Status [ArticleStatus.bestellt] nachbestellt wurde.
+  /// Null, wenn der Artikel nicht im Status "bestellt" ist.
+  final int? reorderedQuantity;
+
   /// Whether the article is visible in the customer-facing shop.
   /// Defaults to false so new articles stay internal until explicitly published.
   final bool isPublic;
@@ -74,6 +79,7 @@ class Article {
     double? sellingPrice,
     Object? storageLocation = _unset,
     ArticleStatus? status,
+    Object? reorderedQuantity = _unset,
     bool? isPublic,
     Object? imageUrl = _unset,
     DateTime? createdAt,
@@ -94,6 +100,7 @@ class Article {
       sellingPrice: sellingPrice ?? this.sellingPrice,
       storageLocation: identical(storageLocation, _unset) ? this.storageLocation : storageLocation as String?,
       status: status ?? this.status,
+      reorderedQuantity: identical(reorderedQuantity, _unset) ? this.reorderedQuantity : reorderedQuantity as int?,
       isPublic: isPublic ?? this.isPublic,
       imageUrl: identical(imageUrl, _unset) ? this.imageUrl : imageUrl as String?,
       createdAt: createdAt ?? this.createdAt,
@@ -117,6 +124,7 @@ class Article {
       sellingPrice: (json['sellingPrice'] as num).toDouble(),
       storageLocation: json['storageLocation'] as String?,
       status: ArticleStatus.values.byName(json['status'] as String),
+      reorderedQuantity: json['reorderedQuantity'] as int?,
       isPublic: json['isPublic'] as bool? ?? false,
       imageUrl: json['imageUrl'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -140,6 +148,7 @@ class Article {
       'sellingPrice': sellingPrice,
       'storageLocation': storageLocation,
       'status': status.name,
+      'reorderedQuantity': reorderedQuantity,
       'isPublic': isPublic,
       'imageUrl': imageUrl,
       'createdAt': createdAt.toIso8601String(),

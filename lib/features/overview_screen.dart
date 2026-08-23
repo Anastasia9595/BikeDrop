@@ -26,8 +26,22 @@ class OverviewScreen extends ConsumerWidget {
                 child: articlesAsync.when(
                   data: (articles) {
                     return articles.isNotEmpty
-                        ? ListView.builder(
+                        ? ListView.separated(
                           itemCount: articles.length,
+                          separatorBuilder:
+                              (context, index) => Padding(
+                                padding: EdgeInsets.only(
+                                  left:
+                                      AppSpacing.screenPaddingH +
+                                      AppSpacing.listThumbnailSize +
+                                      AppSpacing.listRowGap,
+                                ),
+                                child: const Divider(
+                                  height: 1,
+                                  thickness: 1,
+                                  color: AppColors.listDivider,
+                                ),
+                              ),
                           itemBuilder: (context, index) {
                             final article = articles[index];
                             return ItemListTile(
@@ -35,6 +49,12 @@ class OverviewScreen extends ConsumerWidget {
                               quantity: article.quantity,
                               category: article.category,
                               status: article.status,
+                              reorderedQuantity: article.reorderedQuantity,
+                              isPublic: article.isPublic,
+                              image:
+                                  article.imageUrl != null
+                                      ? NetworkImage(article.imageUrl!)
+                                      : null,
                             );
                           },
                         )
