@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:bikedrop/design_system/design_system.dart';
+import 'package:bikedrop/models/article.dart';
 import 'package:bikedrop/providers/article_repository_provider.dart';
 
 class OverviewScreen extends ConsumerStatefulWidget {
@@ -20,6 +21,28 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _editQuantity(Article article) async {
+    final location = article.storageLocation;
+    final subtitle =
+        location != null
+            ? '$location · aktuell ${article.quantity} Stk.'
+            : 'aktuell ${article.quantity} Stk.';
+
+    final newQuantity = await QuantityEditSheet.show(
+      context,
+      title: article.name,
+      subtitle: subtitle,
+      initialQuantity: article.quantity,
+    );
+
+    if (newQuantity == null || newQuantity == article.quantity) return;
+
+    await ref
+        .read(articleRepositoryProvider)
+        .changeQuantity(article.id, newQuantity);
+    ref.invalidate(filterArticleByName(_searchQuery));
   }
 
   @override
@@ -93,6 +116,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                               status: article.status,
                               reorderedQuantity: article.reorderedQuantity,
                               isPublic: article.isPublic,
+                              onQuantityTap: () => _editQuantity(article),
                               image:
                                   article.imageUrl != null
                                       ? NetworkImage(article.imageUrl!)
