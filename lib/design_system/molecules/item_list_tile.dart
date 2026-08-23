@@ -119,21 +119,20 @@ class ItemListTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    runSpacing: 4,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       CategoryBadge(category: category),
                       if (stockStatus != null) ...[
                         const SizedBox(width: 12),
                         stockStatus,
                       ],
-                      if (visibilityStatus != null) ...[
-                        SizedBox(width: stockStatus != null ? 8 : 12),
-                        visibilityStatus,
-                      ],
                     ],
                   ),
+                  if (visibilityStatus != null) ...[
+                    const SizedBox(height: 4),
+                    visibilityStatus,
+                  ],
                 ],
               ),
             ),
