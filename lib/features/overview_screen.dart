@@ -5,12 +5,26 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:bikedrop/design_system/design_system.dart';
 import 'package:bikedrop/providers/article_repository_provider.dart';
 
-class OverviewScreen extends ConsumerWidget {
+class OverviewScreen extends ConsumerStatefulWidget {
   const OverviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final articlesAsync = ref.watch(articleListProvider);
+  ConsumerState<OverviewScreen> createState() => _OverviewScreenState();
+}
+
+class _OverviewScreenState extends ConsumerState<OverviewScreen> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final articlesAsync = ref.watch(filterArticleByName(_searchQuery));
 
     return Scaffold(
       appBar: AppBar(title: Text('Bestand', style: AppTypography.screenTitle)),
@@ -22,9 +36,37 @@ class OverviewScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: AppSpacing.screenSpacingV,
+                  bottom: AppSpacing.screenSpacingV,
+                ),
+                child: AppSearchBar(
+                  controller: _searchController,
+                  placeholder: 'Artikel suchen...',
+                  onChanged: (value) {
+                    setState(() => _searchQuery = value);
+                  },
+                  onClear: () {
+                    setState(() => _searchQuery = '');
+                  },
+                ),
+              ),
               Expanded(
                 child: articlesAsync.when(
                   data: (articles) {
+                    if (articles.isEmpty && _searchQuery.isNotEmpty) {
+                      return Center(
+                        child: Text(
+                          'Keine Artikel gefunden für „$_searchQuery“.',
+                          textAlign: TextAlign.center,
+                          style: AppTypography.body.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      );
+                    }
+
                     return articles.isNotEmpty
                         ? ListView.separated(
                           itemCount: articles.length,

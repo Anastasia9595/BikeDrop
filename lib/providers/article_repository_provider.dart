@@ -12,3 +12,11 @@ final articleListProvider = FutureProvider<List<Article>>((ref) {
   final repository = ref.watch(articleRepositoryProvider);
   return repository.getArticles();
 });
+
+final filterArticleByName = FutureProvider.family<List<Article>, String>((
+  ref,
+  name,
+) async {
+  final repository = ref.watch(articleRepositoryProvider);
+  return repository.searchArticlesByName(name);
+});
