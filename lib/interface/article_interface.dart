@@ -24,4 +24,7 @@ abstract class ArticleRepository {
 
   /// Löscht einen Artikel unwiderruflich (S7)
   Future<void> deleteArticle(String id);
+
+  /// Liefert alle bereits verwendeten Lieferanten (S6 – Dropdown)
+  Future<List<String>> getSuppliers();
 }

@@ -17,12 +17,6 @@ class ArticleFormScreen extends ConsumerStatefulWidget {
 }
 
 class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
-  static const _defaultSuppliers = [
-    'Lieferant 1',
-    'Lieferant 2',
-    'Lieferant 3',
-  ];
-
   late final TextEditingController _articleNumberController;
   late final TextEditingController _nameController;
   late final TextEditingController _minQuantityController;
@@ -74,14 +68,6 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     super.dispose();
   }
 
-  List<String> get _supplierOptions {
-    final supplier = _supplier;
-    if (supplier == null || _defaultSuppliers.contains(supplier)) {
-      return _defaultSuppliers;
-    }
-    return [..._defaultSuppliers, supplier];
-  }
-
   bool get _canSave =>
       _nameController.text.trim().isNotEmpty && _category != null;
 
@@ -94,32 +80,34 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     final storageLocation = _storageLocationController.text.trim();
     final existing = widget.article;
 
-    final article = (existing ??
-            Article(
-              name: '',
+    final article =
+        (existing ??
+                Article(
+                  name: '',
+                  category: category,
+                  quantity: 0,
+                  minQuantity: 0,
+                  purchasePrice: 0,
+                  sellingPrice: 0,
+                  status: ArticleStatus.inStock,
+                  createdAt: now,
+                  updatedAt: now,
+                ))
+            .copyWith(
+              ean: ean.isEmpty ? null : ean,
+              name: _nameController.text.trim(),
               category: category,
-              quantity: 0,
-              minQuantity: 0,
-              purchasePrice: 0,
-              sellingPrice: 0,
-              status: ArticleStatus.inStock,
-              createdAt: now,
+              supplier: _supplier,
+              quantity: _quantity,
+              minQuantity: int.tryParse(_minQuantityController.text) ?? 0,
+              purchasePrice:
+                  double.tryParse(_purchasePriceController.text) ?? 0,
+              sellingPrice: double.tryParse(_sellingPriceController.text) ?? 0,
+              storageLocation: storageLocation.isEmpty ? null : storageLocation,
+              status: _status,
+              isPublic: _visibleForCustomers,
               updatedAt: now,
-            ))
-        .copyWith(
-          ean: ean.isEmpty ? null : ean,
-          name: _nameController.text.trim(),
-          category: category,
-          supplier: _supplier,
-          quantity: _quantity,
-          minQuantity: int.tryParse(_minQuantityController.text) ?? 0,
-          purchasePrice: double.tryParse(_purchasePriceController.text) ?? 0,
-          sellingPrice: double.tryParse(_sellingPriceController.text) ?? 0,
-          storageLocation: storageLocation.isEmpty ? null : storageLocation,
-          status: _status,
-          isPublic: _visibleForCustomers,
-          updatedAt: now,
-        );
+            );
 
     final repository = ref.read(articleRepositoryProvider);
     if (existing != null) {
@@ -179,19 +167,24 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                     items: Category.values,
                     itemLabel: (item) => item.label,
                     value: _category,
-                    onChanged:
-                        (Category? value) => setState(() => _category = value),
+                    onChanged: (Category? value) =>
+                        setState(() => _category = value),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.screenSpacingH),
                 Expanded(
                   child: AppDropdownField<String>(
                     label: 'Lieferant',
-                    items: _supplierOptions,
+                    items: ref
+                        .read(getSuppliers)
+                        .maybeWhen(
+                          data: (data) => data.whereType<String>().toList(),
+                          orElse: () => [],
+                        ),
                     itemLabel: (item) => item,
                     value: _supplier,
-                    onChanged:
-                        (String? value) => setState(() => _supplier = value),
+                    onChanged: (String? value) =>
+                        setState(() => _supplier = value),
                   ),
                 ),
               ],
@@ -258,8 +251,8 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               title: 'Für Kunden sichtbar',
               description: 'Erscheint auf der Kunden-Website',
               value: _visibleForCustomers,
-              onChanged:
-                  (value) => setState(() => _visibleForCustomers = value),
+              onChanged: (value) =>
+                  setState(() => _visibleForCustomers = value),
             ),
             const SizedBox(height: AppSpacing.screenSpacingV),
             AppPrimaryButton(
