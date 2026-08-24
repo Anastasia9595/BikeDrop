@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:bikedrop/core/article_image.dart';
 import 'package:bikedrop/design_system/design_system.dart';
 import 'package:bikedrop/features/article_form_screen.dart';
 import 'package:bikedrop/models/article.dart';
@@ -121,10 +122,7 @@ class OverviewScreen extends ConsumerWidget {
                               onTap: () => _openArticleForm(context, article),
                               onQuantityTap:
                                   () => _editQuantity(context, ref, article),
-                              image:
-                                  article.imageUrl != null
-                                      ? NetworkImage(article.imageUrl!)
-                                      : null,
+                              image: articleImageProvider(article.imageUrl),
                             );
                           },
                         )

@@ -1,5 +1,6 @@
 export '../enums/category.dart';
 export '../enums/article_status.dart';
+export '../enums/image_source_option.dart';
 export 'tokens/app_colors.dart';
 export 'tokens/app_typography.dart';
 export 'tokens/app_spacing.dart';
@@ -22,4 +23,5 @@ export 'molecules/item_list_tile.dart';
 export 'molecules/list_column_header.dart';
 export 'molecules/quantity_stepper.dart';
 export 'organisms/delete_confirmation_dialog.dart';
+export 'organisms/image_source_sheet.dart';
 export 'organisms/quantity_edit_sheet.dart';

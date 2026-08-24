@@ -29,7 +29,7 @@ void main() {
     expect(tapCount, 1);
   });
 
-  group('imageUrl', () {
+  group('image', () {
     testWidgets('shows the image instead of the upload prompt when set', (
       tester,
     ) async {
@@ -38,7 +38,7 @@ void main() {
           home: Scaffold(
             body: AppImageUploadField(
               onTap: () {},
-              imageUrl: 'https://example.com/bike.png',
+              image: const NetworkImage('https://example.com/bike.png'),
             ),
           ),
         ),
@@ -62,7 +62,7 @@ void main() {
           home: Scaffold(
             body: AppImageUploadField(
               onTap: () => tapCount++,
-              imageUrl: 'https://example.com/bike.png',
+              image: const NetworkImage('https://example.com/bike.png'),
             ),
           ),
         ),

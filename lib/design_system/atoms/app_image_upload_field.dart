@@ -7,26 +7,27 @@ import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
 class AppImageUploadField extends StatelessWidget {
-  const AppImageUploadField({required this.onTap, this.imageUrl, super.key});
+  const AppImageUploadField({required this.onTap, this.image, super.key});
 
   final VoidCallback onTap;
 
   /// Wenn gesetzt, wird das Bild anstelle des Upload-Platzhalters
   /// angezeigt. Bleibt weiterhin über [onTap] antippbar (z. B. um das
-  /// Bild zu ändern).
-  final String? imageUrl;
+  /// Bild zu ändern). Woher das Bild kommt (Netzwerk, lokale Datei)
+  /// entscheidet der Aufrufer.
+  final ImageProvider? image;
 
   @override
   Widget build(BuildContext context) {
-    final url = imageUrl;
-    if (url != null) {
+    final image = this.image;
+    if (image != null) {
       return InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-          child: Image.network(
-            url,
+          child: Image(
+            image: image,
             width: double.infinity,
             height: AppSpacing.imageUploadFieldHeight,
             fit: BoxFit.cover,
