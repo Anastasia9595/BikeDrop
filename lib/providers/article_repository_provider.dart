@@ -9,13 +9,8 @@ final articleRepositoryProvider = Provider<ArticleRepository>((ref) {
   return MockArticleRepository();
 });
 
-/// Aktueller Suchtext der Such-Leiste auf dem Bestand-Screen.
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
-/// Vom Bestand-Screen verwendeter TextEditingController, damit der Screen
-/// selbst als ConsumerWidget ohne eigenen State auskommt. Wird automatisch
-/// disposed, sobald niemand mehr auf ihn watcht (z. B. beim Verlassen
-/// des Screens).
 final searchControllerProvider = Provider.autoDispose<TextEditingController>((
   ref,
 ) {
@@ -35,4 +30,9 @@ final filterArticleByName = FutureProvider.family<List<Article>, String>((
 ) async {
   final repository = ref.watch(articleRepositoryProvider);
   return repository.searchArticlesByName(name);
+});
+
+final getSuppliers = FutureProvider<List<String?>>((ref) async {
+  final repository = ref.watch(articleRepositoryProvider);
+  return repository.getSuppliers();
 });

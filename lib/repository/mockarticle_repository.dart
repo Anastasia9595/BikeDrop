@@ -12,10 +12,9 @@ class MockArticleRepository implements ArticleRepository {
         'assets/data/seed_articles.json',
       );
       final List<dynamic> jsonList = jsonDecode(jsonString);
-      _articles =
-          jsonList
-              .map((e) => Article.fromJson(e as Map<String, dynamic>))
-              .toList();
+      _articles = jsonList
+          .map((e) => Article.fromJson(e as Map<String, dynamic>))
+          .toList();
       return _articles!;
     }
 
@@ -103,5 +102,14 @@ class MockArticleRepository implements ArticleRepository {
     final updated = article.copyWith(updatedAt: DateTime.now());
     articles[index] = updated;
     return updated;
+  }
+
+  @override
+  Future<List<String>> getSuppliers() async {
+    final articles = await _ensureLoaded();
+    final suppliers =
+        articles.map((a) => a.supplier).whereType<String>().toSet().toList()
+          ..sort();
+    return suppliers;
   }
 }
