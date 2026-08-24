@@ -13,10 +13,9 @@ Future<void> _editQuantity(
   Article article,
 ) async {
   final location = article.storageLocation;
-  final subtitle =
-      location != null
-          ? '$location · aktuell ${article.quantity} Stk.'
-          : 'aktuell ${article.quantity} Stk.';
+  final subtitle = location != null
+      ? '$location · aktuell ${article.quantity} Stk.'
+      : 'aktuell ${article.quantity} Stk.';
 
   final newQuantity = await QuantityEditSheet.show(
     context,
@@ -94,92 +93,92 @@ class OverviewScreen extends ConsumerWidget {
 
                     return articles.isNotEmpty
                         ? ListView.separated(
-                          itemCount: articles.length,
-                          separatorBuilder:
-                              (context, index) => Padding(
-                                padding: EdgeInsets.only(
-                                  left:
-                                      AppSpacing.screenPaddingH +
-                                      AppSpacing.listThumbnailSize +
-                                      AppSpacing.listRowGap,
-                                ),
-                                child: const Divider(
-                                  height: 1,
-                                  thickness: 1,
-                                  color: AppColors.listDivider,
-                                ),
+                            itemCount: articles.length,
+                            separatorBuilder: (context, index) => Padding(
+                              padding: EdgeInsets.only(
+                                left:
+                                    AppSpacing.screenPaddingH +
+                                    AppSpacing.listThumbnailSize +
+                                    AppSpacing.listRowGap,
                               ),
-                          itemBuilder: (context, index) {
-                            final article = articles[index];
-                            return ItemListTile(
-                              title: article.name,
-                              quantity: article.quantity,
-                              category: article.category,
-                              status: article.status,
-                              reorderedQuantity: article.reorderedQuantity,
-                              isPublic: article.isPublic,
-                              onTap: () => _openArticleForm(context, article),
-                              onQuantityTap:
-                                  () => _editQuantity(context, ref, article),
-                              image:
-                                  article.imageUrl != null
-                                      ? NetworkImage(article.imageUrl!)
-                                      : null,
-                            );
-                          },
-                        )
+                              child: const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: AppColors.listDivider,
+                              ),
+                            ),
+                            itemBuilder: (context, index) {
+                              final article = articles[index];
+                              return ItemListTile(
+                                title: article.name,
+                                quantity: article.quantity,
+                                unit: article.unit.isNotEmpty
+                                    ? article.unit
+                                    : 'Stk.',
+                                category: article.category,
+                                status: article.status,
+                                reorderedQuantity: article.reorderedQuantity,
+                                isPublic: article.isPublic,
+                                onTap: () => _openArticleForm(context, article),
+                                onQuantityTap: () =>
+                                    _editQuantity(context, ref, article),
+                                image: article.imageUrl != null
+                                    ? NetworkImage(article.imageUrl!)
+                                    : null,
+                              );
+                            },
+                          )
                         : Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
 
-                            children: [
-                              DottedBorder(
-                                options: RoundedRectDottedBorderOptions(
-                                  radius: const Radius.circular(12),
-                                  color: AppColors.border,
-                                  dashPattern: [10, 5],
-                                  strokeWidth: 2,
-                                  padding: EdgeInsets.all(16),
+                              children: [
+                                DottedBorder(
+                                  options: RoundedRectDottedBorderOptions(
+                                    radius: const Radius.circular(12),
+                                    color: AppColors.border,
+                                    dashPattern: [10, 5],
+                                    strokeWidth: 2,
+                                    padding: EdgeInsets.all(16),
+                                  ),
+                                  child: Icon(
+                                    Symbols.package_2,
+                                    size: AppSpacing.iconSizeLarge,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
-                                child: Icon(
-                                  Symbols.package_2,
-                                  size: AppSpacing.iconSizeLarge,
-                                  color: AppColors.textSecondary,
+                                const SizedBox(height: 24),
+                                Text(
+                                  'Noch kein Bestand erfasst',
+                                  style: AppTypography.heading.copyWith(
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 24),
-                              Text(
-                                'Noch kein Bestand erfasst',
-                                style: AppTypography.heading.copyWith(
-                                  color: AppColors.textPrimary,
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Fügen Sie jetzt Ihren ersten Artikel hinzu, um den Überblick zu behalten.',
+                                  textAlign: TextAlign.center,
+                                  style: AppTypography.body.copyWith(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 17,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Fügen Sie jetzt Ihren ersten Artikel hinzu, um den Überblick zu behalten.',
-                                textAlign: TextAlign.center,
-                                style: AppTypography.body.copyWith(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 17,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+                              ],
+                            ),
+                          );
                   },
-                  loading:
-                      () => const Center(child: CircularProgressIndicator()),
-                  error:
-                      (error, stackTrace) => Center(
-                        child: Text(
-                          'Fehler beim Laden der Artikel: $error',
-                          style: AppTypography.body.copyWith(
-                            color: AppColors.textError,
-                          ),
-                        ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, stackTrace) => Center(
+                    child: Text(
+                      'Fehler beim Laden der Artikel: $error',
+                      style: AppTypography.body.copyWith(
+                        color: AppColors.textError,
                       ),
+                    ),
+                  ),
                 ),
               ),
               Row(

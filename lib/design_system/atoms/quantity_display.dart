@@ -8,9 +8,15 @@ import '../tokens/app_typography.dart';
 /// "Stk."-Label fester Breite, damit die Spalte über alle Zeilen bündig
 /// bleibt und beim Scrollen nicht flackert.
 class QuantityDisplay extends StatelessWidget {
-  const QuantityDisplay({required this.quantity, this.onTap, super.key});
+  const QuantityDisplay({
+    required this.quantity,
+    required this.unit,
+    this.onTap,
+    super.key,
+  });
 
   final int quantity;
+  final String unit;
   final VoidCallback? onTap;
 
   @override
@@ -67,7 +73,7 @@ class QuantityDisplay extends StatelessWidget {
           width: 28,
           child: Center(
             child: Text(
-              'Stk.',
+              unit,
               maxLines: 1,
               softWrap: false,
               overflow: TextOverflow.visible,

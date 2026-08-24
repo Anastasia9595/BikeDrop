@@ -14,6 +14,7 @@ class ItemListTile extends StatelessWidget {
     required this.title,
     required this.quantity,
     required this.category,
+    required this.unit,
     this.image,
     this.onTap,
     required this.status,
@@ -25,6 +26,7 @@ class ItemListTile extends StatelessWidget {
 
   final String title;
   final int quantity;
+  final String unit;
   final Category category;
   final ImageProvider? image;
   final VoidCallback? onTap;
@@ -93,13 +95,9 @@ class ItemListTile extends StatelessWidget {
                 height: AppSpacing.listThumbnailSize,
                 color: AppColors.surface,
                 alignment: Alignment.center,
-                child:
-                    thumbnailImage != null
-                        ? Image(image: thumbnailImage, fit: BoxFit.cover)
-                        : Icon(
-                          Symbols.image,
-                          color: AppColors.textQuaternaryLight,
-                        ),
+                child: thumbnailImage != null
+                    ? Image(image: thumbnailImage, fit: BoxFit.cover)
+                    : Icon(Symbols.image, color: AppColors.textQuaternaryLight),
               ),
             ),
             SizedBox(width: AppSpacing.listRowGap),
@@ -136,7 +134,11 @@ class ItemListTile extends StatelessWidget {
                 ],
               ),
             ),
-            QuantityDisplay(quantity: quantity, onTap: onQuantityTap),
+            QuantityDisplay(
+              quantity: quantity,
+              unit: unit,
+              onTap: onQuantityTap,
+            ),
           ],
         ),
       ),
@@ -144,9 +146,9 @@ class ItemListTile extends StatelessWidget {
 
     return onTap != null
         ? Material(
-          type: MaterialType.transparency,
-          child: InkWell(onTap: onTap, child: content),
-        )
+            type: MaterialType.transparency,
+            child: InkWell(onTap: onTap, child: content),
+          )
         : content;
   }
 }
