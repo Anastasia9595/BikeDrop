@@ -63,12 +63,18 @@ class QuantityDisplay extends StatelessWidget {
         ),
         const SizedBox(width: 4),
         SizedBox(
-          width: 22,
-          child: Text(
-            'Stk.',
-            style: AppTypography.listNumber.copyWith(
-              fontSize: 11,
-              color: AppColors.textSecondary,
+          height: AppSpacing.minTapTarget,
+          width: 28,
+          child: Center(
+            child: Text(
+              'Stk.',
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.visible,
+              style: AppTypography.listNumber.copyWith(
+                fontSize: 11,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
         ),
