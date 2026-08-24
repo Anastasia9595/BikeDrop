@@ -93,13 +93,9 @@ class ItemListTile extends StatelessWidget {
                 height: AppSpacing.listThumbnailSize,
                 color: AppColors.surface,
                 alignment: Alignment.center,
-                child:
-                    thumbnailImage != null
-                        ? Image(image: thumbnailImage, fit: BoxFit.cover)
-                        : Icon(
-                          Symbols.image,
-                          color: AppColors.textQuaternaryLight,
-                        ),
+                child: thumbnailImage != null
+                    ? Image(image: thumbnailImage, fit: BoxFit.cover)
+                    : Icon(Symbols.image, color: AppColors.textQuaternaryLight),
               ),
             ),
             SizedBox(width: AppSpacing.listRowGap),
@@ -108,6 +104,10 @@ class ItemListTile extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (visibilityStatus != null) ...[
+                    const SizedBox(height: 4),
+                    visibilityStatus,
+                  ],
                   Text(
                     title,
                     maxLines: 2,
@@ -129,10 +129,6 @@ class ItemListTile extends StatelessWidget {
                       ],
                     ],
                   ),
-                  if (visibilityStatus != null) ...[
-                    const SizedBox(height: 4),
-                    visibilityStatus,
-                  ],
                 ],
               ),
             ),
@@ -144,9 +140,9 @@ class ItemListTile extends StatelessWidget {
 
     return onTap != null
         ? Material(
-          type: MaterialType.transparency,
-          child: InkWell(onTap: onTap, child: content),
-        )
+            type: MaterialType.transparency,
+            child: InkWell(onTap: onTap, child: content),
+          )
         : content;
   }
 }
