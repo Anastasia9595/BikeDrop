@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/article_image.dart';
 import '../design_system/design_system.dart';
 import '../models/article.dart';
 import '../providers/article_repository_provider.dart';
+import '../providers/image_picker_provider.dart';
 
 class ArticleFormScreen extends ConsumerStatefulWidget {
   const ArticleFormScreen({this.article, super.key});
@@ -30,6 +32,10 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
   late int _quantity;
   late ArticleStatus _status;
   late bool _visibleForCustomers;
+
+  /// Verweis auf das Artikelbild: entweder die gespeicherte URL oder,
+  /// nach einer frischen Aufnahme, der lokale Pfad der Bilddatei.
+  late String? _imageSource;
 
   @override
   void initState() {
@@ -59,6 +65,29 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     _quantity = article?.quantity ?? 1;
     _status = article?.status ?? ArticleStatus.inStock;
     _visibleForCustomers = article?.isPublic ?? false;
+    _imageSource = article?.imageUrl;
+  }
+
+  /// Laesst den Nutzer die Quelle waehlen und uebernimmt das aufgenommene
+  /// bzw. ausgewaehlte Bild ins Formular.
+  Future<void> _pickImage() async {
+    final source = await ImageSourceSheet.show(context);
+    if (source == null || !mounted) return;
+
+    try {
+      final file = await ref.read(imagePickerServiceProvider).pickImage(source);
+      // Abbruch in Kamera/Galerie liefert null — dann bleibt das
+      // bisherige Bild stehen.
+      if (file == null || !mounted) return;
+      setState(() => _imageSource = file.path);
+    } on Exception catch (error, stackTrace) {
+      // Ohne Log ist die Snackbar nicht diagnostizierbar — z. B. eine
+      // MissingPluginException, wenn die App nach dem Hinzufuegen des
+      // Plugins nur hot-reloaded statt neu gebaut wurde.
+      debugPrint('Bildauswahl fehlgeschlagen: $error\n$stackTrace');
+      if (!mounted) return;
+      AppSnackbar.show(context, 'Bild konnte nicht geladen werden');
+    }
   }
 
   @override
@@ -133,6 +162,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               storageLocation: storageLocation.isEmpty ? null : storageLocation,
               status: _status,
               isPublic: _visibleForCustomers,
+              imageUrl: _imageSource,
               updatedAt: now,
             );
 
@@ -174,8 +204,8 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
           spacing: AppSpacing.fieldGap,
           children: [
             AppImageUploadField(
-              onTap: () {},
-              imageUrl: widget.article?.imageUrl,
+              onTap: _pickImage,
+              image: articleImageProvider(_imageSource),
             ),
             AppTextField(
               label: 'Artikelnummer',
