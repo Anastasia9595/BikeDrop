@@ -33,7 +33,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: AppTypography.fieldLabel,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.fieldLabelGap),
         ],
         Container(
           height: AppSpacing.fieldHeight,
@@ -53,8 +53,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
                   child: AppSegment(
                     label: labelBuilder(option),
                     selected: option == value,
-                    onTap:
-                        option == value ? null : () => onChanged(option),
+                    onTap: option == value ? null : () => onChanged(option),
                   ),
                 ),
             ],

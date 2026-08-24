@@ -23,6 +23,7 @@ Future<void> _editQuantity(
     title: article.name,
     subtitle: subtitle,
     initialQuantity: article.quantity,
+    max: article.maxQuantity,
   );
 
   if (newQuantity == null || newQuantity == article.quantity) return;
