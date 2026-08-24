@@ -205,7 +205,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                   child: AppDropdownField<String>(
                     label: 'Lieferant',
                     items: ref
-                        .read(getSuppliers)
+                        .watch(getSuppliers)
                         .maybeWhen(
                           data: (data) => data.whereType<String>().toList(),
                           orElse: () => [],

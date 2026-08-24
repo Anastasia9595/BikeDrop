@@ -42,6 +42,9 @@ Article _buildArticle({
 }
 
 class _FakeArticleRepository implements ArticleRepository {
+  _FakeArticleRepository({this.suppliers = const []});
+
+  final List<String> suppliers;
   Article? created;
   Article? updated;
 
@@ -74,7 +77,12 @@ class _FakeArticleRepository implements ArticleRepository {
   Future<List<Article>> getArticles() async => [];
 
   @override
-  Future<List<String>> getSuppliers() async => [];
+  Future<List<String>> getSuppliers() async {
+    // Wie das echte Repository: laedt asynchron, ist beim ersten Build
+    // also noch nicht fertig.
+    await Future<void>.delayed(Duration.zero);
+    return suppliers;
+  }
 
   @override
   Future<List<Article>> searchArticlesByName(String query) async => [];
@@ -408,6 +416,25 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repository.updated?.maxQuantity, isNull);
+    });
+  });
+
+  group('Lieferanten-Dropdown', () {
+    testWidgets('fills the dropdown once the provider resolves, without any '
+        'user interaction', (tester) async {
+      final repository = _FakeArticleRepository(
+        suppliers: const ['DT Swiss', 'Shimano'],
+      );
+
+      await tester.pumpWidget(
+        _wrap(const ArticleFormScreen(), repository: repository),
+      );
+      await tester.pumpAndSettle();
+
+      final dropdown = tester.widget<AppDropdownField<String>>(
+        find.byType(AppDropdownField<String>),
+      );
+      expect(dropdown.items, const ['DT Swiss', 'Shimano']);
     });
   });
 }
