@@ -15,6 +15,7 @@ Article _buildArticle({
   String? supplier,
   required int quantity,
   required int minQuantity,
+  int? maxQuantity,
   required double purchasePrice,
   required double sellingPrice,
   String? storageLocation,
@@ -29,6 +30,7 @@ Article _buildArticle({
     supplier: supplier,
     quantity: quantity,
     minQuantity: minQuantity,
+    maxQuantity: maxQuantity,
     purchasePrice: purchasePrice,
     sellingPrice: sellingPrice,
     storageLocation: storageLocation,
@@ -70,6 +72,9 @@ class _FakeArticleRepository implements ArticleRepository {
 
   @override
   Future<List<Article>> getArticles() async => [];
+
+  @override
+  Future<List<String>> getSuppliers() async => [];
 
   @override
   Future<List<Article>> searchArticlesByName(String query) async => [];
@@ -210,10 +215,9 @@ void main() {
         await tester.pumpWidget(
           _wrap(
             Navigator(
-              onGenerateRoute:
-                  (settings) => MaterialPageRoute(
-                    builder: (_) => ArticleFormScreen(article: article),
-                  ),
+              onGenerateRoute: (settings) => MaterialPageRoute(
+                builder: (_) => ArticleFormScreen(article: article),
+              ),
             ),
             repository: repository,
           ),
@@ -261,6 +265,149 @@ void main() {
         find.widgetWithText(ElevatedButton, 'Artikel speichern'),
       );
       expect(button.onPressed, isNull);
+    });
+  });
+
+  group('Höchstbestand', () {
+    Finder maxField() => find.byWidgetPredicate(
+      (widget) => widget is AppTextField && widget.label == 'Höchstbestand',
+    );
+
+    Finder maxInput() =>
+        find.descendant(of: maxField(), matching: find.byType(TextField));
+
+    ElevatedButton saveButton(WidgetTester tester) => tester.widget(
+      find.widgetWithText(ElevatedButton, 'Änderungen speichern'),
+    );
+
+    Article articleWith({int quantity = 10, int? maxQuantity}) => _buildArticle(
+      name: 'Speiche',
+      category: Category.laufraeder,
+      quantity: quantity,
+      minQuantity: 5,
+      maxQuantity: maxQuantity,
+      purchasePrice: 0.45,
+      sellingPrice: 0.95,
+      status: ArticleStatus.inStock,
+    );
+
+    testWidgets('leaves the stepper unbounded when the article has no limit', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(ArticleFormScreen(article: articleWith())));
+
+      expect(
+        tester.widget<QuantityStepper>(find.byType(QuantityStepper)).max,
+        isNull,
+      );
+      expect(find.text('unbegrenzt'), findsOneWidget);
+    });
+
+    testWidgets('passes the article limit to the stepper', (tester) async {
+      await tester.pumpWidget(
+        _wrap(ArticleFormScreen(article: articleWith(maxQuantity: 500))),
+      );
+
+      expect(
+        tester.widget<QuantityStepper>(find.byType(QuantityStepper)).max,
+        500,
+      );
+      expect(find.text('500'), findsOneWidget);
+    });
+
+    testWidgets('blocks saving a limit below the current quantity', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(ArticleFormScreen(article: articleWith(quantity: 128))),
+      );
+
+      await tester.enterText(maxInput(), '100');
+      await tester.pump();
+
+      expect(
+        find.text('Darf nicht unter der aktuellen Menge liegen'),
+        findsOneWidget,
+      );
+      expect(saveButton(tester).onPressed, isNull);
+    });
+
+    testWidgets('blocks saving a limit below the minimum stock', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(ArticleFormScreen(article: articleWith(quantity: 1))),
+      );
+
+      await tester.enterText(maxInput(), '3');
+      await tester.pump();
+
+      expect(
+        find.text('Darf nicht unter dem Mindestbestand liegen'),
+        findsOneWidget,
+      );
+      expect(saveButton(tester).onPressed, isNull);
+    });
+
+    testWidgets('keeps the stepper open while the entered limit is invalid', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(ArticleFormScreen(article: articleWith(quantity: 128))),
+      );
+
+      await tester.enterText(maxInput(), '100');
+      await tester.pump();
+
+      expect(
+        tester.widget<QuantityStepper>(find.byType(QuantityStepper)).max,
+        isNull,
+      );
+    });
+
+    testWidgets('saves the entered limit', (tester) async {
+      final repository = _FakeArticleRepository();
+
+      await tester.pumpWidget(
+        _wrap(
+          Navigator(
+            onGenerateRoute: (settings) => MaterialPageRoute(
+              builder: (_) => ArticleFormScreen(article: articleWith()),
+            ),
+          ),
+          repository: repository,
+        ),
+      );
+
+      await tester.enterText(maxInput(), '250');
+      await tester.pump();
+      await tester.tap(find.text('Änderungen speichern'));
+      await tester.pumpAndSettle();
+
+      expect(repository.updated?.maxQuantity, 250);
+    });
+
+    testWidgets('clears the limit when the field is emptied', (tester) async {
+      final repository = _FakeArticleRepository();
+
+      await tester.pumpWidget(
+        _wrap(
+          Navigator(
+            onGenerateRoute: (settings) => MaterialPageRoute(
+              builder: (_) =>
+                  ArticleFormScreen(article: articleWith(maxQuantity: 500)),
+            ),
+          ),
+          repository: repository,
+        ),
+      );
+
+      await tester.enterText(maxInput(), '');
+      await tester.pump();
+      await tester.tap(find.text('Änderungen speichern'));
+      await tester.pumpAndSettle();
+
+      expect(repository.updated?.maxQuantity, isNull);
     });
   });
 }

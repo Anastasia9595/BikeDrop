@@ -45,7 +45,7 @@ class AppDropdownField<T> extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: AppTypography.fieldLabel,
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: AppSpacing.fieldLabelGap),
         SizedBox(
           height: AppSpacing.fieldHeight,
           child: InputDecorator(

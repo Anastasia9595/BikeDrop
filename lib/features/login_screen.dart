@@ -36,11 +36,12 @@ class LoginScreen extends StatelessWidget {
                 AppTextField(
                   label: l10n.loginEmailLabel,
                   keyboardType: TextInputType.emailAddress,
+                  maxLines: 1,
                   onChanged: (value) {
                     // Handle email input change
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.fieldGap),
                 AppTextField(
                   label: l10n.loginPasswordLabel,
                   obscureText: true,

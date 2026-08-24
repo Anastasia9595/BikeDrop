@@ -20,6 +20,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
   late final TextEditingController _articleNumberController;
   late final TextEditingController _nameController;
   late final TextEditingController _minQuantityController;
+  late final TextEditingController _maxQuantityController;
   late final TextEditingController _purchasePriceController;
   late final TextEditingController _sellingPriceController;
   late final TextEditingController _storageLocationController;
@@ -39,6 +40,9 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     _nameController = TextEditingController(text: article?.name ?? '');
     _minQuantityController = TextEditingController(
       text: article != null ? '${article.minQuantity}' : '',
+    );
+    _maxQuantityController = TextEditingController(
+      text: article?.maxQuantity != null ? '${article!.maxQuantity}' : '',
     );
     _purchasePriceController = TextEditingController(
       text: article != null ? '${article.purchasePrice}' : '',
@@ -62,14 +66,36 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     _articleNumberController.dispose();
     _nameController.dispose();
     _minQuantityController.dispose();
+    _maxQuantityController.dispose();
     _purchasePriceController.dispose();
     _sellingPriceController.dispose();
     _storageLocationController.dispose();
     super.dispose();
   }
 
+  int get _minQuantity => int.tryParse(_minQuantityController.text.trim()) ?? 0;
+
+  /// Eingetragener Hoechstbestand, null wenn das Feld leer ist (= unbegrenzt).
+  int? get _maxQuantity => int.tryParse(_maxQuantityController.text.trim());
+
+  /// Verhindert, dass man sich eine Obergrenze setzt, die unter dem bereits
+  /// eingelagerten Bestand liegt — sonst laesst sich die Menge danach nicht
+  /// mehr erhoehen.
+  String? get _maxQuantityError {
+    if (_maxQuantityController.text.trim().isEmpty) return null;
+    final max = _maxQuantity;
+    if (max == null) return 'Bitte eine ganze Zahl eingeben';
+    if (max < _minQuantity) {
+      return 'Darf nicht unter dem Mindestbestand liegen';
+    }
+    if (max < _quantity) return 'Darf nicht unter der aktuellen Menge liegen';
+    return null;
+  }
+
   bool get _canSave =>
-      _nameController.text.trim().isNotEmpty && _category != null;
+      _nameController.text.trim().isNotEmpty &&
+      _category != null &&
+      _maxQuantityError == null;
 
   Future<void> _save() async {
     final category = _category;
@@ -99,7 +125,8 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               category: category,
               supplier: _supplier,
               quantity: _quantity,
-              minQuantity: int.tryParse(_minQuantityController.text) ?? 0,
+              minQuantity: _minQuantity,
+              maxQuantity: _maxQuantity,
               purchasePrice:
                   double.tryParse(_purchasePriceController.text) ?? 0,
               sellingPrice: double.tryParse(_sellingPriceController.text) ?? 0,
@@ -144,15 +171,16 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
           vertical: AppSpacing.screenSpacingV,
         ),
         child: Column(
+          spacing: AppSpacing.fieldGap,
           children: [
             AppImageUploadField(
               onTap: () {},
               imageUrl: widget.article?.imageUrl,
             ),
-            const SizedBox(height: AppSpacing.screenSpacingV),
             AppTextField(
               label: 'Artikelnummer',
               controller: _articleNumberController,
+              maxLines: 1,
             ),
             AppTextField(
               label: 'Artikelname',
@@ -160,6 +188,8 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               onChanged: (_) => setState(() {}),
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: AppSpacing.screenSpacingH,
               children: [
                 Expanded(
                   child: AppDropdownField<Category>(
@@ -171,7 +201,6 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                         setState(() => _category = value),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.screenSpacingH),
                 Expanded(
                   child: AppDropdownField<String>(
                     label: 'Lieferant',
@@ -189,30 +218,45 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                 ),
               ],
             ),
+            QuantityStepper(
+              label: 'Menge',
+              quantity: _quantity,
+              onChanged: (int value) => setState(() => _quantity = value),
+              min: 0,
+              // Nur eine gueltige Grenze begrenzen lassen — solange die
+              // Eingabe fehlerhaft ist, bleibt der Stepper offen.
+              max: _maxQuantityError == null ? _maxQuantity : null,
+            ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: AppSpacing.screenSpacingH,
               children: [
-                Expanded(
-                  child: QuantityStepper(
-                    label: 'Menge',
-                    quantity: _quantity,
-                    onChanged: (int value) => setState(() => _quantity = value),
-                    min: 0,
-                    max: 100,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.screenSpacingH),
                 Expanded(
                   child: AppTextField(
                     label: 'Mindestbestand',
                     keyboardType: TextInputType.number,
                     placeholder: '0',
                     controller: _minQuantityController,
+                    maxLines: 1,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+                Expanded(
+                  child: AppTextField(
+                    label: 'Höchstbestand',
+                    keyboardType: TextInputType.number,
+                    placeholder: 'unbegrenzt',
+                    controller: _maxQuantityController,
+                    errorText: _maxQuantityError,
+                    maxLines: 1,
+                    onChanged: (_) => setState(() {}),
                   ),
                 ),
               ],
             ),
-
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: AppSpacing.screenSpacingH,
               children: [
                 Expanded(
                   child: AppTextField(
@@ -220,15 +264,16 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                     keyboardType: TextInputType.number,
                     placeholder: '0.00 €',
                     controller: _purchasePriceController,
+                    maxLines: 1,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.screenSpacingH),
                 Expanded(
                   child: AppTextField(
                     label: 'Verkaufspreis',
                     keyboardType: TextInputType.number,
                     placeholder: '0.00 €',
                     controller: _sellingPriceController,
+                    maxLines: 1,
                   ),
                 ),
               ],
@@ -238,7 +283,6 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               placeholder: 'z.B. Regal A, Fach 3',
               controller: _storageLocationController,
             ),
-            const SizedBox(height: AppSpacing.screenSpacingV),
             AppSegmentedControl<ArticleStatus>(
               label: 'Status',
               options: ArticleStatus.values,
@@ -246,7 +290,6 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               value: _status,
               onChanged: (status) => setState(() => _status = status),
             ),
-            const SizedBox(height: AppSpacing.screenSpacingV),
             AppToggleCard(
               title: 'Für Kunden sichtbar',
               description: 'Erscheint auf der Kunden-Website',
@@ -254,7 +297,6 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               onChanged: (value) =>
                   setState(() => _visibleForCustomers = value),
             ),
-            const SizedBox(height: AppSpacing.screenSpacingV),
             AppPrimaryButton(
               label: isEditing ? 'Änderungen speichern' : 'Artikel speichern',
               onPressed: _canSave ? _save : null,

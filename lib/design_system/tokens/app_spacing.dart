@@ -22,6 +22,12 @@ class AppSpacing {
   static const double screenSpacingV = 16.0;
   static const double screenSpacingH = 16.0;
 
+  /// Abstand zwischen Feld-Label und dem Feld selbst.
+  static const double fieldLabelGap = 6.0;
+
+  /// Vertikaler Abstand zwischen zwei Formularfeldern.
+  static const double fieldGap = 16.0;
+
   /// Standard-Icongroesse fuer Icon-Buttons und Inline-Icons.
   static const double iconSize = 20.0;
 

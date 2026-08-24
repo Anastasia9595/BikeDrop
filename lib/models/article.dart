@@ -15,6 +15,7 @@ class Article {
     this.supplier,
     required this.quantity,
     required this.minQuantity,
+    this.maxQuantity,
     this.unit = 'Stk',
     this.packSize = 1,
     required this.purchasePrice,
@@ -41,6 +42,11 @@ class Article {
   final String? supplier;
   final int quantity;
   final int minQuantity;
+
+  /// Hoechstbestand: wie viel von diesem Artikel maximal eingelagert werden
+  /// kann. Null bedeutet unbegrenzt — die Menge hat dann keine Obergrenze.
+  final int? maxQuantity;
+
   final String unit;
 
   /// Quantity added per scan, e.g. 10 when scanning a full box (Karton)
@@ -73,6 +79,7 @@ class Article {
     Object? supplier = _unset,
     int? quantity,
     int? minQuantity,
+    Object? maxQuantity = _unset,
     String? unit,
     int? packSize,
     double? purchasePrice,
@@ -91,21 +98,34 @@ class Article {
       ean: identical(ean, _unset) ? this.ean : ean as String?,
       name: name ?? this.name,
       category: category ?? this.category,
-      supplier: identical(supplier, _unset) ? this.supplier : supplier as String?,
+      supplier: identical(supplier, _unset)
+          ? this.supplier
+          : supplier as String?,
       quantity: quantity ?? this.quantity,
       minQuantity: minQuantity ?? this.minQuantity,
+      maxQuantity: identical(maxQuantity, _unset)
+          ? this.maxQuantity
+          : maxQuantity as int?,
       unit: unit ?? this.unit,
       packSize: packSize ?? this.packSize,
       purchasePrice: purchasePrice ?? this.purchasePrice,
       sellingPrice: sellingPrice ?? this.sellingPrice,
-      storageLocation: identical(storageLocation, _unset) ? this.storageLocation : storageLocation as String?,
+      storageLocation: identical(storageLocation, _unset)
+          ? this.storageLocation
+          : storageLocation as String?,
       status: status ?? this.status,
-      reorderedQuantity: identical(reorderedQuantity, _unset) ? this.reorderedQuantity : reorderedQuantity as int?,
+      reorderedQuantity: identical(reorderedQuantity, _unset)
+          ? this.reorderedQuantity
+          : reorderedQuantity as int?,
       isPublic: isPublic ?? this.isPublic,
-      imageUrl: identical(imageUrl, _unset) ? this.imageUrl : imageUrl as String?,
+      imageUrl: identical(imageUrl, _unset)
+          ? this.imageUrl
+          : imageUrl as String?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      updatedBy: identical(updatedBy, _unset) ? this.updatedBy : updatedBy as String?,
+      updatedBy: identical(updatedBy, _unset)
+          ? this.updatedBy
+          : updatedBy as String?,
     );
   }
 
@@ -118,6 +138,7 @@ class Article {
       supplier: json['supplier'] as String?,
       quantity: json['quantity'] as int,
       minQuantity: json['minQuantity'] as int,
+      maxQuantity: json['maxQuantity'] as int?,
       unit: json['unit'] as String? ?? 'Stk',
       packSize: json['packSize'] as int? ?? 1,
       purchasePrice: (json['purchasePrice'] as num).toDouble(),
@@ -142,6 +163,7 @@ class Article {
       'supplier': supplier,
       'quantity': quantity,
       'minQuantity': minQuantity,
+      'maxQuantity': maxQuantity,
       'unit': unit,
       'packSize': packSize,
       'purchasePrice': purchasePrice,

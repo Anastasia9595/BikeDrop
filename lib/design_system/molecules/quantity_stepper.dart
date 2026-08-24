@@ -101,7 +101,7 @@ class _QuantityStepperState extends State<QuantityStepper> {
             overflow: TextOverflow.ellipsis,
             style: AppTypography.fieldLabel,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.fieldLabelGap),
         ],
         Container(
           height: AppSpacing.fieldHeight,
