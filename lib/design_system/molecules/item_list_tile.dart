@@ -106,6 +106,10 @@ class ItemListTile extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (visibilityStatus != null) ...[
+                    const SizedBox(height: 4),
+                    visibilityStatus,
+                  ],
                   Text(
                     title,
                     maxLines: 2,
@@ -127,10 +131,6 @@ class ItemListTile extends StatelessWidget {
                       ],
                     ],
                   ),
-                  if (visibilityStatus != null) ...[
-                    const SizedBox(height: 4),
-                    visibilityStatus,
-                  ],
                 ],
               ),
             ),
