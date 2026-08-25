@@ -1,0 +1,58 @@
+[
+  {
+    "ean": "4055123456789",
+    "name": "Shimano Deore Bremsscheibe 180mm",
+    "category": "bremsen",
+    "supplier": "Shimano",
+    "imageUrl": "https://picsum.photos/seed/bremsscheibe180/400/400"
+  },
+  {
+    "ean": "4711234567890",
+    "name": "KMC Kette X11",
+    "category": "antrieb",
+    "supplier": "KMC",
+    "imageUrl": "https://picsum.photos/seed/kmckettex11/400/400"
+  },
+  {
+    "ean": "4033445566778",
+    "name": "Bremsbeläge organisch Set",
+    "category": "bremsen",
+    "supplier": "Shimano",
+    "imageUrl": "https://picsum.photos/seed/bremsbelaegeset/400/400"
+  },
+  {
+    "ean": "4088776655443",
+    "name": "Kettenöl Teflon 100ml",
+    "category": "antrieb",
+    "supplier": "Finish Line",
+    "imageUrl": "https://picsum.photos/seed/kettenoelteflon/400/400"
+  },
+  {
+    "ean": "4260119901234",
+    "name": "Schwalbe Marathon Plus 28x1.75",
+    "category": "reifen",
+    "supplier": "Schwalbe",
+    "imageUrl": "https://picsum.photos/seed/marathonplus28/400/400"
+  },
+  {
+    "ean": "4045678912345",
+    "name": "Continental Grand Prix 5000 700x25C",
+    "category": "reifen",
+    "supplier": "Continental",
+    "imageUrl": "https://picsum.photos/seed/grandprix5000/400/400"
+  },
+  {
+    "ean": "4051234509876",
+    "name": "Muc-Off Bike Cleaner 1L",
+    "category": "pflege",
+    "supplier": "Muc-Off",
+    "imageUrl": null
+  },
+  {
+    "ean": "4029876501234",
+    "name": "Abus Bordo 6000 Faltschloss 90cm",
+    "category": "zubehoer",
+    "supplier": "Abus",
+    "imageUrl": "https://picsum.photos/seed/abusbordo6000/400/400"
+  }
+]
