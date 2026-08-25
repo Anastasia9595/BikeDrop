@@ -8,10 +8,10 @@ void main() {
   test('liefert den Katalogartikel zu einer bekannten EAN', () async {
     final repository = MockCatalogRepository();
 
-    final article = await repository.lookupByEan('4260119901234');
+    final article = await repository.lookupByEan('4260119901230');
 
     expect(article, isNotNull);
-    expect(article!.ean, '4260119901234');
+    expect(article!.ean, '4260119901230');
     expect(article.name, 'Schwalbe Marathon Plus 28x1.75');
     expect(article.category, Category.reifen);
     expect(article.supplier, 'Schwalbe');
@@ -32,7 +32,7 @@ void main() {
   test('liefert imageUrl null fuer einen Katalogartikel ohne Bild', () async {
     final repository = MockCatalogRepository();
 
-    final article = await repository.lookupByEan('4051234509876');
+    final article = await repository.lookupByEan('4051234509872');
 
     expect(article, isNotNull);
     expect(article!.name, 'Muc-Off Bike Cleaner 1L');
@@ -42,7 +42,7 @@ void main() {
   test('findet auch EANs, die bereits als Artikel im Lager existieren', () async {
     final repository = MockCatalogRepository();
 
-    final article = await repository.lookupByEan('4055123456789');
+    final article = await repository.lookupByEan('4055123456780');
 
     expect(article, isNotNull);
     expect(article!.name, 'Shimano Deore Bremsscheibe 180mm');
@@ -52,8 +52,8 @@ void main() {
   test('liefert bei wiederholtem Lookup dieselbe Instanz aus dem Cache', () async {
     final repository = MockCatalogRepository();
 
-    final first = await repository.lookupByEan('4711234567890');
-    final second = await repository.lookupByEan('4711234567890');
+    final first = await repository.lookupByEan('4711234567899');
+    final second = await repository.lookupByEan('4711234567899');
 
     expect(identical(first, second), isTrue);
   });

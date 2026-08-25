@@ -131,7 +131,7 @@ void main() {
 
   group('vorausgefülltes Bearbeiten', () {
     final article = _buildArticle(
-      ean: '4055123456789',
+      ean: '4055123456780',
       name: 'Shimano Deore Bremsscheibe 180mm',
       category: Category.bremsen,
       supplier: 'Shimano',
@@ -154,7 +154,7 @@ void main() {
     testWidgets('pre-fills the text fields from the article', (tester) async {
       await tester.pumpWidget(_wrap(ArticleFormScreen(article: article)));
 
-      expect(find.text('4055123456789'), findsOneWidget);
+      expect(find.text('4055123456780'), findsOneWidget);
       expect(find.text('Shimano Deore Bremsscheibe 180mm'), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
       expect(find.text('18.5'), findsOneWidget);

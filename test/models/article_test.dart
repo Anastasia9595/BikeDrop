@@ -7,7 +7,7 @@ import 'package:bikedrop/models/article.dart';
 Map<String, dynamic> _json({int? maxQuantity}) {
   return {
     'id': 'art_001',
-    'ean': '4055123456789',
+    'ean': '4055123456780',
     'name': 'Shimano Deore Bremsscheibe 180mm',
     'category': 'bremsen',
     'supplier': 'Shimano',
