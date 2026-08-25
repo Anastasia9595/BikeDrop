@@ -8,7 +8,9 @@ final catalogRepositoryProvider = Provider<CatalogRepository>((ref) {
   return MockCatalogRepository();
 });
 
-final lookupByEanProvider = FutureProvider.family<CatalogArticle?, String>((
+/// Stammdaten zu einer gescannten EAN, oder null wenn der Katalog sie nicht
+/// kennt. Eine unbekannte EAN ist kein Fehler, sondern ein neuer Artikel.
+final catalogArticleByEan = FutureProvider.family<CatalogArticle?, String>((
   ref,
   ean,
 ) async {

@@ -13,6 +13,9 @@ class MobileScannerAdapter implements BarcodeScannerInterface {
   }
 
   @override
+  Stream<String> get scans => _out.stream;
+
+  @override
   Future<String> get scan => _out.stream.first;
 
   @override

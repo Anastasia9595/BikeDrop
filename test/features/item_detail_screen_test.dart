@@ -210,6 +210,7 @@ void main() {
       'calls updateArticle with the edited values and pops the screen',
       (tester) async {
         final article = _buildArticle(
+          ean: '4055123456780',
           name: 'Alter Name',
           category: Category.bremsen,
           quantity: 5,
@@ -250,12 +251,26 @@ void main() {
         _wrap(const ArticleFormScreen(), repository: repository),
       );
 
-      // TextField #1 is "Artikelname" (index 0 is "Artikelnummer").
+      // Alle Pflichtfelder fuellen, sonst bleibt Speichern gesperrt.
+      // TextField #0 is "Artikelnummer", #1 is "Artikelname".
+      await tester.enterText(find.byType(TextField).at(0), '4055123456780');
       await tester.enterText(find.byType(TextField).at(1), 'Testartikel');
       await tester.tap(find.byType(DropdownButton<Category>));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Bremsen').last);
       await tester.pumpAndSettle();
+
+      Future<void> fill(String label, String value) => tester.enterText(
+        find.descendant(
+          of: find.widgetWithText(AppTextField, label.toUpperCase()),
+          matching: find.byType(TextField),
+        ),
+        value,
+      );
+      await fill('Mindestbestand', '2');
+      await fill('Einkaufspreis', '18.50');
+      await fill('Verkaufspreis', '34.90');
+      await tester.pump();
 
       await tester.tap(find.text('Artikel speichern'));
       await tester.pumpAndSettle();
@@ -289,6 +304,7 @@ void main() {
     );
 
     Article articleWith({int quantity = 10, int? maxQuantity}) => _buildArticle(
+      ean: '4022334455666',
       name: 'Speiche',
       category: Category.laufraeder,
       quantity: quantity,

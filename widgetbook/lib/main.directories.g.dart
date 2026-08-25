@@ -24,6 +24,8 @@ import 'package:bikedrop_widgetbook/use_cases/atoms/app_segment.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_segment;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_text_field.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_text_field;
+import 'package:bikedrop_widgetbook/use_cases/atoms/barcode_painter.dart'
+    as _bikedrop_widgetbook_use_cases_atoms_barcode_painter;
 import 'package:bikedrop_widgetbook/use_cases/atoms/category_badge.dart'
     as _bikedrop_widgetbook_use_cases_atoms_category_badge;
 import 'package:bikedrop_widgetbook/use_cases/molecules/app_search_bar.dart'
@@ -34,6 +36,8 @@ import 'package:bikedrop_widgetbook/use_cases/molecules/app_snackbar.dart'
     as _bikedrop_widgetbook_use_cases_molecules_app_snackbar;
 import 'package:bikedrop_widgetbook/use_cases/molecules/app_toggle_card.dart'
     as _bikedrop_widgetbook_use_cases_molecules_app_toggle_card;
+import 'package:bikedrop_widgetbook/use_cases/molecules/demo_option_tile.dart'
+    as _bikedrop_widgetbook_use_cases_molecules_demo_option_tile;
 import 'package:bikedrop_widgetbook/use_cases/molecules/item_list_tile.dart'
     as _bikedrop_widgetbook_use_cases_molecules_item_list_tile;
 import 'package:bikedrop_widgetbook/use_cases/molecules/list_column_header.dart'
@@ -42,6 +46,10 @@ import 'package:bikedrop_widgetbook/use_cases/molecules/quantity_stepper.dart'
     as _bikedrop_widgetbook_use_cases_molecules_quantity_stepper;
 import 'package:bikedrop_widgetbook/use_cases/organisms/delete_confirmation_dialog.dart'
     as _bikedrop_widgetbook_use_cases_organisms_delete_confirmation_dialog;
+import 'package:bikedrop_widgetbook/use_cases/organisms/fake_camera_view.dart'
+    as _bikedrop_widgetbook_use_cases_organisms_fake_camera_view;
+import 'package:bikedrop_widgetbook/use_cases/organisms/scanner_frame.dart'
+    as _bikedrop_widgetbook_use_cases_organisms_scanner_frame;
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 
 final directories = <_widgetbook.WidgetbookNode>[
@@ -124,6 +132,21 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'BarcodeWidget',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder: _bikedrop_widgetbook_use_cases_atoms_barcode_painter
+                    .barcodeWidgetDefault,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Ungültige EAN',
+                builder: _bikedrop_widgetbook_use_cases_atoms_barcode_painter
+                    .barcodeWidgetInvalid,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'CategoryBadge',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -181,6 +204,17 @@ final directories = <_widgetbook.WidgetbookNode>[
             ],
           ),
           _widgetbook.WidgetbookComponent(
+            name: 'DemoOptionTile',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder:
+                    _bikedrop_widgetbook_use_cases_molecules_demo_option_tile
+                        .demoOptionTileDefault,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
             name: 'ItemListTile',
             useCases: [
               _widgetbook.WidgetbookUseCase(
@@ -225,6 +259,32 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _bikedrop_widgetbook_use_cases_organisms_delete_confirmation_dialog
                         .deleteConfirmationDialogDefault,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'FakeCameraView',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder:
+                    _bikedrop_widgetbook_use_cases_organisms_fake_camera_view
+                        .fakeCameraViewDefault,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'ScannerFrame',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder: _bikedrop_widgetbook_use_cases_organisms_scanner_frame
+                    .scannerFrameDefault,
+              ),
+              _widgetbook.WidgetbookUseCase(
+                name: 'Mit Barcode',
+                builder: _bikedrop_widgetbook_use_cases_organisms_scanner_frame
+                    .scannerFrameWithBarcode,
               ),
             ],
           ),
