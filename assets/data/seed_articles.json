@@ -1,7 +1,7 @@
 [
   {
     "id": "art_001",
-    "ean": "4055123456789",
+    "ean": "4055123456780",
     "name": "Shimano Deore Bremsscheibe 180mm",
     "category": "bremsen",
     "supplier": "Shimano",
@@ -21,7 +21,7 @@
   },
   {
     "id": "art_002",
-    "ean": "4711234567890",
+    "ean": "4711234567899",
     "name": "KMC Kette X11",
     "category": "antrieb",
     "supplier": "KMC",
@@ -41,7 +41,7 @@
   },
   {
     "id": "art_003",
-    "ean": "4055987654321",
+    "ean": "4055987654322",
     "name": "Bosch PowerTube 625Wh",
     "category": "eBike",
     "supplier": "Bosch",
@@ -63,7 +63,7 @@
   },
   {
     "id": "art_004",
-    "ean": "4022334455667",
+    "ean": "4022334455666",
     "name": "Speiche Edelstahl 2.0mm, silber, 296mm, für Shimano/SRAM-kompatible Naben",
     "category": "laufraeder",
     "supplier": "DT Swiss",
@@ -84,7 +84,7 @@
   },
   {
     "id": "art_005",
-    "ean": "4066112233445",
+    "ean": "4066112233442",
     "name": "Ersatzteil ohne Foto",
     "category": "bremsen",
     "supplier": "Magura",
@@ -125,7 +125,7 @@
   },
   {
     "id": "art_007",
-    "ean": "4099887766554",
+    "ean": "4099887766556",
     "name": "Carbon-Sattelstütze 27.2x350mm Ultralight Aero-Profil Team Edition",
     "category": "eBike",
     "supplier": "Ritchey",
@@ -145,7 +145,7 @@
   },
   {
     "id": "art_008",
-    "ean": "4033445566778",
+    "ean": "4033445566776",
     "name": "Bremsbeläge organisch Set",
     "category": "bremsen",
     "supplier": "Shimano",
@@ -186,7 +186,7 @@
   },
   {
     "id": "art_010",
-    "ean": "4088776655443",
+    "ean": "4088776655446",
     "name": "Kettenöl Teflon 100ml",
     "category": "antrieb",
     "supplier": "Finish Line",
