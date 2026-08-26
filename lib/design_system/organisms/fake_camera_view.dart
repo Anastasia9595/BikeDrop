@@ -18,10 +18,13 @@ class FakeCameraView extends StatelessWidget {
     required this.demoOptions,
     required this.activeEan,
     required this.onOptionTap,
+    required this.onTapWithoutBarcode,
     super.key,
   });
 
   final List<DemoScanOption> demoOptions;
+
+  final void Function() onTapWithoutBarcode;
 
   /// null = idle, sonst die EAN, die gerade "gescannt" wird.
   final String? activeEan;
@@ -68,9 +71,9 @@ class FakeCameraView extends StatelessWidget {
             horizontal: AppSpacing.screenSpacingH,
           ),
           child: AppSecondaryButton(
-            label: 'Ohne Barcode anlegen',
+            label: 'Keine EAN scannen',
             icon: Icons.add,
-            onPressed: () {},
+            onPressed: onTapWithoutBarcode,
           ),
         ),
       ],

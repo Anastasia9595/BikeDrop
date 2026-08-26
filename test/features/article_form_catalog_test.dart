@@ -14,11 +14,18 @@ const _catalogArticle = CatalogArticle(
   supplier: 'Abus',
 );
 
-Future<void> _pump(WidgetTester tester, {CatalogArticle? catalogArticle}) {
+Future<void> _pump(
+  WidgetTester tester, {
+  CatalogArticle? catalogArticle,
+  String? scannedEan,
+}) {
   return tester.pumpWidget(
     ProviderScope(
       child: MaterialApp(
-        home: ArticleFormScreen(catalogArticle: catalogArticle),
+        home: ArticleFormScreen(
+          catalogArticle: catalogArticle,
+          scannedEan: scannedEan,
+        ),
       ),
     ),
   );
@@ -78,5 +85,25 @@ void main() {
 
     // Der Ladeversuch scheitert im Test mangels Netzwerk — das ist erwartet.
     tester.takeException();
+  });
+
+  testWidgets('fuellt die Artikelnummer mit der gescannten EAN, wenn weder '
+      'Lager noch Katalog sie kennen', (tester) async {
+    await _pump(tester, scannedEan: '0978020137962');
+
+    expect(find.text('0978020137962'), findsWidgets);
+    expect(find.text('Neuer Artikel'), findsOneWidget);
+  });
+
+  testWidgets('laesst dem Katalogartikel den Vorrang vor der gescannten EAN',
+      (tester) async {
+    await _pump(
+      tester,
+      catalogArticle: _catalogArticle,
+      scannedEan: '0978020137962',
+    );
+
+    expect(find.text(_catalogArticle.ean), findsWidgets);
+    expect(find.text('0978020137962'), findsNothing);
   });
 }

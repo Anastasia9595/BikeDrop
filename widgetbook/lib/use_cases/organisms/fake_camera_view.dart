@@ -44,6 +44,7 @@ Widget fakeCameraViewDefault(BuildContext context) {
       demoOptions: _demoOptions,
       activeEan: scanning ? activeEan : null,
       onOptionTap: (option) => debugPrint('Tap: ${option.ean}'),
+      onTapWithoutBarcode: () => debugPrint('Keine EAN scannen'),
     ),
   );
 }

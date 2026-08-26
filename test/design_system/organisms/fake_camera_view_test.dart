@@ -33,6 +33,7 @@ Future<List<DemoScanOption>> _pump(
           demoOptions: options,
           activeEan: activeEan,
           onOptionTap: tapped.add,
+          onTapWithoutBarcode: () => debugPrint('Keine EAN scannen'),
         ),
       ),
     ),
@@ -62,12 +63,14 @@ void main() {
     expect(barcode.barColor, Colors.white);
   });
 
-  testWidgets('blendet den Barcode ueber einen AnimatedSwitcher ein',
-      (tester) async {
+  testWidgets('blendet den Barcode ueber einen AnimatedSwitcher ein', (
+    tester,
+  ) async {
     await _pump(tester);
 
-    final switcher =
-        tester.widget<AnimatedSwitcher>(find.byType(AnimatedSwitcher));
+    final switcher = tester.widget<AnimatedSwitcher>(
+      find.byType(AnimatedSwitcher),
+    );
     expect(switcher.duration, const Duration(milliseconds: 300));
   });
 
@@ -81,8 +84,9 @@ void main() {
     }
   });
 
-  testWidgets('meldet einen Tap mit der angetippten Option nach aussen',
-      (tester) async {
+  testWidgets('meldet einen Tap mit der angetippten Option nach aussen', (
+    tester,
+  ) async {
     final tapped = await _pump(tester);
 
     await tester.tap(find.text(_miss.label));

@@ -199,4 +199,31 @@ void main() {
 
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('meldet einen ungueltigen Barcode und ruft onEanScanned nicht auf',
+      (tester) async {
+    final scanner = _RealScannerStub();
+    final scanned = await _pump(tester, scanner: scanner);
+
+    // Gleiche EAN wie oben, nur mit falscher Pruefziffer.
+    scanner._controller.add('4029876501234');
+    await tester.pump();
+
+    expect(scanned, isEmpty);
+    expect(
+      find.text('Ungültiger Barcode – bitte erneut scannen'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('reicht ein UPC-A normalisiert auf 13 Stellen weiter',
+      (tester) async {
+    final scanner = _RealScannerStub();
+    final scanned = await _pump(tester, scanner: scanner);
+
+    scanner._controller.add('978020137962');
+    await tester.pump();
+
+    expect(scanned, ['0978020137962']);
+  });
 }

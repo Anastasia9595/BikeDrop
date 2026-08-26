@@ -222,6 +222,13 @@ class OverviewScreen extends ConsumerWidget {
                                       'EAN 978020137962 · Unbekanntes Produkt',
                                   icon: Symbols.question_mark_rounded,
                                 ),
+                                DemoScanOption(
+                                  ean: '4029876501234',
+                                  label: 'Ungültigen Barcode simulieren',
+                                  subtitle:
+                                      'EAN 4029876501234 · falsche Prüfziffer',
+                                  icon: Symbols.error_rounded,
+                                ),
                               ],
                               onEanScanned:
                                   (
@@ -249,6 +256,9 @@ class OverviewScreen extends ConsumerWidget {
                                         builder: (context) => ArticleFormScreen(
                                           article: article,
                                           catalogArticle: catalogArticle,
+                                          // Kennt keiner von beiden die EAN,
+                                          // bleibt sie als einzige Vorgabe.
+                                          scannedEan: ean,
                                         ),
                                       ),
                                     );

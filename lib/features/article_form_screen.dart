@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/article_image.dart';
+import '../core/ean.dart';
 import '../design_system/design_system.dart';
 import '../models/article.dart';
 import '../models/catalogarticle.dart';
@@ -9,7 +10,12 @@ import '../providers/article_repository_provider.dart';
 import '../providers/image_picker_provider.dart';
 
 class ArticleFormScreen extends ConsumerStatefulWidget {
-  const ArticleFormScreen({this.article, this.catalogArticle, super.key});
+  const ArticleFormScreen({
+    this.article,
+    this.catalogArticle,
+    this.scannedEan,
+    super.key,
+  });
 
   /// Wenn gesetzt, startet das Formular vorausgefüllt zum Bearbeiten
   /// dieses Artikels. Bei null wird ein neuer Artikel angelegt.
@@ -19,6 +25,11 @@ class ArticleFormScreen extends ConsumerStatefulWidget {
   /// nicht im Lager hat. Befüllt das Formular vor, es bleibt aber ein NEUER
   /// Artikel — anders als [article]. Wird ignoriert, wenn [article] gesetzt ist.
   final CatalogArticle? catalogArticle;
+
+  /// Eine gescannte EAN, die weder das Lager noch der Katalog kennt. Sie
+  /// befuellt allein die Artikelnummer — alles Weitere traegt der Nutzer
+  /// ein. Wird ignoriert, sobald [article] oder [catalogArticle] gesetzt ist.
+  final String? scannedEan;
 
   @override
   ConsumerState<ArticleFormScreen> createState() => _ArticleFormScreenState();
@@ -51,7 +62,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     final catalog = article == null ? widget.catalogArticle : null;
 
     _articleNumberController = TextEditingController(
-      text: article?.ean ?? catalog?.ean ?? '',
+      text: article?.ean ?? catalog?.ean ?? widget.scannedEan ?? '',
     );
     _nameController = TextEditingController(
       text: article?.name ?? catalog?.name ?? '',
@@ -133,6 +144,19 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     return null;
   }
 
+  /// Dieselbe Regel wie beim Scan: getippt und gescannt gehen denselben Weg.
+  ///
+  /// Leer heisst „noch nicht ausgefuellt", nicht „falsch" — dass das Feld
+  /// Pflicht ist, erzwingt [_canSave].
+  String? get _articleNumberError {
+    final input = _articleNumberController.text.trim();
+    if (input.isEmpty) return null;
+    if (normalizeScannedEan(input) == null) {
+      return 'Keine gültige EAN – bitte Ziffern und Prüfziffer prüfen';
+    }
+    return null;
+  }
+
   /// Ein Zahlenfeld zaehlt erst als ausgefuellt, wenn es auch lesbar ist —
   /// sonst wuerde beim Speichern still 0 landen.
   bool _hasNumber(TextEditingController controller) =>
@@ -142,6 +166,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
   /// Lagerort und Bild sind im Datenmodell nullable und bleiben freiwillig.
   bool get _canSave =>
       _articleNumberController.text.trim().isNotEmpty &&
+      _articleNumberError == null &&
       _nameController.text.trim().isNotEmpty &&
       _category != null &&
       _hasNumber(_minQuantityController) &&
@@ -154,7 +179,11 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     if (category == null) return;
 
     final now = DateTime.now();
-    final ean = _articleNumberController.text.trim();
+    // Damit ein getippter UPC-A genauso 13-stellig im Bestand landet wie
+    // derselbe Code ueber den Scanner. _canSave garantiert die Gueltigkeit
+    // bereits, der Fallback ist reine Vorsicht.
+    final raw = _articleNumberController.text.trim();
+    final ean = normalizeScannedEan(raw) ?? raw;
     final storageLocation = _storageLocationController.text.trim();
     final existing = widget.article;
 
@@ -241,6 +270,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               label: 'Artikelnummer',
               controller: _articleNumberController,
               maxLines: 1,
+              errorText: _articleNumberError,
               onChanged: (_) => setState(() {}),
             ),
             AppTextField(

@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/ean.dart';
+import '../design_system/molecules/app_snackbar.dart';
 import '../design_system/organisms/fake_camera_view.dart';
 import '../design_system/organisms/scanner_frame.dart';
 import '../interface/barcode_scanner_interface.dart';
 import '../models/demoscanoption.dart';
 import '../providers/scanner_provider.dart';
 import '../repository/fake_barcod_scanner_repository.dart';
+import 'article_form_screen.dart';
 
 /// Generischer Scanner-Container.
 ///
@@ -62,7 +65,19 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
 
   /// Der einzige Ort, an dem [ScannerScreen.onEanScanned] aufgerufen wird —
   /// echte und simulierte Scans laufen beide durch denselben Stream.
-  Future<void> _handleScannedEan(String ean) async {
+  ///
+  /// Zugleich der Torwaechter: Der Aufrufer bekommt nur gueltige, auf 13
+  /// Stellen normalisierte EANs zu sehen und muss selbst nichts pruefen.
+  Future<void> _handleScannedEan(String raw) async {
+    final ean = normalizeScannedEan(raw);
+    if (ean == null) {
+      if (!mounted) return;
+      // Kein Abbruch des Scans: Der Nutzer bleibt stehen und haelt einfach
+      // den naechsten Barcode vor die Kamera.
+      AppSnackbar.show(context, 'Ungültiger Barcode – bitte erneut scannen');
+      return;
+    }
+
     await widget.onEanScanned(context, ref, ean);
   }
 
@@ -94,6 +109,11 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
           ? FakeCameraView(
               demoOptions: widget.demoOptions,
               activeEan: _activeEan,
+              onTapWithoutBarcode: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => ArticleFormScreen()),
+                );
+              },
               onOptionTap: _simulate,
             )
           : const ScannerFrame(
