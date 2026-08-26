@@ -61,10 +61,12 @@ class MockArticleRepository implements ArticleRepository {
   @override
   Future<Article?> getArticleByEan(String ean) async {
     final articles = await _ensureLoaded();
-    return articles.firstWhere(
-      (article) => article.ean == ean,
-      orElse: () => throw Exception('Article not found'),
-    );
+    // Eine unbekannte EAN ist der Normalfall beim Scannen (neuer Artikel),
+    // kein Fehler — deshalb null statt einer Exception.
+    for (final article in articles) {
+      if (article.ean == ean) return article;
+    }
+    return null;
   }
 
   @override

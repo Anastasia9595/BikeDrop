@@ -5,6 +5,9 @@ class FakeBarcodeScanner implements BarcodeScannerInterface {
   final _controller = StreamController<String>.broadcast();
 
   @override
+  Stream<String> get scans => _controller.stream;
+
+  @override
   Future<String> get scan => _controller.stream.first;
 
   @override

@@ -2,17 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/article_image.dart';
+import '../core/ean.dart';
 import '../design_system/design_system.dart';
 import '../models/article.dart';
+import '../models/catalogarticle.dart';
 import '../providers/article_repository_provider.dart';
 import '../providers/image_picker_provider.dart';
 
 class ArticleFormScreen extends ConsumerStatefulWidget {
-  const ArticleFormScreen({this.article, super.key});
+  const ArticleFormScreen({
+    this.article,
+    this.catalogArticle,
+    this.scannedEan,
+    super.key,
+  });
 
   /// Wenn gesetzt, startet das Formular vorausgefüllt zum Bearbeiten
   /// dieses Artikels. Bei null wird ein neuer Artikel angelegt.
   final Article? article;
+
+  /// Stammdaten aus dem Katalog zu einer gescannten EAN, die das Projekt noch
+  /// nicht im Lager hat. Befüllt das Formular vor, es bleibt aber ein NEUER
+  /// Artikel — anders als [article]. Wird ignoriert, wenn [article] gesetzt ist.
+  final CatalogArticle? catalogArticle;
+
+  /// Eine gescannte EAN, die weder das Lager noch der Katalog kennt. Sie
+  /// befuellt allein die Artikelnummer — alles Weitere traegt der Nutzer
+  /// ein. Wird ignoriert, sobald [article] oder [catalogArticle] gesetzt ist.
+  final String? scannedEan;
 
   @override
   ConsumerState<ArticleFormScreen> createState() => _ArticleFormScreenState();
@@ -41,9 +58,15 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
   void initState() {
     super.initState();
     final article = widget.article;
+    // Nur relevant, solange kein Artikel bearbeitet wird.
+    final catalog = article == null ? widget.catalogArticle : null;
 
-    _articleNumberController = TextEditingController(text: article?.ean ?? '');
-    _nameController = TextEditingController(text: article?.name ?? '');
+    _articleNumberController = TextEditingController(
+      text: article?.ean ?? catalog?.ean ?? widget.scannedEan ?? '',
+    );
+    _nameController = TextEditingController(
+      text: article?.name ?? catalog?.name ?? '',
+    );
     _minQuantityController = TextEditingController(
       text: article != null ? '${article.minQuantity}' : '',
     );
@@ -60,12 +83,12 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
       text: article?.storageLocation ?? '',
     );
 
-    _category = article?.category;
-    _supplier = article?.supplier;
+    _category = article?.category ?? catalog?.category;
+    _supplier = article?.supplier ?? catalog?.supplier;
     _quantity = article?.quantity ?? 1;
     _status = article?.status ?? ArticleStatus.inStock;
     _visibleForCustomers = article?.isPublic ?? false;
-    _imageSource = article?.imageUrl;
+    _imageSource = article?.imageUrl ?? catalog?.imageUrl;
   }
 
   /// Laesst den Nutzer die Quelle waehlen und uebernimmt das aufgenommene
@@ -121,9 +144,34 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     return null;
   }
 
+  /// Dieselbe Regel wie beim Scan: getippt und gescannt gehen denselben Weg.
+  ///
+  /// Leer heisst „noch nicht ausgefuellt", nicht „falsch" — dass das Feld
+  /// Pflicht ist, erzwingt [_canSave].
+  String? get _articleNumberError {
+    final input = _articleNumberController.text.trim();
+    if (input.isEmpty) return null;
+    if (normalizeScannedEan(input) == null) {
+      return 'Keine gültige EAN – bitte Ziffern und Prüfziffer prüfen';
+    }
+    return null;
+  }
+
+  /// Ein Zahlenfeld zaehlt erst als ausgefuellt, wenn es auch lesbar ist —
+  /// sonst wuerde beim Speichern still 0 landen.
+  bool _hasNumber(TextEditingController controller) =>
+      double.tryParse(controller.text.trim().replaceAll(',', '.')) != null;
+
+  /// Pflicht sind nur die fachlich noetigen Felder. Hoechstbestand, Lieferant,
+  /// Lagerort und Bild sind im Datenmodell nullable und bleiben freiwillig.
   bool get _canSave =>
+      _articleNumberController.text.trim().isNotEmpty &&
+      _articleNumberError == null &&
       _nameController.text.trim().isNotEmpty &&
       _category != null &&
+      _hasNumber(_minQuantityController) &&
+      _hasNumber(_purchasePriceController) &&
+      _hasNumber(_sellingPriceController) &&
       _maxQuantityError == null;
 
   Future<void> _save() async {
@@ -131,7 +179,11 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     if (category == null) return;
 
     final now = DateTime.now();
-    final ean = _articleNumberController.text.trim();
+    // Damit ein getippter UPC-A genauso 13-stellig im Bestand landet wie
+    // derselbe Code ueber den Scanner. _canSave garantiert die Gueltigkeit
+    // bereits, der Fallback ist reine Vorsicht.
+    final raw = _articleNumberController.text.trim();
+    final ean = normalizeScannedEan(raw) ?? raw;
     final storageLocation = _storageLocationController.text.trim();
     final existing = widget.article;
 
@@ -180,16 +232,23 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     }
   }
 
+  /// Die bekannten Lieferanten, ergaenzt um den aktuell gesetzten.
+  ///
+  /// [getSuppliers] kennt nur Lieferanten, die schon an einem Lagerartikel
+  /// haengen. Ein aus dem Katalog uebernommener Lieferant fehlt dort und wuerde
+  /// im Dropdown sonst leer bleiben.
+  List<String> _supplierOptions(List<String> known) {
+    final supplier = _supplier;
+    if (supplier == null || known.contains(supplier)) return known;
+    return [supplier, ...known];
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.article != null;
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
         title: Text(
           isEditing ? 'Artikel bearbeiten' : 'Neuer Artikel',
           style: AppTypography.screenTitle,
@@ -211,6 +270,8 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               label: 'Artikelnummer',
               controller: _articleNumberController,
               maxLines: 1,
+              errorText: _articleNumberError,
+              onChanged: (_) => setState(() {}),
             ),
             AppTextField(
               label: 'Artikelname',
@@ -234,12 +295,14 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                 Expanded(
                   child: AppDropdownField<String>(
                     label: 'Lieferant',
-                    items: ref
-                        .watch(getSuppliers)
-                        .maybeWhen(
-                          data: (data) => data.whereType<String>().toList(),
-                          orElse: () => [],
-                        ),
+                    items: _supplierOptions(
+                      ref
+                          .watch(getSuppliers)
+                          .maybeWhen(
+                            data: (data) => data.whereType<String>().toList(),
+                            orElse: () => <String>[],
+                          ),
+                    ),
                     itemLabel: (item) => item,
                     value: _supplier,
                     onChanged: (String? value) =>
@@ -291,6 +354,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                 Expanded(
                   child: AppTextField(
                     label: 'Einkaufspreis',
+                    onChanged: (_) => setState(() {}),
                     keyboardType: TextInputType.number,
                     placeholder: '0.00 €',
                     controller: _purchasePriceController,
@@ -300,6 +364,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                 Expanded(
                   child: AppTextField(
                     label: 'Verkaufspreis',
+                    onChanged: (_) => setState(() {}),
                     keyboardType: TextInputType.number,
                     placeholder: '0.00 €',
                     controller: _sellingPriceController,

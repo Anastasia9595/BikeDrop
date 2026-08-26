@@ -7,6 +7,10 @@ import 'package:bikedrop/design_system/design_system.dart';
 import 'package:bikedrop/features/article_form_screen.dart';
 import 'package:bikedrop/models/article.dart';
 import 'package:bikedrop/providers/article_repository_provider.dart';
+import 'package:bikedrop/providers/catalog_repository_provider.dart';
+
+import '../models/demoscanoption.dart';
+import 'scanner_screen.dart';
 
 Future<void> _editQuantity(
   BuildContext context,
@@ -14,10 +18,9 @@ Future<void> _editQuantity(
   Article article,
 ) async {
   final location = article.storageLocation;
-  final subtitle =
-      location != null
-          ? '$location · aktuell ${article.quantity} Stk.'
-          : 'aktuell ${article.quantity} Stk.';
+  final subtitle = location != null
+      ? '$location · aktuell ${article.quantity} Stk.'
+      : 'aktuell ${article.quantity} Stk.';
 
   final newQuantity = await QuantityEditSheet.show(
     context,
@@ -95,89 +98,87 @@ class OverviewScreen extends ConsumerWidget {
 
                     return articles.isNotEmpty
                         ? ListView.separated(
-                          itemCount: articles.length,
-                          separatorBuilder:
-                              (context, index) => Padding(
-                                padding: EdgeInsets.only(
-                                  left:
-                                      AppSpacing.screenPaddingH +
-                                      AppSpacing.listThumbnailSize +
-                                      AppSpacing.listRowGap,
-                                ),
-                                child: const Divider(
-                                  height: 1,
-                                  thickness: 1,
-                                  color: AppColors.listDivider,
-                                ),
+                            itemCount: articles.length,
+                            separatorBuilder: (context, index) => Padding(
+                              padding: EdgeInsets.only(
+                                left:
+                                    AppSpacing.screenPaddingH +
+                                    AppSpacing.listThumbnailSize +
+                                    AppSpacing.listRowGap,
                               ),
-                          itemBuilder: (context, index) {
-                            final article = articles[index];
-                            return ItemListTile(
-                              title: article.name,
-                              quantity: article.quantity,
-                              category: article.category,
-                              status: article.status,
-                              reorderedQuantity: article.reorderedQuantity,
-                              isPublic: article.isPublic,
-                              onTap: () => _openArticleForm(context, article),
-                              onQuantityTap:
-                                  () => _editQuantity(context, ref, article),
-                              image: articleImageProvider(article.imageUrl),
-                            );
-                          },
-                        )
+                              child: const Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: AppColors.listDivider,
+                              ),
+                            ),
+                            itemBuilder: (context, index) {
+                              final article = articles[index];
+                              return ItemListTile(
+                                title: article.name,
+                                quantity: article.quantity,
+                                category: article.category,
+                                status: article.status,
+                                reorderedQuantity: article.reorderedQuantity,
+                                isPublic: article.isPublic,
+                                onTap: () => _openArticleForm(context, article),
+                                onQuantityTap: () =>
+                                    _editQuantity(context, ref, article),
+                                image: articleImageProvider(article.imageUrl),
+                              );
+                            },
+                          )
                         : Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
 
-                            children: [
-                              DottedBorder(
-                                options: RoundedRectDottedBorderOptions(
-                                  radius: const Radius.circular(12),
-                                  color: AppColors.border,
-                                  dashPattern: [10, 5],
-                                  strokeWidth: 2,
-                                  padding: EdgeInsets.all(16),
+                              children: [
+                                DottedBorder(
+                                  options: RoundedRectDottedBorderOptions(
+                                    radius: const Radius.circular(12),
+                                    color: AppColors.border,
+                                    dashPattern: [10, 5],
+                                    strokeWidth: 2,
+                                    padding: EdgeInsets.all(16),
+                                  ),
+                                  child: Icon(
+                                    Symbols.package_2,
+                                    size: AppSpacing.iconSizeLarge,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
-                                child: Icon(
-                                  Symbols.package_2,
-                                  size: AppSpacing.iconSizeLarge,
-                                  color: AppColors.textSecondary,
+                                const SizedBox(height: 24),
+                                Text(
+                                  'Noch kein Bestand erfasst',
+                                  style: AppTypography.heading.copyWith(
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 24),
-                              Text(
-                                'Noch kein Bestand erfasst',
-                                style: AppTypography.heading.copyWith(
-                                  color: AppColors.textPrimary,
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Fügen Sie jetzt Ihren ersten Artikel hinzu, um den Überblick zu behalten.',
+                                  textAlign: TextAlign.center,
+                                  style: AppTypography.body.copyWith(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 17,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Fügen Sie jetzt Ihren ersten Artikel hinzu, um den Überblick zu behalten.',
-                                textAlign: TextAlign.center,
-                                style: AppTypography.body.copyWith(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 17,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+                              ],
+                            ),
+                          );
                   },
-                  loading:
-                      () => const Center(child: CircularProgressIndicator()),
-                  error:
-                      (error, stackTrace) => Center(
-                        child: Text(
-                          'Fehler beim Laden der Artikel: $error',
-                          style: AppTypography.body.copyWith(
-                            color: AppColors.textError,
-                          ),
-                        ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, stackTrace) => Center(
+                    child: Text(
+                      'Fehler beim Laden der Artikel: $error',
+                      style: AppTypography.body.copyWith(
+                        color: AppColors.textError,
                       ),
+                    ),
+                  ),
                 ),
               ),
               Row(
@@ -195,7 +196,76 @@ class OverviewScreen extends ConsumerWidget {
                     child: AppSecondaryButton(
                       label: 'Artikel anlegen',
                       onPressed: () {
-                        // Handle get started action
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ScannerScreen(
+                              title: 'Artikel anlegen',
+                              demoOptions: [
+                                DemoScanOption(
+                                  ean: '4029876501233',
+                                  label: 'Katalogartikel simulieren',
+                                  subtitle:
+                                      'EAN 4029876501233 · Abus Bordo 6000 Faltschloss 90cm',
+                                  icon: Symbols.qr_code,
+                                ),
+                                DemoScanOption(
+                                  ean: '4711234567899',
+                                  label: 'Eigenen Artikel simulieren',
+                                  subtitle:
+                                      'EAN 4711234567899 · Eigenes Produkt · KMC Kette X11',
+                                  icon: Symbols.qr_code,
+                                ),
+                                DemoScanOption(
+                                  ean: '978020137962',
+                                  label: 'Unbekannten Artikel simulieren',
+                                  subtitle:
+                                      'EAN 978020137962 · Unbekanntes Produkt',
+                                  icon: Symbols.question_mark_rounded,
+                                ),
+                                DemoScanOption(
+                                  ean: '4029876501234',
+                                  label: 'Ungültigen Barcode simulieren',
+                                  subtitle:
+                                      'EAN 4029876501234 · falsche Prüfziffer',
+                                  icon: Symbols.error_rounded,
+                                ),
+                              ],
+                              onEanScanned:
+                                  (
+                                    BuildContext context,
+                                    WidgetRef ref,
+                                    String ean,
+                                  ) async {
+                                    // Erst das Lager: kennt es die EAN, wird
+                                    // der bestehende Artikel bearbeitet.
+                                    final article = await ref.read(
+                                      filterArticleByEan(ean).future,
+                                    );
+                                    // Sonst der Katalog: dessen Stammdaten
+                                    // befuellen einen NEUEN Artikel vor.
+                                    final catalogArticle = article != null
+                                        ? null
+                                        : await ref.read(
+                                            catalogArticleByEan(ean).future,
+                                          );
+
+                                    if (!context.mounted) return;
+
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => ArticleFormScreen(
+                                          article: article,
+                                          catalogArticle: catalogArticle,
+                                          // Kennt keiner von beiden die EAN,
+                                          // bleibt sie als einzige Vorgabe.
+                                          scannedEan: ean,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),

@@ -3,7 +3,16 @@ import '../interface/barcode_scanner_interface.dart';
 import 'dart:async';
 
 class MobileScannerAdapter implements BarcodeScannerInterface {
-  final _controller = MobileScannerController();
+  // Ohne diese Einschraenkung liefert mobile_scanner den rawValue JEDES
+  // erkannten Codes — auch den Inhalt eines QR-Codes, der dann als "EAN"
+  // in die Lookup-Kaskade liefe.
+  final _controller = MobileScannerController(
+    formats: const [
+      BarcodeFormat.ean13,
+      BarcodeFormat.ean8,
+      BarcodeFormat.upcA,
+    ],
+  );
   final _out = StreamController<String>.broadcast();
   StreamSubscription<BarcodeCapture>? _sub;
 
@@ -11,6 +20,9 @@ class MobileScannerAdapter implements BarcodeScannerInterface {
     await _sub?.cancel();
     await _controller.stop();
   }
+
+  @override
+  Stream<String> get scans => _out.stream;
 
   @override
   Future<String> get scan => _out.stream.first;

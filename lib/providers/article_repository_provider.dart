@@ -32,6 +32,14 @@ final filterArticleByName = FutureProvider.family<List<Article>, String>((
   return repository.searchArticlesByName(name);
 });
 
+final filterArticleByEan = FutureProvider.family<Article?, String>((
+  ref,
+  ean,
+) async {
+  final repository = ref.watch(articleRepositoryProvider);
+  return repository.getArticleByEan(ean);
+});
+
 final getSuppliers = FutureProvider<List<String?>>((ref) async {
   final repository = ref.watch(articleRepositoryProvider);
   return repository.getSuppliers();
