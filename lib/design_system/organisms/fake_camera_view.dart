@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../models/demoscanoption.dart';
-import '../atoms/barcode_painter.dart';
 import '../atoms/text_divider.dart';
 import '../design_system.dart';
-import '../molecules/demo_option_tile.dart';
-import 'scanner_frame.dart';
 
 /// Rein praesentationale Anzeige des simulierten Scans.
 ///
