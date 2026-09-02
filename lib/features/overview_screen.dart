@@ -38,6 +38,28 @@ Future<void> _editQuantity(
   ref.invalidate(filterArticleByName(ref.read(searchQueryProvider)));
 }
 
+/// Zaehlt die Artikel je Status. Gezaehlt wird immer das Suchergebnis, nicht
+/// die schon status-gefilterte Liste — sonst waeren zwei der drei Zahlen 0,
+/// sobald ein Filter aktiv ist.
+Map<ArticleStatus, int> _countByStatus(List<Article> articles) {
+  return {
+    for (final status in ArticleStatus.values)
+      status: articles.where((a) => a.status == status).length,
+  };
+}
+
+/// Text fuer die leere Liste — je nachdem, ob Suche, Status-Filter oder
+/// beides zusammen nichts gefunden haben.
+String _noResultsMessage(String searchQuery, ArticleStatus? status) {
+  if (status != null && searchQuery.isNotEmpty) {
+    return 'Keine Artikel mit Status „${status.label}“ für „$searchQuery“.';
+  }
+  if (status != null) {
+    return 'Keine Artikel mit Status „${status.label}“.';
+  }
+  return 'Keine Artikel gefunden für „$searchQuery“.';
+}
+
 void _openArticleForm(BuildContext context, Article article) {
   Navigator.of(context).push(
     MaterialPageRoute(
@@ -53,6 +75,7 @@ class OverviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final searchQuery = ref.watch(searchQueryProvider);
     final searchController = ref.watch(searchControllerProvider);
+    final statusFilter = ref.watch(statusFilterProvider);
     final articlesAsync = ref.watch(filterArticleByName(searchQuery));
 
     return Scaffold(
@@ -81,13 +104,33 @@ class OverviewScreen extends ConsumerWidget {
                   },
                 ),
               ),
+              // Die Kacheln zaehlen immer das Suchergebnis, nicht die schon
+              // status-gefilterte Liste — sonst waeren zwei der drei Zahlen
+              // 0, sobald ein Filter aktiv ist.
+              if (articlesAsync.valueOrNull?.isNotEmpty ?? false) ...[
+                KpiFilterRow(
+                  counts: _countByStatus(articlesAsync.requireValue),
+                  selected: statusFilter,
+                  onStatusTap: (status) =>
+                      ref.read(statusFilterProvider.notifier).state =
+                          statusFilter == status ? null : status,
+                ),
+                const SizedBox(height: AppSpacing.screenSpacingV),
+              ],
               Expanded(
                 child: articlesAsync.when(
                   data: (articles) {
-                    if (articles.isEmpty && searchQuery.isNotEmpty) {
+                    final visible = statusFilter == null
+                        ? articles
+                        : articles
+                              .where((a) => a.status == statusFilter)
+                              .toList();
+
+                    if (visible.isEmpty &&
+                        (searchQuery.isNotEmpty || statusFilter != null)) {
                       return Center(
                         child: Text(
-                          'Keine Artikel gefunden für „$searchQuery“.',
+                          _noResultsMessage(searchQuery, statusFilter),
                           textAlign: TextAlign.center,
                           style: AppTypography.body.copyWith(
                             color: AppColors.textSecondary,
@@ -96,9 +139,9 @@ class OverviewScreen extends ConsumerWidget {
                       );
                     }
 
-                    return articles.isNotEmpty
+                    return visible.isNotEmpty
                         ? ListView.separated(
-                            itemCount: articles.length,
+                            itemCount: visible.length,
                             separatorBuilder: (context, index) => Padding(
                               padding: EdgeInsets.only(
                                 left:
@@ -113,7 +156,7 @@ class OverviewScreen extends ConsumerWidget {
                               ),
                             ),
                             itemBuilder: (context, index) {
-                              final article = articles[index];
+                              final article = visible[index];
                               return ItemListTile(
                                 title: article.name,
                                 quantity: article.quantity,

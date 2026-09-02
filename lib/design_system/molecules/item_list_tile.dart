@@ -122,10 +122,13 @@ class ItemListTile extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CategoryBadge(category: category),
+                      // Beide flexibel: auf schmalen Geraeten oder bei
+                      // grosser Schrift werden Badge und Statustext gekuerzt,
+                      // statt die Zeile zu sprengen.
+                      Flexible(child: CategoryBadge(category: category)),
                       if (stockStatus != null) ...[
                         const SizedBox(width: 12),
-                        stockStatus,
+                        Flexible(child: stockStatus),
                       ],
                     ],
                   ),

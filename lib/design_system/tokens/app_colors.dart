@@ -59,4 +59,13 @@ class AppColors {
     ArticleStatus.bestellt: statusColorWarning,
     ArticleStatus.fehlt: statusColorError,
   };
+
+  /// Vordergrundfarbe *auf* der gesaettigten Statusfarbe — z. B. in der
+  /// KpiFilterCard. Auf Gruen und Rot traegt Weiss, auf dem hellen Gelb
+  /// waere Weiss unlesbar (1.5:1), dort steht dunkles Ink (10.6:1).
+  static const Map<ArticleStatus, Color> statusOnColors = {
+    ArticleStatus.inStock: white,
+    ArticleStatus.bestellt: textPrimary,
+    ArticleStatus.fehlt: white,
+  };
 }

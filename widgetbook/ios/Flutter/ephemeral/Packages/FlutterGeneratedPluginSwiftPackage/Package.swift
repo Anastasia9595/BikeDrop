@@ -1,0 +1,34 @@
+// swift-tools-version: 5.9
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+//
+// Generated file. Do not edit.
+//
+
+import PackageDescription
+
+let package = Package(
+    name: "FlutterGeneratedPluginSwiftPackage",
+    platforms: [
+        .iOS("13.0")
+    ],
+    products: [
+        .library(name: "FlutterGeneratedPluginSwiftPackage", type: .static, targets: ["FlutterGeneratedPluginSwiftPackage"])
+    ],
+    dependencies: [
+        .package(name: "image_picker_ios", path: "../.packages/image_picker_ios-0.8.13+6"),
+        .package(name: "mobile_scanner", path: "../.packages/mobile_scanner-7.4.0"),
+        .package(name: "url_launcher_ios", path: "../.packages/url_launcher_ios-6.3.4"),
+        .package(name: "FlutterFramework", path: "../.packages/FlutterFramework")
+    ],
+    targets: [
+        .target(
+            name: "FlutterGeneratedPluginSwiftPackage",
+            dependencies: [
+                .product(name: "image-picker-ios", package: "image_picker_ios"),
+                .product(name: "mobile-scanner", package: "mobile_scanner"),
+                .product(name: "url-launcher-ios", package: "url_launcher_ios"),
+                .product(name: "FlutterFramework", package: "FlutterFramework")
+            ]
+        )
+    ]
+)
