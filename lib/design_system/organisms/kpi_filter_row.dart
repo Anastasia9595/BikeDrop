@@ -39,20 +39,17 @@ class KpiFilterRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
+      spacing: AppSpacing.listRowGap,
+      runSpacing: AppSpacing.listRowGap,
       children: [
-        for (final status in order) ...[
-          Expanded(
-            child: KpiFilterCard(
-              value: counts[status] ?? 0,
-              status: status,
-              selected: selected == status,
-              onTap: onStatusTap == null ? null : () => onStatusTap!(status),
-            ),
+        for (final status in order)
+          KpiFilterCard(
+            value: counts[status] ?? 0,
+            status: status,
+            selected: selected == status,
+            onTap: onStatusTap == null ? null : () => onStatusTap!(status),
           ),
-          if (status != order.last)
-            const SizedBox(width: AppSpacing.listRowGap),
-        ],
       ],
     );
   }

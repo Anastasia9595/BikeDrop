@@ -19,7 +19,11 @@ class AppColors {
   static const Color accentTint = Color(0xFFFFF2EF);
 
   static const Color statusColorSuccess = Color(0xFF2D9B4A);
-  static const Color statusColorWarning = Color(0xFFF2C94C);
+
+  /// Dunkler als ein typisches Warngelb, damit weisser Text/Icon-Kontrast
+  /// AA erreicht (~5.4:1). Ein helles Gelb wie #F2C94C schafft mit Weiss
+  /// nur ~1.5:1 und waere unlesbar.
+  static const Color statusColorWarning = Color(0xFF9C5A00);
   static const Color statusColorError = Color(0xFFEB5757);
 
   static const Color textPrimary = Color(0xFF201E1D);
@@ -61,11 +65,11 @@ class AppColors {
   };
 
   /// Vordergrundfarbe *auf* der gesaettigten Statusfarbe — z. B. in der
-  /// KpiFilterCard. Auf Gruen und Rot traegt Weiss, auf dem hellen Gelb
-  /// waere Weiss unlesbar (1.5:1), dort steht dunkles Ink (10.6:1).
+  /// KpiFilterCard. Alle drei Statusfarben sind inzwischen dunkel genug
+  /// fuer Weiss (>= 4.5:1).
   static const Map<ArticleStatus, Color> statusOnColors = {
     ArticleStatus.inStock: white,
-    ArticleStatus.bestellt: textPrimary,
+    ArticleStatus.bestellt: white,
     ArticleStatus.fehlt: white,
   };
 }
