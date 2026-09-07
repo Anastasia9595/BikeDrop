@@ -20,6 +20,8 @@ class CategoryBadge extends StatelessWidget {
       ),
       child: Text(
         category.label.toUpperCase(),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: AppTypography.categoryBadgeLabel.copyWith(color: pair.text),
       ),
     );

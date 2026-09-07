@@ -86,4 +86,22 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     fontSize: 11,
   );
+
+  /// Grosse Kennzahl in der KpiFilterCard. Enge Zeilenhoehe, damit die
+  /// Zahl direkt unter dem Label sitzt.
+  static const TextStyle kpiValue = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w800,
+    fontSize: 32,
+    height: 1.0,
+    letterSpacing: -0.48,
+  );
+
+  /// Label ueber der Kennzahl in der KpiFilterCard.
+  static const TextStyle kpiLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w700,
+    fontSize: 13,
+    height: 1.2,
+  );
 }

@@ -34,11 +34,15 @@ class StatusIndicator extends StatelessWidget {
       children: [
         marker,
         const SizedBox(width: 6),
-        Text(
-          label,
-          style: AppTypography.body.copyWith(
-            fontSize: 12,
-            color: AppColors.textSecondary,
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.body.copyWith(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
           ),
         ),
       ],

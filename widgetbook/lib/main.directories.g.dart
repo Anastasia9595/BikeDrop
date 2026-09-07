@@ -16,6 +16,8 @@ import 'package:bikedrop_widgetbook/use_cases/atoms/app_icon_button.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_icon_button;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_image_upload_field.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_image_upload_field;
+import 'package:bikedrop_widgetbook/use_cases/atoms/app_kpi_card.dart'
+    as _bikedrop_widgetbook_use_cases_atoms_app_kpi_card;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_primary_button.dart'
     as _bikedrop_widgetbook_use_cases_atoms_app_primary_button;
 import 'package:bikedrop_widgetbook/use_cases/atoms/app_secondary_button.dart'
@@ -48,6 +50,8 @@ import 'package:bikedrop_widgetbook/use_cases/organisms/delete_confirmation_dial
     as _bikedrop_widgetbook_use_cases_organisms_delete_confirmation_dialog;
 import 'package:bikedrop_widgetbook/use_cases/organisms/fake_camera_view.dart'
     as _bikedrop_widgetbook_use_cases_organisms_fake_camera_view;
+import 'package:bikedrop_widgetbook/use_cases/organisms/kpi_filter_row.dart'
+    as _bikedrop_widgetbook_use_cases_organisms_kpi_filter_row;
 import 'package:bikedrop_widgetbook/use_cases/organisms/scanner_frame.dart'
     as _bikedrop_widgetbook_use_cases_organisms_scanner_frame;
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
@@ -153,6 +157,16 @@ final directories = <_widgetbook.WidgetbookNode>[
                 name: 'Default',
                 builder: _bikedrop_widgetbook_use_cases_atoms_category_badge
                     .categoryBadgeDefault,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'KpiFilterCard',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder: _bikedrop_widgetbook_use_cases_atoms_app_kpi_card
+                    .kpiFilterCardDefault,
               ),
             ],
           ),
@@ -270,6 +284,16 @@ final directories = <_widgetbook.WidgetbookNode>[
                 builder:
                     _bikedrop_widgetbook_use_cases_organisms_fake_camera_view
                         .fakeCameraViewDefault,
+              ),
+            ],
+          ),
+          _widgetbook.WidgetbookComponent(
+            name: 'KpiFilterRow',
+            useCases: [
+              _widgetbook.WidgetbookUseCase(
+                name: 'Default',
+                builder: _bikedrop_widgetbook_use_cases_organisms_kpi_filter_row
+                    .kpiFilterRowDefault,
               ),
             ],
           ),
