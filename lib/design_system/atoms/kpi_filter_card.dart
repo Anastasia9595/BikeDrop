@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 import '../../enums/article_status.dart';
 import '../tokens/app_colors.dart';
 import '../tokens/app_typography.dart';
 
-extension on ArticleStatus {
-  IconData get icon => switch (this) {
-    ArticleStatus.inStock => Symbols.order_approve_rounded,
-    ArticleStatus.bestellt => Symbols.delivery_truck_speed_rounded,
-    ArticleStatus.fehlt => Symbols.cancel_rounded,
-  };
-}
-
-/// Filter-Chip auf dem Overview-Screen: zeigt Icon, Status-Label und Anzahl
-/// und filtert die Liste beim Antippen darauf.
+/// Filter-Chip auf dem Overview-Screen: zeigt einen farbigen Punkt,
+/// Status-Label und Anzahl, und filtert die Liste beim Antippen darauf.
 ///
-/// Hintergrund ist die gesaettigte Statusfarbe, Icon und Schrift stehen in
-/// [AppColors.statusOnColors] — auf Gelb also dunkles Ink statt Weiss.
+/// Angelehnt an schlichte Status-Chips: im Ruhezustand weiss mit duennem
+/// Rahmen, im ausgewaehlten Zustand ein zarter Farbton der Statusfarbe als
+/// Hintergrund mit farbigem Rahmen. Der Punkt traegt in beiden Zustaenden
+/// die volle Statusfarbe.
 class KpiFilterCard extends StatelessWidget {
   const KpiFilterCard({
     super.key,
@@ -30,33 +23,32 @@ class KpiFilterCard extends StatelessWidget {
   final int value;
   final ArticleStatus status;
 
-  /// Markiert den Chip als aktiven Filter — sichtbar ueber einen Ring in
-  /// dunklem Ink. Ein Ring in der Vordergrundfarbe (Weiss) waere hier
-  /// sinnlos: Text und Icon sind ebenfalls weiss, der Ring wuerde optisch
-  /// mit ihnen verschmelzen statt sich vom Chip abzuheben.
+  /// Markiert den Chip als aktiven Filter.
   final bool selected;
 
   final VoidCallback? onTap;
 
-  /// Staerke des Auswahl-Rings. Der Ring liegt *innerhalb* des Chips, das
-  /// Padding ist um dieselbe Staerke reduziert — so sitzt der Inhalt in
-  /// beiden Zustaenden an derselben Stelle und die Zeile springt nicht.
-  static const double _ringWidth = 3;
+  static const double _borderWidth = 1.5;
 
   /// Innenabstand des Chips.
-  static const double _paddingH = 14;
+  static const double _paddingH = 16;
   static const double _paddingV = 10;
 
-  static const double _iconSize = 18;
-  static const double _iconGap = 6;
+  static const double _dotSize = 8;
+  static const double _dotGap = 8;
   static const double _valueGap = 6;
 
   @override
   Widget build(BuildContext context) {
-    final foreground = AppColors.statusOnColors[status]!;
+    final dotColor = AppColors.statusColors[status]!;
+    final borderColor = selected ? dotColor : AppColors.border;
+    final backgroundColor = selected
+        ? AppColors.statusColorTints[status]!
+        : AppColors.white;
+    final textColor = selected ? dotColor : AppColors.textPrimary;
 
     return Material(
-      color: AppColors.statusColors[status],
+      color: backgroundColor,
       shape: const StadiumBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -65,29 +57,28 @@ class KpiFilterCard extends StatelessWidget {
         child: Container(
           decoration: ShapeDecoration(
             shape: StadiumBorder(
-              side: BorderSide(
-                color: selected ? AppColors.textPrimary : Colors.transparent,
-                width: _ringWidth,
-                // Ohne strokeAlignInside liegt die Haelfte des Rings ausser-
-                // halb dieses Containers und wird vom Clip.antiAlias des
-                // umschliessenden Material weggeschnitten — auf Weiss-auf-
-                // Gruen/Rot war davon praktisch nichts mehr zu sehen.
-                strokeAlign: BorderSide.strokeAlignInside,
-              ),
+              side: BorderSide(color: borderColor, width: _borderWidth),
             ),
           ),
-          padding: EdgeInsets.symmetric(
-            horizontal: _paddingH - _ringWidth,
-            vertical: _paddingV - _ringWidth,
+          padding: const EdgeInsets.symmetric(
+            horizontal: _paddingH,
+            vertical: _paddingV,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(status.icon, size: _iconSize, color: foreground),
-              const SizedBox(width: _iconGap),
+              Container(
+                width: _dotSize,
+                height: _dotSize,
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: _dotGap),
               Text(
                 status.label,
-                style: AppTypography.kpiLabel.copyWith(color: foreground),
+                style: AppTypography.kpiLabel.copyWith(color: textColor),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -95,7 +86,7 @@ class KpiFilterCard extends StatelessWidget {
               Text(
                 value.toString(),
                 style: AppTypography.kpiLabel.copyWith(
-                  color: foreground,
+                  color: textColor,
                   fontWeight: FontWeight.w800,
                 ),
                 maxLines: 1,

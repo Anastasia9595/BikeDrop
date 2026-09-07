@@ -20,10 +20,11 @@ class AppColors {
 
   static const Color statusColorSuccess = Color(0xFF2D9B4A);
 
-  /// Dunkler als ein typisches Warngelb, damit weisser Text/Icon-Kontrast
-  /// AA erreicht (~5.4:1). Ein helles Gelb wie #F2C94C schafft mit Weiss
-  /// nur ~1.5:1 und waere unlesbar.
-  static const Color statusColorWarning = Color(0xFF9C5A00);
+  /// Amper-Gelb fuer die Ampel-Optik (Gruen/Gelb/Rot). Da die Farbe im
+  /// KpiFilterCard nur noch als Punkt neben dunklem Text erscheint (kein
+  /// weisser Text mehr direkt auf der Flaeche), ist ein kraeftiges,
+  /// erkennbares Gelb statt eines gedeckten Braun-Tons moeglich.
+  static const Color statusColorWarning = Color(0xFFF2A900);
   static const Color statusColorError = Color(0xFFEB5757);
 
   static const Color textPrimary = Color(0xFF201E1D);
@@ -62,6 +63,16 @@ class AppColors {
     ArticleStatus.inStock: statusColorSuccess,
     ArticleStatus.bestellt: statusColorWarning,
     ArticleStatus.fehlt: statusColorError,
+  };
+
+  /// Zarter Hintergrundton je Status fuer den ausgewaehlten Zustand des
+  /// KpiFilterCard-Chips — die Statusfarbe selbst waere als Flaeche zu
+  /// kraeftig, hier soll nur ein Hauch Farbe hinter Punkt, Label und Rahmen
+  /// liegen.
+  static const Map<ArticleStatus, Color> statusColorTints = {
+    ArticleStatus.inStock: Color(0xFFEAF6ED),
+    ArticleStatus.bestellt: Color(0xFFF5EDE0),
+    ArticleStatus.fehlt: Color(0xFFFCEAEA),
   };
 
   /// Vordergrundfarbe *auf* der gesaettigten Statusfarbe — z. B. in der
