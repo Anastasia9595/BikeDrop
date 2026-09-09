@@ -30,7 +30,7 @@ class ReceivingCartItemTile extends StatelessWidget {
     if (resolved != null) return resolved.name;
     final catalog = item.catalogData;
     if (catalog != null) return catalog.name;
-    return 'Unbekannter Artikel';
+    return item.suggestedName ?? 'Unbekannter Artikel';
   }
 
   IconData get _icon => switch (item.scanStatus) {
@@ -95,25 +95,34 @@ class ReceivingCartItemTile extends StatelessWidget {
             const SizedBox(width: AppSpacing.listRowGap),
             if (isUnknown)
               SizedBox(
-                height: 36,
+                width: 120,
+                height: AppSpacing.fieldHeight,
                 child: OutlinedButton(
                   onPressed: onAnlegenTap,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
+                    minimumSize: Size.zero,
                     side: const BorderSide(
                       color: AppColors.border,
                       width: AppSpacing.fieldBorderWidth,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.buttonRadius,
+                      ),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Symbols.add, size: 16, color: AppColors.textPrimary),
-                      const SizedBox(width: 4),
+                      const Icon(
+                        Symbols.add,
+                        size: 14,
+                        color: AppColors.textPrimary,
+                      ),
+                      const SizedBox(width: 2),
                       Text(
                         'Anlegen',
                         style: AppTypography.secondaryButtonLabel.copyWith(

@@ -155,7 +155,7 @@ void main() {
     expect(find.textContaining('4 Stk'), findsOneWidget);
   });
 
-  testWidgets('dragging all the way up also reveals the full view without overflowing', (
+  testWidgets('dragging the handle all the way up also reveals the full view without overflowing', (
     tester,
   ) async {
     await _pump(
@@ -168,7 +168,7 @@ void main() {
     );
 
     await tester.dragFrom(
-      tester.getCenter(find.byType(ReceivingCartItemTile).first),
+      tester.getCenter(find.byKey(const ValueKey('receiving-cart-drag-handle'))),
       const Offset(0, -700),
     );
     await tester.pumpAndSettle();
@@ -176,6 +176,77 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(KpiFilterRow), findsOneWidget);
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(3));
+  });
+
+  testWidgets('dragging a list item does not resize the sheet, only scrolls the list', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      seed: [
+        _known(ean: '1', quantity: 1),
+        _known(ean: '2', quantity: 1),
+      ],
+    );
+
+    await tester.dragFrom(
+      tester.getCenter(find.byType(ReceivingCartItemTile).first),
+      const Offset(0, -700),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(KpiFilterRow), findsNothing);
+    expect(find.textContaining('Wareneingang abschließen'), findsNothing);
+  });
+
+  testWidgets('dragging the handle down from the expanded view collapses back to peek', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      seed: [
+        _known(ean: '1', quantity: 2),
+        _known(ean: '2', quantity: 1),
+        _known(ean: '3', quantity: 1),
+      ],
+    );
+
+    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+    await tester.pumpAndSettle();
+    expect(find.byType(KpiFilterRow), findsOneWidget);
+
+    await tester.dragFrom(
+      tester.getCenter(find.byKey(const ValueKey('receiving-cart-drag-handle'))),
+      const Offset(0, 700),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(KpiFilterRow), findsNothing);
+  });
+
+  testWidgets('tapping the collapse icon in the expanded view returns to the peek state', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      seed: [
+        _known(ean: '1', quantity: 2),
+        _known(ean: '2', quantity: 1),
+        _known(ean: '3', quantity: 1),
+      ],
+    );
+
+    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+    await tester.pumpAndSettle();
+    expect(find.byType(KpiFilterRow), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Warenkorb einklappen'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(KpiFilterRow), findsNothing);
+    expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
   });
 
   testWidgets('tapping a filter chip narrows the expanded list', (tester) async {
@@ -229,4 +300,79 @@ void main() {
 
     expect(container.read(receivingCartProvider).single.resolvedArticle?.name, 'Neuer Artikel');
   });
+
+  testWidgets('Anlegen prefills EAN and the suggested name in the form', (tester) async {
+    await _pump(
+      tester,
+      seed: const [
+        ReceivingCartItem(
+          ean: '4090123456781',
+          quantity: 1,
+          suggestedName: 'Rücklicht Pulse X1',
+        ),
+      ],
+    );
+
+    await tester.tap(find.text('Anlegen'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('4090123456781'), findsOneWidget);
+    expect(find.text('Rücklicht Pulse X1'), findsOneWidget);
+  });
+
+  testWidgets('Wareneingang abschließen is disabled while an unresolved unknown item remains', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      seed: [
+        _known(ean: '1', quantity: 1),
+        const ReceivingCartItem(ean: '978020137962', quantity: 1),
+      ],
+    );
+
+    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+    await tester.pumpAndSettle();
+
+    final button = tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton));
+    expect(button.onPressed, isNull);
+  });
+
+  testWidgets('Wareneingang abschließen is enabled once no unknown item remains', (tester) async {
+    await _pump(tester, seed: [_known(ean: '1', quantity: 1)]);
+
+    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+    await tester.pumpAndSettle();
+
+    final button = tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton));
+    expect(button.onPressed, isNotNull);
+  });
+
+  testWidgets(
+    'Wareneingang abschließen becomes enabled after the last unknown item is resolved',
+    (tester) async {
+      await _pump(
+        tester,
+        seed: const [ReceivingCartItem(ean: '978020137962', quantity: 1)],
+        articlesByEan: {'978020137962': _article(ean: '978020137962', name: 'Neuer Artikel')},
+      );
+
+      await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onPressed,
+        isNull,
+      );
+
+      await tester.tap(find.text('Anlegen'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton)).onPressed,
+        isNotNull,
+      );
+    },
+  );
 }

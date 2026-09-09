@@ -18,6 +18,7 @@ Future<void> _pump(
   WidgetTester tester, {
   CatalogArticle? catalogArticle,
   String? scannedEan,
+  String? scannedName,
 }) {
   return tester.pumpWidget(
     ProviderScope(
@@ -25,6 +26,7 @@ Future<void> _pump(
         home: ArticleFormScreen(
           catalogArticle: catalogArticle,
           scannedEan: scannedEan,
+          scannedName: scannedName,
         ),
       ),
     ),
@@ -106,4 +108,33 @@ void main() {
     expect(find.text(_catalogArticle.ean), findsWidgets);
     expect(find.text('0978020137962'), findsNothing);
   });
+
+  testWidgets(
+    'fuellt den Artikelnamen mit dem Namensvorschlag, wenn weder Lager noch '
+    'Katalog die EAN kennen',
+    (tester) async {
+      await _pump(
+        tester,
+        scannedEan: '4090123456781',
+        scannedName: 'Rücklicht Pulse X1',
+      );
+
+      expect(find.text('4090123456781'), findsWidgets);
+      expect(find.text('Rücklicht Pulse X1'), findsWidgets);
+    },
+  );
+
+  testWidgets(
+    'laesst dem Katalogartikel den Vorrang vor dem Namensvorschlag',
+    (tester) async {
+      await _pump(
+        tester,
+        catalogArticle: _catalogArticle,
+        scannedName: 'Rücklicht Pulse X1',
+      );
+
+      expect(find.text(_catalogArticle.name), findsWidgets);
+      expect(find.text('Rücklicht Pulse X1'), findsNothing);
+    },
+  );
 }
