@@ -5,6 +5,12 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 @widgetbook.UseCase(name: 'Default', type: KpiFilterCard)
 Widget kpiFilterCardDefault(BuildContext context) {
+  final status = context.knobs.object.dropdown<ArticleStatus>(
+    label: 'Status (nur zur Vorschau)',
+    options: ArticleStatus.values,
+    labelBuilder: (status) => status.label,
+  );
+
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(24),
@@ -13,11 +19,9 @@ Widget kpiFilterCardDefault(BuildContext context) {
         width: 111,
         child: KpiFilterCard(
           value: context.knobs.int.input(label: 'Wert', initialValue: 432),
-          status: context.knobs.object.dropdown<ArticleStatus>(
-            label: 'Status',
-            options: ArticleStatus.values,
-            labelBuilder: (status) => status.label,
-          ),
+          label: status.label,
+          color: AppColors.statusColors[status]!,
+          tint: AppColors.statusColorTints[status]!,
           selected: context.knobs.boolean(label: 'Als Filter aktiv'),
           onTap: () {},
         ),
