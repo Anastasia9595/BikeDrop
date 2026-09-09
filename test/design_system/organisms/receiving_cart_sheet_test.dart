@@ -61,6 +61,15 @@ Future<ProviderContainer> _pump(
   required List<ReceivingCartItem> seed,
   Map<String, Article> articlesByEan = const {},
 }) async {
+  // Realistische Telefonhoehe statt der 600dp-Testvorgabe: bei der ist die
+  // Peek-Box (minChildSize-Anteil davon) zu knapp, um zuverlaessig 2 Zeilen
+  // zu zeigen — die ListView ist lazy und baut sonst nur, was ins (sehr
+  // kleine) Viewport passt.
+  tester.view.physicalSize = const Size(393, 852);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
   late final ProviderContainer container;
   await tester.pumpWidget(
     ProviderScope(
@@ -124,7 +133,31 @@ void main() {
     expect(find.byType(ReceivingCartItemTile), findsOneWidget);
   });
 
-  testWidgets('dragging up reveals the header, filters, full list and CTA', (tester) async {
+  testWidgets('tapping the expand icon reveals the header, filters, full list and CTA', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      seed: [
+        _known(ean: '1', quantity: 2),
+        _known(ean: '2', quantity: 1),
+        _known(ean: '3', quantity: 1),
+      ],
+    );
+
+    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(KpiFilterRow), findsOneWidget);
+    expect(find.byType(ReceivingCartItemTile), findsNWidgets(3));
+    expect(find.text('Wareneingang abschließen (3 Artikel)'), findsOneWidget);
+    expect(find.textContaining('3 Positionen'), findsOneWidget);
+    expect(find.textContaining('4 Stk'), findsOneWidget);
+  });
+
+  testWidgets('dragging all the way up also reveals the full view without overflowing', (
+    tester,
+  ) async {
     await _pump(
       tester,
       seed: [
@@ -136,15 +169,13 @@ void main() {
 
     await tester.dragFrom(
       tester.getCenter(find.byType(ReceivingCartItemTile).first),
-      const Offset(0, -500),
+      const Offset(0, -700),
     );
     await tester.pumpAndSettle();
 
+    expect(tester.takeException(), isNull);
     expect(find.byType(KpiFilterRow), findsOneWidget);
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(3));
-    expect(find.text('Wareneingang abschließen (3 Artikel)'), findsOneWidget);
-    expect(find.textContaining('3 Positionen'), findsOneWidget);
-    expect(find.textContaining('4 Stk'), findsOneWidget);
   });
 
   testWidgets('tapping a filter chip narrows the expanded list', (tester) async {
@@ -156,10 +187,7 @@ void main() {
       ],
     );
 
-    await tester.dragFrom(
-      tester.getCenter(find.byType(ReceivingCartItemTile).first),
-      const Offset(0, -500),
-    );
+    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
     await tester.pumpAndSettle();
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
 
@@ -173,10 +201,7 @@ void main() {
   testWidgets('the quantity stepper updates the cart provider', (tester) async {
     final container = await _pump(tester, seed: [_known(ean: '1', quantity: 1)]);
 
-    await tester.dragFrom(
-      tester.getCenter(find.byType(ReceivingCartItemTile).first),
-      const Offset(0, -500),
-    );
+    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Menge erhöhen'));
@@ -192,10 +217,7 @@ void main() {
       articlesByEan: {'978020137962': _article(ean: '978020137962', name: 'Neuer Artikel')},
     );
 
-    await tester.dragFrom(
-      tester.getCenter(find.byType(ReceivingCartItemTile).first),
-      const Offset(0, -500),
-    );
+    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Anlegen'));
