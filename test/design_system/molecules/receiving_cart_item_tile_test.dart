@@ -1,6 +1,4 @@
 import 'package:bikedrop/design_system/design_system.dart';
-import 'package:bikedrop/enums/article_status.dart';
-import 'package:bikedrop/enums/category.dart';
 import 'package:bikedrop/models/article.dart';
 import 'package:bikedrop/models/catalogarticle.dart';
 import 'package:bikedrop/models/receivingcartitem.dart';
