@@ -33,4 +33,10 @@ class MockCatalogRepository implements CatalogRepository {
     final catalog = await _ensureLoaded();
     return catalog[ean];
   }
+
+  @override
+  Future<List<CatalogArticle>> getCatalogArticles() async {
+    final catalog = await _ensureLoaded();
+    return List.unmodifiable(catalog.values);
+  }
 }

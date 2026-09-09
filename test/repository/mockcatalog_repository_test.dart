@@ -1,6 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bikedrop/enums/category.dart';
+import 'package:bikedrop/models/catalogarticle.dart';
 import 'package:bikedrop/repository/mockcatalog_repository.dart';
+
+const _catalogArticle = CatalogArticle(
+  name: 'Test',
+  category: Category.zubehoer,
+  ean: '0000000000000',
+);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -56,5 +63,22 @@ void main() {
     final second = await repository.lookupByEan('4711234567899');
 
     expect(identical(first, second), isTrue);
+  });
+
+  test('liefert alle Katalogartikel', () async {
+    final repository = MockCatalogRepository();
+
+    final articles = await repository.getCatalogArticles();
+
+    expect(articles, hasLength(8));
+    expect(articles.map((a) => a.ean), contains('4029876501233'));
+  });
+
+  test('liefert eine unveraenderliche Liste', () async {
+    final repository = MockCatalogRepository();
+
+    final articles = await repository.getCatalogArticles();
+
+    expect(() => articles.add(_catalogArticle), throwsUnsupportedError);
   });
 }
