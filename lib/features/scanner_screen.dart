@@ -134,8 +134,15 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Stack(
+        // Beide Kinder bewusst positioned: ein Stack mit einem
+        // nicht-positionierten Kind schrumpft in Scaffold.body (lose statt
+        // straffe Constraints) auf dessen natuerliche Hoehe, statt die volle
+        // Bildschirmhoehe zu fuellen. Das overlay wuerde sich dann relativ
+        // zu dieser zu kleinen Box positionieren, nicht zum echten
+        // Bildschirmende — genau der Bug hinter der weissen Flaeche unterm
+        // Peek-Sheet.
         children: [
-          content,
+          Positioned.fill(child: SingleChildScrollView(child: content)),
           if (widget.overlay != null) Positioned.fill(child: widget.overlay!),
         ],
       ),

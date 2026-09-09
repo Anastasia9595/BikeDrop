@@ -270,6 +270,36 @@ void main() {
     expect(find.byType(FakeCameraView), findsOneWidget);
   });
 
+  testWidgets('the overlay reaches the true bottom of the screen, not just the '
+      'bottom of a short content', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [scannerProvider.overrideWithValue(FakeBarcodeScanner())],
+        child: MaterialApp(
+          home: ScannerScreen(
+            title: 'Test',
+            demoOptions: const [_option],
+            onEanScanned: (context, ref, ean) async {},
+            overlay: const Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(key: ValueKey('scanner-overlay-bottom-probe'), height: 1),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final scaffoldBottom = tester.getBottomLeft(find.byType(Scaffold)).dy;
+    final overlayProbeBottom = tester
+        .getBottomLeft(find.byKey(const ValueKey('scanner-overlay-bottom-probe')))
+        .dy;
+
+    // FakeCameraView (der Inhalt) ist deutlich kuerzer als der Bildschirm —
+    // das Overlay muss trotzdem bis zum echten unteren Bildschirmrand
+    // reichen, nicht nur bis zum Ende des kurzen Inhalts dahinter.
+    expect(overlayProbeBottom, closeTo(scaffoldBottom, 1));
+  });
+
   testWidgets('an empty overlay does not block taps on the demo buttons behind it', (
     tester,
   ) async {
