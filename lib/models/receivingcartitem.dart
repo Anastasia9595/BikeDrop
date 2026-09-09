@@ -14,6 +14,7 @@ class ReceivingCartItem {
     required this.quantity,
     this.resolvedArticle,
     this.catalogData,
+    this.suggestedName,
   });
 
   /// Gescannter Barcode. Schluessel der Position und immer vorhanden.
@@ -30,11 +31,18 @@ class ReceivingCartItem {
   /// Null, wenn der Barcode im Katalog unbekannt ist.
   final CatalogArticle? catalogData;
 
+  /// Vorschlag fuer den Artikelnamen bei einer unbekannten [ean] (weder
+  /// [resolvedArticle] noch [catalogData] vorhanden) — befuellt beim
+  /// "Anlegen" nur das Namensfeld vor, der Nutzer kann ihn aendern. Null,
+  /// wenn kein Vorschlag bekannt ist.
+  final String? suggestedName;
+
   ReceivingCartItem copyWith({
     String? ean,
     int? quantity,
     Object? resolvedArticle = _unset,
     Object? catalogData = _unset,
+    Object? suggestedName = _unset,
   }) {
     return ReceivingCartItem(
       ean: ean ?? this.ean,
@@ -45,6 +53,9 @@ class ReceivingCartItem {
       catalogData: identical(catalogData, _unset)
           ? this.catalogData
           : catalogData as CatalogArticle?,
+      suggestedName: identical(suggestedName, _unset)
+          ? this.suggestedName
+          : suggestedName as String?,
     );
   }
 
@@ -60,6 +71,7 @@ class ReceivingCartItem {
       catalogData: catalogData == null
           ? null
           : CatalogArticle.fromJson(catalogData),
+      suggestedName: json['suggestedName'] as String?,
     );
   }
 
@@ -69,6 +81,7 @@ class ReceivingCartItem {
       'quantity': quantity,
       'resolvedArticle': resolvedArticle?.toJson(),
       'catalogData': catalogData?.toJson(),
+      'suggestedName': suggestedName,
     };
   }
 }

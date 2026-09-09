@@ -39,6 +39,19 @@ Widget _wrap(ReceivingCartItem item, {ValueChanged<int>? onQuantityChanged, Void
   );
 }
 
+/// Wie [_wrap], aber mit dem echten [AppTheme] statt dem Flutter-Default —
+/// nur so greift das globale OutlinedButton-Theme (minimumSize: volle
+/// Breite), das den Anlegen-Button in der Row sonst mit ungueltigen
+/// unendlichen BoxConstraints crashen laesst.
+Widget _wrapWithRealTheme(ReceivingCartItem item) {
+  return MaterialApp(
+    theme: AppTheme.light(),
+    home: Scaffold(
+      body: ReceivingCartItemTile(item: item, onQuantityChanged: (_) {}, onAnlegenTap: () {}),
+    ),
+  );
+}
+
 void main() {
   testWidgets('shows the resolved article name and its EAN', (tester) async {
     await tester.pumpWidget(
@@ -61,6 +74,21 @@ void main() {
     await tester.pumpWidget(_wrap(const ReceivingCartItem(ean: '978020137962', quantity: 1)));
 
     expect(find.text('Unbekannter Artikel'), findsOneWidget);
+  });
+
+  testWidgets('shows the suggested name for an unknown item when one is set', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const ReceivingCartItem(
+          ean: '4090123456781',
+          quantity: 1,
+          suggestedName: 'Rücklicht Pulse X1',
+        ),
+      ),
+    );
+
+    expect(find.text('Rücklicht Pulse X1'), findsOneWidget);
+    expect(find.text('Unbekannter Artikel'), findsNothing);
   });
 
   testWidgets('shows a QuantityStepper and no Anlegen-button for a known item', (tester) async {
@@ -90,6 +118,17 @@ void main() {
 
     expect(find.text('Anlegen'), findsOneWidget);
     expect(find.byType(QuantityStepper), findsNothing);
+  });
+
+  testWidgets('lays out the Anlegen-button under the real app theme without overflow', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrapWithRealTheme(const ReceivingCartItem(ean: '4090123456781', quantity: 1)),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Anlegen'), findsOneWidget);
   });
 
   testWidgets('reports a tap on Anlegen', (tester) async {

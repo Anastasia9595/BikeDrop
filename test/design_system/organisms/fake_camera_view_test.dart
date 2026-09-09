@@ -1,6 +1,9 @@
 import 'package:bikedrop/design_system/atoms/barcode_painter.dart';
+import 'package:bikedrop/design_system/molecules/demo_option_tile.dart';
+import 'package:bikedrop/design_system/organisms/demo_scenario_grid.dart';
 import 'package:bikedrop/design_system/organisms/fake_camera_view.dart';
 import 'package:bikedrop/design_system/organisms/scanner_frame.dart';
+import 'package:bikedrop/models/demo_options_layout.dart';
 import 'package:bikedrop/models/demoscanoption.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,6 +26,7 @@ Future<List<DemoScanOption>> _pump(
   WidgetTester tester, {
   String? activeEan,
   List<DemoScanOption> options = const [_hit, _miss],
+  DemoOptionsLayout layout = DemoOptionsLayout.list,
 }) async {
   final tapped = <DemoScanOption>[];
 
@@ -32,6 +36,7 @@ Future<List<DemoScanOption>> _pump(
         body: FakeCameraView(
           demoOptions: options,
           activeEan: activeEan,
+          layout: layout,
           onOptionTap: tapped.add,
           onTapWithoutBarcode: () => debugPrint('Keine EAN scannen'),
         ),
@@ -109,5 +114,23 @@ void main() {
 
     expect(find.byType(ScannerFrame), findsOneWidget);
     expect(find.byType(InkWell), findsNothing);
+  });
+
+  testWidgets('zeigt bei layout: list die Kachel-Liste, kein Grid', (
+    tester,
+  ) async {
+    await _pump(tester);
+
+    expect(find.byType(DemoOptionTile), findsNWidgets(2));
+    expect(find.byType(DemoScenarioGrid), findsNothing);
+  });
+
+  testWidgets('zeigt bei layout: grid das Szenario-Grid statt der Liste', (
+    tester,
+  ) async {
+    await _pump(tester, layout: DemoOptionsLayout.grid);
+
+    expect(find.byType(DemoScenarioGrid), findsOneWidget);
+    expect(find.byType(DemoOptionTile), findsNothing);
   });
 }

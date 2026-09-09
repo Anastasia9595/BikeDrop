@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../models/demo_options_layout.dart';
 import '../../models/demoscanoption.dart';
 import '../atoms/text_divider.dart';
 import '../design_system.dart';
@@ -16,6 +17,7 @@ class FakeCameraView extends StatelessWidget {
     required this.activeEan,
     required this.onOptionTap,
     required this.onTapWithoutBarcode,
+    this.layout = DemoOptionsLayout.list,
     super.key,
   });
 
@@ -27,6 +29,10 @@ class FakeCameraView extends StatelessWidget {
   final String? activeEan;
 
   final void Function(DemoScanOption option) onOptionTap;
+
+  /// Liste mit Untertitel (Default, "Artikel anlegen") oder Grid ohne
+  /// Untertitel ("Wareneingang").
+  final DemoOptionsLayout layout;
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +56,20 @@ class FakeCameraView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        ...demoOptions.map(
-          (option) => DemoOptionTile(
-            option: option,
-            enabled: ean == null,
-            onTap: () => onOptionTap(option),
+        if (layout == DemoOptionsLayout.grid)
+          DemoScenarioGrid(
+            options: demoOptions,
+            activeEan: activeEan,
+            onOptionTap: onOptionTap,
+          )
+        else
+          ...demoOptions.map(
+            (option) => DemoOptionTile(
+              option: option,
+              enabled: ean == null,
+              onTap: () => onOptionTap(option),
+            ),
           ),
-        ),
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.screenSpacingH,

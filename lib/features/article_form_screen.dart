@@ -14,6 +14,7 @@ class ArticleFormScreen extends ConsumerStatefulWidget {
     this.article,
     this.catalogArticle,
     this.scannedEan,
+    this.scannedName,
     super.key,
   });
 
@@ -30,6 +31,12 @@ class ArticleFormScreen extends ConsumerStatefulWidget {
   /// befuellt allein die Artikelnummer — alles Weitere traegt der Nutzer
   /// ein. Wird ignoriert, sobald [article] oder [catalogArticle] gesetzt ist.
   final String? scannedEan;
+
+  /// Namensvorschlag zu [scannedEan], falls einer bekannt ist (z. B. aus
+  /// einem simulierten Demo-Scan) — befuellt nur das Namensfeld vor, der
+  /// Nutzer kann ihn aendern. Wird ignoriert, sobald [article] oder
+  /// [catalogArticle] gesetzt ist.
+  final String? scannedName;
 
   @override
   ConsumerState<ArticleFormScreen> createState() => _ArticleFormScreenState();
@@ -65,7 +72,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
       text: article?.ean ?? catalog?.ean ?? widget.scannedEan ?? '',
     );
     _nameController = TextEditingController(
-      text: article?.name ?? catalog?.name ?? '',
+      text: article?.name ?? catalog?.name ?? widget.scannedName ?? '',
     );
     _minQuantityController = TextEditingController(
       text: article != null ? '${article.minQuantity}' : '',

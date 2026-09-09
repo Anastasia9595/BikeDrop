@@ -273,10 +273,10 @@ class OverviewScreen extends ConsumerWidget {
                                   color: AppColors.statusColorSuccess,
                                 ),
                                 DemoScanOption(
-                                  ean: '978020137962',
+                                  ean: '4090123456781',
                                   label: 'Unbekannt',
                                   subtitle:
-                                      'EAN 978020137962 · Unbekanntes Produkt',
+                                      'EAN 4090123456781 · Rücklicht Pulse X1',
                                   icon: Symbols.question_mark_rounded,
                                   color: AppColors.statusColorWarning,
                                 ),
@@ -301,8 +301,11 @@ class OverviewScreen extends ConsumerWidget {
                                         await notifier.addFromCatalog();
                                       case '4711234567899':
                                         await notifier.addFromOwnArticles();
-                                      case '978020137962':
-                                        notifier.addUnknown(ean);
+                                      case '4090123456781':
+                                        notifier.addUnknown(
+                                          ean,
+                                          suggestedName: 'Rücklicht Pulse X1',
+                                        );
                                     }
                                   },
                             ),
@@ -336,10 +339,10 @@ class OverviewScreen extends ConsumerWidget {
                                   icon: Symbols.qr_code,
                                 ),
                                 DemoScanOption(
-                                  ean: '978020137962',
+                                  ean: '4090123456781',
                                   label: 'Unbekannten Artikel simulieren',
                                   subtitle:
-                                      'EAN 978020137962 · Unbekanntes Produkt',
+                                      'EAN 4090123456781 · Rücklicht Pulse X1',
                                   icon: Symbols.question_mark_rounded,
                                 ),
                                 DemoScanOption(

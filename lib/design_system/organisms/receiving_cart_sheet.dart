@@ -28,17 +28,8 @@ class ReceivingCartSheet extends ConsumerStatefulWidget {
 }
 
 class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
-  /// Passt Drag-Handle + Kopfzeile + bis zu 2 Vorschau-Zeilen bequem hinein
-  /// (~220-230dp) — kleiner gewaehlt zeigt die (lazy gebaute) Liste im
-  /// Peek-Zustand unzuverlaessig nur 1 statt 2 Zeilen, je nach Bildschirmhoehe.
   static const double _minSize = 0.28;
   static const double _maxSize = 0.85;
-
-  /// Erst ab hier zeigen wir die volle Ansicht (Kopfzeile, Filter-Chips,
-  /// Liste, CTA-Button) — deren fixer Rahmen (ohne die Liste selbst)
-  /// braucht ca. 250-260dp. Bei einem niedrigeren Schwellenwert kann die
-  /// Box waehrend des Ziehens kurzzeitig kleiner sein als dieser fixe
-  /// Rahmen und einen RenderFlex-Overflow ausloesen.
   static const double _expandThreshold = 0.5;
 
   final _controller = DraggableScrollableController();
@@ -50,22 +41,30 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
     super.dispose();
   }
 
-  /// Springt direkt auf die volle Ansicht — bewusst [jumpTo] statt eines
-  /// animierten [DraggableScrollableController.animateTo]: Der Wechsel von
-  /// Peek- zu voller Ansicht aendert die Widget-Struktur (Kopfzeile,
-  /// Filter-Chips, Footer-Button erscheinen/verschwinden). Passiert das
-  /// waehrend eine animateTo()-Animation noch laeuft, bricht
-  /// DraggableScrollableSheet die Animation an ihrem aktuellen Wert ab,
-  /// statt sie zu Ende zu fuehren. jumpTo hat keinen Ticker, den ein
-  /// struktureller Rebuild unterbrechen koennte.
-  void _expand() => _controller.jumpTo(_maxSize);
+  /// Springt direkt auf Peek- oder volle Ansicht — bewusst [jumpTo] statt
+  /// eines animierten [DraggableScrollableController.animateTo]: Der
+  /// Wechsel aendert die Widget-Struktur (Kopfzeile, Filter-Chips,
+  /// Footer-Button erscheinen/verschwinden). Passiert das waehrend eine
+  /// animateTo()-Animation noch laeuft, bricht DraggableScrollableSheet die
+  /// Animation an ihrem aktuellen Wert ab, statt sie zu Ende zu fuehren.
+  /// jumpTo hat keinen Ticker, den ein struktureller Rebuild unterbrechen
+  /// koennte.
+  void _toggleExpanded(bool expanded) =>
+      _controller.jumpTo(expanded ? _minSize : _maxSize);
 
   Future<void> _openAnlegenForm(ReceivingCartItem item) async {
     await Navigator.of(context).push<void>(
-      MaterialPageRoute(builder: (_) => ArticleFormScreen(scannedEan: item.ean)),
+      MaterialPageRoute(
+        builder: (_) => ArticleFormScreen(
+          scannedEan: item.ean,
+          scannedName: item.suggestedName,
+        ),
+      ),
     );
     if (!mounted) return;
-    final resolved = await ref.read(articleRepositoryProvider).getArticleByEan(item.ean);
+    final resolved = await ref
+        .read(articleRepositoryProvider)
+        .getArticleByEan(item.ean);
     if (resolved != null) {
       ref.read(receivingCartProvider.notifier).resolveUnknown(item, resolved);
     }
@@ -76,13 +75,17 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
     final items = ref.watch(receivingCartProvider);
     if (items.isEmpty) return const SizedBox.shrink();
 
-    final totalQuantity = items.fold<int>(0, (sum, item) => sum + item.quantity);
+    final totalQuantity = items.fold<int>(
+      0,
+      (sum, item) => sum + item.quantity,
+    );
     final counts = <ReceivingScanStatus, int>{
       for (final status in ReceivingScanStatus.values)
         status: items.where((item) => item.scanStatus == status).length,
     };
     final openCount = counts[ReceivingScanStatus.unknown] ?? 0;
-    final summary = '${items.length} Positionen · $totalQuantity Stk · $openCount offen';
+    final summary =
+        '${items.length} Positionen · $totalQuantity Stk · $openCount offen';
 
     return DraggableScrollableSheet(
       controller: _controller,
@@ -94,7 +97,9 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
         return Material(
           color: AppColors.white,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.dialogRadius)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppSpacing.dialogRadius),
+            ),
           ),
           // Bewusst ein lokal auf _controller hoerendes AnimatedBuilder statt
           // eines setState() im aeusseren State: DraggableScrollableSheet
@@ -108,7 +113,9 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, _) {
-              final expanded = _controller.isAttached && _controller.size >= _expandThreshold;
+              final expanded =
+                  _controller.isAttached &&
+                  _controller.size >= _expandThreshold;
               return _SheetContent(
                 items: items,
                 summary: summary,
@@ -116,11 +123,13 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
                 filter: _filter,
                 expanded: expanded,
                 scrollController: scrollController,
-                onFilterTap: (status) => setState(() => _filter = _filter == status ? null : status),
-                onQuantityChanged: (item, quantity) =>
-                    ref.read(receivingCartProvider.notifier).updateQuantity(item, quantity),
+                onFilterTap: (status) =>
+                    setState(() => _filter = _filter == status ? null : status),
+                onQuantityChanged: (item, quantity) => ref
+                    .read(receivingCartProvider.notifier)
+                    .updateQuantity(item, quantity),
                 onAnlegenTap: _openAnlegenForm,
-                onExpandTap: _expand,
+                onToggleExpand: () => _toggleExpanded(expanded),
               );
             },
           ),
@@ -130,21 +139,53 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
   }
 }
 
-Widget _dragHandle() => Container(
-  width: 36,
-  height: 4,
-  margin: const EdgeInsets.symmetric(vertical: 12),
-  decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(2)),
-);
+/// Der einzige Ort, an dem [scrollController] (von DraggableScrollableSheet's
+/// builder) haengt — bewusst NICHT an der Liste. Sein Inhalt ist exakt so
+/// hoch wie sein eigenes Viewport, kann also selbst nie scrollen: jede
+/// Ziehbewegung hier landet komplett bei DraggableScrollableSheet als
+/// Groessenaenderung. Wuerde stattdessen die Liste daran haengen (wie
+/// zuvor), wuerde Ziehen auf einem Listeneintrag ebenfalls das Sheet
+/// resizen/einklappen statt nur zu scrollen.
+class _DragHandle extends StatelessWidget {
+  const _DragHandle({required this.scrollController});
 
-/// Peek- und volle Ansicht teilen sich bewusst EINE [ListView] (per [Key]
-/// stabil ueber Rebuilds hinweg identifiziert), statt zwischen zwei
-/// unterschiedlichen Scrollable-Widgets (z.B. SingleChildScrollView vs.
-/// ListView) am selben [scrollController] zu wechseln. Ein Wechsel des
-/// Scrollable-*Typs* haengt eine neue ScrollPosition an denselben
-/// Controller — das bringt DraggableScrollableSheet's interne
-/// Groessen-Verfolgung durcheinander und friert eine gerade laufende
-/// Drag-/animateTo()-Animation beim aktuellen Wert ein.
+  final ScrollController scrollController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 28,
+      width: double.infinity,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SingleChildScrollView(
+            key: const ValueKey('receiving-cart-drag-handle'),
+            controller: scrollController,
+            physics: const ClampingScrollPhysics(),
+            child: const SizedBox(height: 28, width: double.infinity),
+          ),
+          IgnorePointer(
+            child: Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Die Liste bekommt bewusst KEINEN Controller vom Sheet — sie verwaltet
+/// ihre eigene ScrollPosition und bleibt so rein scrollbar. Ziehen auf einem
+/// Item soll nie das Sheet resizen (nur [_DragHandle] darf das per Drag),
+/// dafuer aber ueber Rebuilds hinweg (Peek <-> voll) per [Key] eine stabile
+/// Identitaet behalten, damit Flutter die Scroll-Position nicht verwirft.
 class _SheetContent extends StatelessWidget {
   const _SheetContent({
     required this.items,
@@ -156,7 +197,7 @@ class _SheetContent extends StatelessWidget {
     required this.onFilterTap,
     required this.onQuantityChanged,
     required this.onAnlegenTap,
-    required this.onExpandTap,
+    required this.onToggleExpand,
   });
 
   final List<ReceivingCartItem> items;
@@ -169,9 +210,9 @@ class _SheetContent extends StatelessWidget {
   final void Function(ReceivingCartItem item, int quantity) onQuantityChanged;
   final void Function(ReceivingCartItem item) onAnlegenTap;
 
-  /// Zieht das Sheet programmatisch auf die volle Ansicht hoch — die
+  /// Faehrt das Sheet programmatisch auf die volle bzw. Peek-Ansicht — die
   /// Alternative zum Drag-Gestus fuer alle, die lieber tippen.
-  final VoidCallback onExpandTap;
+  final VoidCallback onToggleExpand;
 
   @override
   Widget build(BuildContext context) {
@@ -183,17 +224,17 @@ class _SheetContent extends StatelessWidget {
 
     return Column(
       children: [
-        _dragHandle(),
+        _DragHandle(scrollController: scrollController),
         expanded ? _buildExpandedHeader() : _buildPeekHeader(),
         if (expanded) const Divider(height: 1, color: AppColors.listDivider),
         Expanded(
           child: ListView.separated(
             key: const ValueKey('receiving-cart-list'),
-            controller: scrollController,
             physics: const ClampingScrollPhysics(),
             padding: EdgeInsets.zero,
             itemCount: visible.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, color: AppColors.listDivider),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 1, color: AppColors.listDivider),
             itemBuilder: (context, index) {
               final item = visible[index];
               return ReceivingCartItemTile(
@@ -210,11 +251,15 @@ class _SheetContent extends StatelessWidget {
               left: AppSpacing.screenPaddingH,
               right: AppSpacing.screenPaddingH,
               top: 12,
-              bottom: AppSpacing.screenPaddingV + MediaQuery.of(context).padding.bottom,
+              bottom:
+                  AppSpacing.screenPaddingV +
+                  MediaQuery.of(context).padding.bottom,
             ),
             child: AppPrimaryButton(
               label: 'Wareneingang abschließen (${items.length} Artikel)',
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: (counts[ReceivingScanStatus.unknown] ?? 0) > 0
+                  ? null
+                  : () => Navigator.of(context).pop(),
             ),
           ),
       ],
@@ -223,19 +268,24 @@ class _SheetContent extends StatelessWidget {
 
   Widget _buildPeekHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPaddingH),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPaddingH,
+      ),
       child: Row(
         children: [
           Expanded(
             child: Text(
               summary,
-              style: AppTypography.body.copyWith(fontSize: 13, color: AppColors.textSecondary),
+              style: AppTypography.body.copyWith(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
           AppIconButton(
-            icon: Symbols.open_in_full,
+            icon: Symbols.keyboard_arrow_up,
             tooltip: 'Warenkorb ganz anzeigen',
-            onPressed: onExpandTap,
+            onPressed: onToggleExpand,
           ),
         ],
       ),
@@ -253,9 +303,31 @@ class _SheetContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Warenkorb', style: AppTypography.heading.copyWith(color: AppColors.textPrimary)),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Warenkorb',
+                  style: AppTypography.heading.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              AppIconButton(
+                icon: Symbols.keyboard_arrow_down,
+                tooltip: 'Warenkorb einklappen',
+                onPressed: onToggleExpand,
+              ),
+            ],
+          ),
           const SizedBox(height: 4),
-          Text(summary, style: AppTypography.body.copyWith(fontSize: 13, color: AppColors.textSecondary)),
+          Text(
+            summary,
+            style: AppTypography.body.copyWith(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+            ),
+          ),
           const SizedBox(height: 12),
           KpiFilterRow(
             entries: [

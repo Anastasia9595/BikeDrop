@@ -192,6 +192,17 @@ void main() {
     expect(cart.every((item) => item.resolvedArticle == null && item.catalogData == null), isTrue);
   });
 
+  test('addUnknown stores the suggested name when one is given', () async {
+    final container = _container();
+    addTearDown(container.dispose);
+    final notifier = container.read(receivingCartProvider.notifier);
+
+    notifier.addUnknown('4090123456781', suggestedName: 'Rücklicht Pulse X1');
+
+    final cart = container.read(receivingCartProvider);
+    expect(cart.single.suggestedName, 'Rücklicht Pulse X1');
+  });
+
   test('updateQuantity changes only the targeted line', () async {
     final container = _container();
     addTearDown(container.dispose);

@@ -62,8 +62,15 @@ class ReceivingCartNotifier extends AutoDisposeNotifier<List<ReceivingCartItem>>
   /// Fuegt immer eine neue Zeile an — unbekannte Zeilen haben keine
   /// Identitaet, ueber die man sinnvoll zusammenfuehren koennte, auch wenn
   /// mehrere Zeilen zufaellig dieselbe (Demo-)EAN tragen.
-  void addUnknown(String ean) {
-    state = [...state, ReceivingCartItem(ean: ean, quantity: 1)];
+  ///
+  /// [suggestedName] befuellt spaeter nur das Namensfeld beim "Anlegen" vor
+  /// — bei einem echten Scan gibt es dafuer keine Quelle, nur die Demo kennt
+  /// den Namen zur simulierten EAN bereits im Voraus.
+  void addUnknown(String ean, {String? suggestedName}) {
+    state = [
+      ...state,
+      ReceivingCartItem(ean: ean, quantity: 1, suggestedName: suggestedName),
+    ];
   }
 
   void updateQuantity(ReceivingCartItem item, int quantity) {
