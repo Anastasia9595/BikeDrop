@@ -9,6 +9,7 @@ import 'package:bikedrop/models/article.dart';
 import 'package:bikedrop/providers/article_repository_provider.dart';
 import 'package:bikedrop/providers/catalog_repository_provider.dart';
 
+import '../models/demo_options_layout.dart';
 import '../models/demoscanoption.dart';
 import 'scanner_screen.dart';
 
@@ -46,6 +47,23 @@ Map<ArticleStatus, int> _countByStatus(List<Article> articles) {
     for (final status in ArticleStatus.values)
       status: articles.where((a) => a.status == status).length,
   };
+}
+
+/// Baut die drei Filter-Kacheln aus den Status-Zaehlern. Bewusst nicht
+/// `ArticleStatus.values`: die Kacheln laufen von "alles gut" nach
+/// "Problem" — gruen, gelb, rot. Die Enum-Reihenfolge waere gruen, rot, gelb.
+List<KpiFilterEntry> _kpiEntries(Map<ArticleStatus, int> counts) {
+  const order = [ArticleStatus.inStock, ArticleStatus.bestellt, ArticleStatus.fehlt];
+  return [
+    for (final status in order)
+      KpiFilterEntry(
+        key: status,
+        label: status.label,
+        color: AppColors.statusColors[status]!,
+        tint: AppColors.statusColorTints[status]!,
+        count: counts[status] ?? 0,
+      ),
+  ];
 }
 
 /// Text fuer die leere Liste — je nachdem, ob Suche, Status-Filter oder
@@ -109,11 +127,11 @@ class OverviewScreen extends ConsumerWidget {
               // 0, sobald ein Filter aktiv ist.
               if (articlesAsync.valueOrNull?.isNotEmpty ?? false) ...[
                 KpiFilterRow(
-                  counts: _countByStatus(articlesAsync.requireValue),
-                  selected: statusFilter,
-                  onStatusTap: (status) =>
+                  entries: _kpiEntries(_countByStatus(articlesAsync.requireValue)),
+                  selectedKey: statusFilter,
+                  onEntryTap: (key) =>
                       ref.read(statusFilterProvider.notifier).state =
-                          statusFilter == status ? null : status,
+                          statusFilter == key ? null : key as ArticleStatus,
                 ),
                 const SizedBox(height: AppSpacing.screenSpacingV),
               ],
@@ -230,7 +248,57 @@ class OverviewScreen extends ConsumerWidget {
                     child: AppPrimaryButton(
                       label: 'Wareneingang',
                       onPressed: () {
-                        // Handle get started action
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ScannerScreen(
+                              title: 'Wareneingang',
+                              layout: DemoOptionsLayout.grid,
+                              demoOptions: [
+                                DemoScanOption(
+                                  ean: '4029876501233',
+                                  label: 'Katalogartikel',
+                                  subtitle:
+                                      'EAN 4029876501233 · Abus Bordo 6000 Faltschloss 90cm',
+                                  icon: Symbols.grid_view,
+                                  color: AppColors.infoBlue,
+                                ),
+                                DemoScanOption(
+                                  ean: '4711234567899',
+                                  label: 'Eigener Artikel',
+                                  subtitle:
+                                      'EAN 4711234567899 · Eigenes Produkt · KMC Kette X11',
+                                  icon: Symbols.check_circle,
+                                  color: AppColors.statusColorSuccess,
+                                ),
+                                DemoScanOption(
+                                  ean: '978020137962',
+                                  label: 'Unbekannt',
+                                  subtitle:
+                                      'EAN 978020137962 · Unbekanntes Produkt',
+                                  icon: Symbols.question_mark_rounded,
+                                  color: AppColors.statusColorWarning,
+                                ),
+                                DemoScanOption(
+                                  ean: '4029876501234',
+                                  label: 'Ungültiger Barcode',
+                                  subtitle:
+                                      'EAN 4029876501234 · falsche Prüfziffer',
+                                  icon: Symbols.warning_rounded,
+                                  color: AppColors.statusColorError,
+                                ),
+                              ],
+                              onEanScanned:
+                                  (
+                                    BuildContext context,
+                                    WidgetRef ref,
+                                    String ean,
+                                  ) async {
+                                    // TODO: Wareneingang-Logik folgt in einem
+                                    // spaeteren Schritt.
+                                  },
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),

@@ -3,17 +3,20 @@ import 'package:bikedrop/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _counts = {
-  ArticleStatus.inStock: 6,
-  ArticleStatus.bestellt: 2,
-  ArticleStatus.fehlt: 1,
-};
+const _green = AppColors.statusColorSuccess;
+const _greenTint = Color(0xFFEAF6ED);
+const _yellow = AppColors.statusColorWarning;
+const _yellowTint = Color(0xFFF5EDE0);
+const _red = AppColors.statusColorError;
+const _redTint = Color(0xFFFCEAEA);
 
-Future<void> _pump(
-  WidgetTester tester,
-  Widget row, {
-  double width = 390,
-}) async {
+const _entries = [
+  KpiFilterEntry(key: 'inStock', label: 'Im Shop', color: _green, tint: _greenTint, count: 6),
+  KpiFilterEntry(key: 'bestellt', label: 'Bestellt', color: _yellow, tint: _yellowTint, count: 2),
+  KpiFilterEntry(key: 'fehlt', label: 'Fehlt', color: _red, tint: _redTint, count: 1),
+];
+
+Future<void> _pump(WidgetTester tester, Widget row, {double width = 390}) async {
   tester.view.physicalSize = Size(width, 640);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
@@ -23,9 +26,7 @@ Future<void> _pump(
     MaterialApp(
       home: Scaffold(
         body: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.screenPaddingH,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPaddingH),
           child: row,
         ),
       ),
@@ -34,91 +35,57 @@ Future<void> _pump(
 }
 
 void main() {
-  testWidgets('shows one card per status with its count', (tester) async {
-    await _pump(tester, const KpiFilterRow(counts: _counts));
+  testWidgets('shows one card per entry with its count', (tester) async {
+    await _pump(tester, const KpiFilterRow(entries: _entries));
 
     expect(find.byType(KpiFilterCard), findsNWidgets(3));
-
-    int valueOf(ArticleStatus status) => tester
-        .widget<KpiFilterCard>(
-          find.byWidgetPredicate(
-            (w) => w is KpiFilterCard && w.status == status,
-          ),
-        )
-        .value;
-    expect(valueOf(ArticleStatus.inStock), 6);
-    expect(valueOf(ArticleStatus.bestellt), 2);
-    expect(valueOf(ArticleStatus.fehlt), 1);
+    expect(find.text('6'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
   });
 
-  testWidgets('runs from green over yellow to red', (tester) async {
-    await _pump(tester, const KpiFilterRow(counts: _counts));
+  testWidgets('keeps the given entry order', (tester) async {
+    await _pump(tester, const KpiFilterRow(entries: _entries));
 
-    final order = tester
+    final labels = tester
         .widgetList<KpiFilterCard>(find.byType(KpiFilterCard))
-        .map((card) => card.status)
+        .map((card) => card.label)
         .toList();
 
-    expect(order, [
-      ArticleStatus.inStock,
-      ArticleStatus.bestellt,
-      ArticleStatus.fehlt,
-    ]);
+    expect(labels, ['Im Shop', 'Bestellt', 'Fehlt']);
   });
 
-  testWidgets('falls back to 0 for a status without a count', (tester) async {
-    await _pump(
-      tester,
-      const KpiFilterRow(counts: {ArticleStatus.inStock: 6}),
-    );
+  testWidgets('marks only the selected entry', (tester) async {
+    await _pump(tester, const KpiFilterRow(entries: _entries, selectedKey: 'bestellt'));
 
-    final fehlt = tester.widget<KpiFilterCard>(
-      find.byWidgetPredicate(
-        (w) => w is KpiFilterCard && w.status == ArticleStatus.fehlt,
-      ),
-    );
-    expect(fehlt.value, 0);
-  });
-
-  testWidgets('marks only the selected status', (tester) async {
-    await _pump(
-      tester,
-      const KpiFilterRow(counts: _counts, selected: ArticleStatus.bestellt),
-    );
-
-    final selected = tester
+    final selectedLabels = tester
         .widgetList<KpiFilterCard>(find.byType(KpiFilterCard))
         .where((card) => card.selected)
-        .map((card) => card.status);
+        .map((card) => card.label);
 
-    expect(selected, [ArticleStatus.bestellt]);
+    expect(selectedLabels, ['Bestellt']);
   });
 
-  testWidgets('reports the tapped status', (tester) async {
-    final tapped = <ArticleStatus>[];
-    await _pump(
-      tester,
-      KpiFilterRow(counts: _counts, onStatusTap: tapped.add),
-    );
+  testWidgets('reports the tapped key', (tester) async {
+    final tapped = <Object>[];
+    await _pump(tester, KpiFilterRow(entries: _entries, onEntryTap: tapped.add));
 
     await tester.tap(find.text('Fehlt'));
     await tester.tap(find.text('Im Shop'));
 
-    expect(tapped, [ArticleStatus.fehlt, ArticleStatus.inStock]);
+    expect(tapped, ['fehlt', 'inStock']);
   });
 
   testWidgets('is display-only without a callback', (tester) async {
-    await _pump(tester, const KpiFilterRow(counts: _counts));
+    await _pump(tester, const KpiFilterRow(entries: _entries));
 
-    for (final card in tester.widgetList<KpiFilterCard>(
-      find.byType(KpiFilterCard),
-    )) {
+    for (final card in tester.widgetList<KpiFilterCard>(find.byType(KpiFilterCard))) {
       expect(card.onTap, isNull);
     }
   });
 
   testWidgets('does not overflow on a 320 dp screen', (tester) async {
-    await _pump(tester, const KpiFilterRow(counts: _counts), width: 320);
+    await _pump(tester, const KpiFilterRow(entries: _entries), width: 320);
 
     expect(tester.takeException(), isNull);
     expect(find.text('Bestellt'), findsOneWidget);
