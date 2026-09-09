@@ -110,10 +110,18 @@ void main() {
       ],
     );
 
+    expect(tester.takeException(), isNull);
     expect(find.byType(DraggableScrollableSheet), findsOneWidget);
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
     expect(find.byType(KpiFilterRow), findsNothing);
     expect(find.textContaining('Wareneingang abschließen'), findsNothing);
+  });
+
+  testWidgets('peek state with a single row does not throw a layout error', (tester) async {
+    await _pump(tester, seed: [_known(ean: '1', quantity: 1)]);
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(ReceivingCartItemTile), findsOneWidget);
   });
 
   testWidgets('dragging up reveals the header, filters, full list and CTA', (tester) async {

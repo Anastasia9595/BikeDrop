@@ -143,6 +143,7 @@ class _PeekContent extends StatelessWidget {
       controller: scrollController,
       physics: const ClampingScrollPhysics(),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _dragHandle(),
