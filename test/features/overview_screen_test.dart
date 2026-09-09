@@ -103,7 +103,7 @@ void main() {
 
     KpiFilterCard card(ArticleStatus status) => tester.widget<KpiFilterCard>(
       find.byWidgetPredicate(
-        (w) => w is KpiFilterCard && w.status == status,
+        (w) => w is KpiFilterCard && w.label == status.label,
       ),
     );
     expect(card(ArticleStatus.inStock).value, 2);
@@ -189,7 +189,7 @@ void main() {
 
     final inStock = tester.widget<KpiFilterCard>(
       find.byWidgetPredicate(
-        (w) => w is KpiFilterCard && w.status == ArticleStatus.inStock,
+        (w) => w is KpiFilterCard && w.label == ArticleStatus.inStock.label,
       ),
     );
     expect(inStock.value, 2);
@@ -221,6 +221,23 @@ void main() {
     expect(find.text('Keine Artikel mit Status „Fehlt“.'), findsOneWidget);
   });
 
+  testWidgets(
+    'tapping Wareneingang opens the scanner with the demo scenario grid',
+    (tester) async {
+      await _pump(tester, size: const Size(390, 780));
+
+      await tester.tap(find.text('Wareneingang'));
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(AppBar, 'Wareneingang'), findsOneWidget);
+      expect(find.byType(DemoScenarioGrid), findsOneWidget);
+      expect(find.text('Katalogartikel'), findsOneWidget);
+      expect(find.text('Eigener Artikel'), findsOneWidget);
+      expect(find.text('Unbekannt'), findsOneWidget);
+      expect(find.text('Ungültiger Barcode'), findsOneWidget);
+    },
+  );
+
   testWidgets('hides the cards when there is no stock at all', (tester) async {
     addTearDown(() => tester.view.resetPhysicalSize());
     tester.view.physicalSize = const Size(390, 780);
@@ -231,5 +248,30 @@ void main() {
 
     expect(find.byType(KpiFilterCard), findsNothing);
     expect(find.text('Noch kein Bestand erfasst'), findsOneWidget);
+  });
+
+  testWidgets('scanning Katalogartikel adds a row to the receiving cart sheet', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          articleRepositoryProvider.overrideWithValue(_FakeArticleRepository(articles: _articles)),
+        ],
+        child: const MaterialApp(home: OverviewScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Wareneingang'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Katalogartikel'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReceivingCartItemTile), findsWidgets);
+    expect(find.textContaining('1 Positionen'), findsOneWidget);
   });
 }

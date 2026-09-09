@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bikedrop/design_system/tokens/app_colors.dart';
 import 'package:bikedrop/enums/category.dart';
+import 'package:bikedrop/enums/receiving_scan_status.dart';
 
 void main() {
   test('core palette matches design doc hex values', () {
@@ -34,5 +35,15 @@ void main() {
     expect(AppColors.categoryColors[Category.zubehoer]!.text, const Color(0xFF5C2A8A));
     expect(AppColors.categoryColors[Category.pflege]!.background, const Color(0xFFFDF1CF));
     expect(AppColors.categoryColors[Category.pflege]!.text, const Color(0xFF8A5A00));
+  });
+
+  test('receiving scan status colors and tints are defined for all statuses', () {
+    for (final status in ReceivingScanStatus.values) {
+      expect(AppColors.receivingStatusColors[status], isNotNull, reason: '$status');
+      expect(AppColors.receivingStatusTints[status], isNotNull, reason: '$status');
+    }
+    expect(AppColors.receivingStatusColors[ReceivingScanStatus.inStock], AppColors.statusColorSuccess);
+    expect(AppColors.receivingStatusColors[ReceivingScanStatus.catalogMatch], AppColors.infoBlue);
+    expect(AppColors.receivingStatusColors[ReceivingScanStatus.unknown], AppColors.statusColorWarning);
   });
 }

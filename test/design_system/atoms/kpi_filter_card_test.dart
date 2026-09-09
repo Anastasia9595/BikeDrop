@@ -3,99 +3,69 @@ import 'package:bikedrop/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+const _green = AppColors.statusColorSuccess;
+const _greenTint = Color(0xFFEAF6ED);
+
 Widget _wrap(Widget child) =>
     MaterialApp(home: Scaffold(body: Center(child: child)));
 
-Material _card(WidgetTester tester) => tester.widget<Material>(
+Material _material(WidgetTester tester) => tester.widget<Material>(
   find.ancestor(of: find.byType(InkWell), matching: find.byType(Material)).first,
 );
 
-/// Drei Kacheln nebeneinander, so wie sie auf dem Overview-Screen stehen.
-Future<void> _pumpRow(
-  WidgetTester tester,
-  double screenWidth, {
-  double textScale = 1.0,
-}) async {
-  tester.view.physicalSize = Size(screenWidth, 640);
-  tester.view.devicePixelRatio = 1.0;
-  addTearDown(tester.view.resetPhysicalSize);
-  addTearDown(tester.view.resetDevicePixelRatio);
-
-  await tester.pumpWidget(
-    MediaQuery(
-      data: MediaQueryData(textScaler: TextScaler.linear(textScale)),
-      child: MaterialApp(
-        home: Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.screenPaddingH,
-            ),
-            child: const KpiFilterRow(
-              counts: {
-                ArticleStatus.inStock: 432,
-                ArticleStatus.bestellt: 12,
-                ArticleStatus.fehlt: 7,
-              },
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
+Container _dot(WidgetTester tester) => tester
+    .widgetList<Container>(find.byType(Container))
+    .firstWhere(
+      (c) =>
+          c.decoration is BoxDecoration &&
+          (c.decoration! as BoxDecoration).shape == BoxShape.circle,
+    );
 
 void main() {
-  testWidgets('shows the value and the status label', (tester) async {
+  testWidgets('shows the value and the label', (tester) async {
     await tester.pumpWidget(
-      _wrap(const KpiFilterCard(value: 432, status: ArticleStatus.inStock)),
+      _wrap(const KpiFilterCard(value: 432, label: 'Im Bestand', color: _green, tint: _greenTint)),
     );
 
     expect(find.text('432'), findsOneWidget);
-    expect(find.text('Im Shop'), findsOneWidget);
+    expect(find.text('Im Bestand'), findsOneWidget);
   });
 
-  testWidgets('paints the card in the status color', (tester) async {
+  testWidgets('paints the dot in the given color', (tester) async {
     await tester.pumpWidget(
-      _wrap(const KpiFilterCard(value: 7, status: ArticleStatus.fehlt)),
+      _wrap(const KpiFilterCard(value: 7, label: 'X', color: _green, tint: _greenTint)),
     );
 
-    expect(
-      _card(tester).color,
-      AppColors.statusColors[ArticleStatus.fehlt],
-    );
+    expect((_dot(tester).decoration! as BoxDecoration).color, _green);
   });
 
-  testWidgets('uses white foreground on green and red', (tester) async {
-    for (final status in [ArticleStatus.inStock, ArticleStatus.fehlt]) {
-      await tester.pumpWidget(_wrap(KpiFilterCard(value: 1, status: status)));
-
-      final value = tester.widget<Text>(find.text('1'));
-      final label = tester.widget<Text>(find.text(status.label));
-      expect(value.style!.color, AppColors.white, reason: '$status');
-      expect(label.style!.color, AppColors.white, reason: '$status');
-    }
-  });
-
-  testWidgets('uses dark ink on the yellow "bestellt" card', (tester) async {
+  testWidgets('is white with dark text when not selected', (tester) async {
     await tester.pumpWidget(
-      _wrap(const KpiFilterCard(value: 12, status: ArticleStatus.bestellt)),
+      _wrap(const KpiFilterCard(value: 1, label: 'X', color: _green, tint: _greenTint)),
     );
 
-    final value = tester.widget<Text>(find.text('12'));
-    final icon = tester.widget<Icon>(find.byType(Icon));
-    expect(value.style!.color, AppColors.textPrimary);
-    expect(icon.color, AppColors.textPrimary);
+    expect(_material(tester).color, AppColors.white);
+    expect(tester.widget<Text>(find.text('1')).style!.color, AppColors.textPrimary);
+  });
+
+  testWidgets('uses the tint background and the given color as text when selected', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        const KpiFilterCard(value: 1, label: 'X', color: _green, tint: _greenTint, selected: true),
+      ),
+    );
+
+    expect(_material(tester).color, _greenTint);
+    expect(tester.widget<Text>(find.text('1')).style!.color, _green);
   });
 
   testWidgets('reports taps', (tester) async {
     var taps = 0;
     await tester.pumpWidget(
       _wrap(
-        KpiFilterCard(
-          value: 5,
-          status: ArticleStatus.bestellt,
-          onTap: () => taps++,
-        ),
+        KpiFilterCard(value: 5, label: 'X', color: _green, tint: _greenTint, onTap: () => taps++),
       ),
     );
 
@@ -105,43 +75,9 @@ void main() {
 
   testWidgets('is not tappable without a callback', (tester) async {
     await tester.pumpWidget(
-      _wrap(const KpiFilterCard(value: 5, status: ArticleStatus.bestellt)),
+      _wrap(const KpiFilterCard(value: 5, label: 'X', color: _green, tint: _greenTint)),
     );
 
     expect(tester.widget<InkWell>(find.byType(InkWell)).onTap, isNull);
-  });
-
-  testWidgets('three cards fit side by side on a 320 dp screen', (
-    tester,
-  ) async {
-    await _pumpRow(tester, 320);
-
-    expect(tester.takeException(), isNull);
-    expect(find.text('Bestellt'), findsOneWidget);
-  });
-
-  testWidgets('three cards fit at a 1.5x text scale', (tester) async {
-    await _pumpRow(tester, 320, textScale: 1.5);
-
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('all three cards make the same icon decision', (tester) async {
-    for (final width in [320.0, 360.0, 390.0, 430.0]) {
-      await _pumpRow(tester, width);
-      expect(
-        find.byType(Icon).evaluate().length,
-        anyOf(0, 3),
-        reason: 'bei ${width}dp',
-      );
-    }
-  });
-
-  // Bewusst sehr breit: die Testschrift ist deutlich breiter als die echte,
-  // eine Grenze nahe an realen Geraetebreiten waere hier nicht aussagekraeftig.
-  testWidgets('keeps the icon when the card is wide enough', (tester) async {
-    await _pumpRow(tester, 800);
-
-    expect(find.byType(Icon), findsNWidgets(3));
   });
 }

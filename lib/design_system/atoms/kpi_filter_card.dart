@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
 
-import '../../enums/article_status.dart';
 import '../tokens/app_colors.dart';
 import '../tokens/app_typography.dart';
 
-/// Filter-Chip auf dem Overview-Screen: zeigt einen farbigen Punkt,
-/// Status-Label und Anzahl, und filtert die Liste beim Antippen darauf.
+/// Generischer Filter-Chip: farbiger Punkt, Label und Anzahl, filtert eine
+/// Liste beim Antippen darauf. Kennt keine Domäne — Farbe/Label/Tint kommen
+/// als primitive Parameter vom Aufrufer (z.B. aus [ArticleStatus] oder
+/// `ReceivingScanStatus` gebaut), damit dieselbe Kachel für mehrere
+/// Status-Enums wiederverwendbar ist.
 ///
-/// Angelehnt an schlichte Status-Chips: im Ruhezustand weiss mit duennem
-/// Rahmen, im ausgewaehlten Zustand ein zarter Farbton der Statusfarbe als
-/// Hintergrund mit farbigem Rahmen. Der Punkt traegt in beiden Zustaenden
-/// die volle Statusfarbe.
+/// Im Ruhezustand weiss mit duennem Rahmen, im ausgewaehlten Zustand ein
+/// zarter Farbton ([tint]) als Hintergrund. Der Punkt traegt in beiden
+/// Zustaenden die volle [color].
 class KpiFilterCard extends StatelessWidget {
   const KpiFilterCard({
     super.key,
     required this.value,
-    required this.status,
+    required this.label,
+    required this.color,
+    required this.tint,
     this.selected = false,
     this.onTap,
   });
 
   final int value;
-  final ArticleStatus status;
+  final String label;
+  final Color color;
+  final Color tint;
 
   /// Markiert den Chip als aktiven Filter.
   final bool selected;
@@ -29,23 +34,17 @@ class KpiFilterCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   static const double _borderWidth = 1.5;
-
-  /// Innenabstand des Chips.
   static const double _paddingH = 16;
   static const double _paddingV = 10;
-
   static const double _dotSize = 8;
   static const double _dotGap = 8;
   static const double _valueGap = 6;
 
   @override
   Widget build(BuildContext context) {
-    final dotColor = AppColors.statusColors[status]!;
-    final borderColor = selected ? dotColor : AppColors.border;
-    final backgroundColor = selected
-        ? AppColors.statusColorTints[status]!
-        : AppColors.white;
-    final textColor = selected ? dotColor : AppColors.textPrimary;
+    final borderColor = selected ? color : AppColors.border;
+    final backgroundColor = selected ? tint : AppColors.white;
+    final textColor = selected ? color : AppColors.textPrimary;
 
     return Material(
       color: backgroundColor,
@@ -70,14 +69,11 @@ class KpiFilterCard extends StatelessWidget {
               Container(
                 width: _dotSize,
                 height: _dotSize,
-                decoration: BoxDecoration(
-                  color: dotColor,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
               const SizedBox(width: _dotGap),
               Text(
-                status.label,
+                label,
                 style: AppTypography.kpiLabel.copyWith(color: textColor),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

@@ -4,6 +4,7 @@ import 'package:bikedrop/design_system/organisms/fake_camera_view.dart';
 import 'package:bikedrop/design_system/organisms/scanner_frame.dart';
 import 'package:bikedrop/features/scanner_screen.dart';
 import 'package:bikedrop/interface/barcode_scanner_interface.dart';
+import 'package:bikedrop/models/demo_options_layout.dart';
 import 'package:bikedrop/models/demoscanoption.dart';
 import 'package:bikedrop/providers/scanner_provider.dart';
 import 'package:bikedrop/repository/fake_barcod_scanner_repository.dart';
@@ -55,6 +56,7 @@ Future<List<String>> _pump(
   WidgetTester tester, {
   BarcodeScannerInterface? scanner,
   List<DemoScanOption> options = const [_option],
+  DemoOptionsLayout layout = DemoOptionsLayout.list,
   Future<void> Function(BuildContext, WidgetRef, String)? onEanScanned,
 }) async {
   final scanned = <String>[];
@@ -68,6 +70,7 @@ Future<List<String>> _pump(
         home: ScannerScreen(
           title: 'Test',
           demoOptions: options,
+          layout: layout,
           onEanScanned: onEanScanned ??
               (context, ref, ean) async => scanned.add(ean),
         ),
@@ -89,6 +92,17 @@ void main() {
     await _pump(tester);
 
     expect(find.byType(FakeCameraView), findsOneWidget);
+  });
+
+  testWidgets('reicht das layout an die FakeCameraView weiter', (
+    tester,
+  ) async {
+    await _pump(tester, layout: DemoOptionsLayout.grid);
+
+    expect(
+      tester.widget<FakeCameraView>(find.byType(FakeCameraView)).layout,
+      DemoOptionsLayout.grid,
+    );
   });
 
   testWidgets('zeigt beim echten Scanner den Kamera-Platzhalter',
@@ -225,5 +239,62 @@ void main() {
     await tester.pump();
 
     expect(scanned, ['0978020137962']);
+  });
+
+  testWidgets('does not render anything extra without an overlay', (tester) async {
+    await _pump(tester);
+
+    expect(find.byKey(const ValueKey('scanner-overlay-probe')), findsNothing);
+  });
+
+  testWidgets('renders the given overlay on top of the content', (tester) async {
+    final scanned = <String>[];
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [scannerProvider.overrideWithValue(FakeBarcodeScanner())],
+        child: MaterialApp(
+          home: ScannerScreen(
+            title: 'Test',
+            demoOptions: const [_option],
+            onEanScanned: (context, ref, ean) async => scanned.add(ean),
+            overlay: const Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(key: ValueKey('scanner-overlay-probe'), height: 40),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey('scanner-overlay-probe')), findsOneWidget);
+    expect(find.byType(FakeCameraView), findsOneWidget);
+  });
+
+  testWidgets('an empty overlay does not block taps on the demo buttons behind it', (
+    tester,
+  ) async {
+    final scanned = await _pump(tester, layout: DemoOptionsLayout.grid);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [scannerProvider.overrideWithValue(FakeBarcodeScanner())],
+        child: MaterialApp(
+          home: ScannerScreen(
+            title: 'Test',
+            demoOptions: const [_option],
+            layout: DemoOptionsLayout.grid,
+            onEanScanned: (context, ref, ean) async => scanned.add(ean),
+            overlay: const SizedBox.shrink(),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text(_option.label));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pump();
+
+    expect(scanned, [_option.ean]);
   });
 }

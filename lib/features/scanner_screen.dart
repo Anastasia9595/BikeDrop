@@ -8,6 +8,7 @@ import '../design_system/molecules/app_snackbar.dart';
 import '../design_system/organisms/fake_camera_view.dart';
 import '../design_system/organisms/scanner_frame.dart';
 import '../interface/barcode_scanner_interface.dart';
+import '../models/demo_options_layout.dart';
 import '../models/demoscanoption.dart';
 import '../providers/scanner_provider.dart';
 import '../repository/fake_barcod_scanner_repository.dart';
@@ -22,6 +23,8 @@ class ScannerScreen extends ConsumerStatefulWidget {
     required this.title,
     required this.demoOptions,
     required this.onEanScanned,
+    this.layout = DemoOptionsLayout.list,
+    this.overlay,
     super.key,
   });
 
@@ -29,6 +32,15 @@ class ScannerScreen extends ConsumerStatefulWidget {
   final List<DemoScanOption> demoOptions;
   final Future<void> Function(BuildContext context, WidgetRef ref, String ean)
   onEanScanned;
+
+  /// Liste mit Untertitel (Default, "Artikel anlegen") oder Grid ohne
+  /// Untertitel ("Wareneingang").
+  final DemoOptionsLayout layout;
+
+  /// Optionales Overlay ueber dem Scanner-Inhalt, z.B. ein persistentes
+  /// Bottom Sheet. Kennt der ScannerScreen selbst nicht — bleibt dadurch
+  /// generisch und weiss nichts von Wareneingang/Warenkorb.
+  final Widget? overlay;
 
   @override
   ConsumerState<ScannerScreen> createState() => _ScannerScreenState();
@@ -103,22 +115,30 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final content = _isFake
+        ? FakeCameraView(
+            demoOptions: widget.demoOptions,
+            activeEan: _activeEan,
+            layout: widget.layout,
+            onTapWithoutBarcode: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => ArticleFormScreen()),
+              );
+            },
+            onOptionTap: _simulate,
+          )
+        : const ScannerFrame(
+            content: Center(child: Text('Kamera folgt in Phase 6')),
+          );
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
-      body: _isFake
-          ? FakeCameraView(
-              demoOptions: widget.demoOptions,
-              activeEan: _activeEan,
-              onTapWithoutBarcode: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => ArticleFormScreen()),
-                );
-              },
-              onOptionTap: _simulate,
-            )
-          : const ScannerFrame(
-              content: Center(child: Text('Kamera folgt in Phase 6')),
-            ),
+      body: Stack(
+        children: [
+          content,
+          if (widget.overlay != null) Positioned.fill(child: widget.overlay!),
+        ],
+      ),
     );
   }
 }
