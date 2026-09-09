@@ -249,4 +249,29 @@ void main() {
     expect(find.byType(KpiFilterCard), findsNothing);
     expect(find.text('Noch kein Bestand erfasst'), findsOneWidget);
   });
+
+  testWidgets('scanning Katalogartikel adds a row to the receiving cart sheet', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          articleRepositoryProvider.overrideWithValue(_FakeArticleRepository(articles: _articles)),
+        ],
+        child: const MaterialApp(home: OverviewScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Wareneingang'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Katalogartikel'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ReceivingCartItemTile), findsWidgets);
+    expect(find.textContaining('1 Positionen'), findsOneWidget);
+  });
 }

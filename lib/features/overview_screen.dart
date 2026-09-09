@@ -8,6 +8,7 @@ import 'package:bikedrop/features/article_form_screen.dart';
 import 'package:bikedrop/models/article.dart';
 import 'package:bikedrop/providers/article_repository_provider.dart';
 import 'package:bikedrop/providers/catalog_repository_provider.dart';
+import 'package:bikedrop/providers/receiving_cart_provider.dart';
 
 import '../models/demo_options_layout.dart';
 import '../models/demoscanoption.dart';
@@ -253,6 +254,7 @@ class OverviewScreen extends ConsumerWidget {
                             builder: (context) => ScannerScreen(
                               title: 'Wareneingang',
                               layout: DemoOptionsLayout.grid,
+                              overlay: const ReceivingCartSheet(),
                               demoOptions: [
                                 DemoScanOption(
                                   ean: '4029876501233',
@@ -293,8 +295,15 @@ class OverviewScreen extends ConsumerWidget {
                                     WidgetRef ref,
                                     String ean,
                                   ) async {
-                                    // TODO: Wareneingang-Logik folgt in einem
-                                    // spaeteren Schritt.
+                                    final notifier = ref.read(receivingCartProvider.notifier);
+                                    switch (ean) {
+                                      case '4029876501233':
+                                        await notifier.addFromCatalog();
+                                      case '4711234567899':
+                                        await notifier.addFromOwnArticles();
+                                      case '978020137962':
+                                        notifier.addUnknown(ean);
+                                    }
                                   },
                             ),
                           ),
