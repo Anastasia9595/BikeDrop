@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../enums/category.dart';
 import '../../enums/article_status.dart';
+import '../../enums/receiving_scan_status.dart';
 
 class CategoryColorPair {
   const CategoryColorPair(this.background, this.text);
@@ -19,6 +20,10 @@ class AppColors {
   static const Color accentTint = Color(0xFFFFF2EF);
 
   static const Color statusColorSuccess = Color(0xFF2D9B4A);
+
+  /// Akzentfarbe fuer den "Katalogartikel"-Button im Wareneingang-Grid — kein
+  /// Status, deshalb kein statusColor*, sondern ein eigener Info-Ton.
+  static const Color infoBlue = Color(0xFF3B82F6);
 
   /// Amper-Gelb fuer die Ampel-Optik (Gruen/Gelb/Rot). Da die Farbe im
   /// KpiFilterCard nur noch als Punkt neben dunklem Text erscheint (kein
@@ -82,5 +87,20 @@ class AppColors {
     ArticleStatus.inStock: white,
     ArticleStatus.bestellt: white,
     ArticleStatus.fehlt: white,
+  };
+
+  /// Punktfarbe je [ReceivingScanStatus] im Wareneingangs-Warenkorb —
+  /// dieselben Töne wie die Demo-Szenario-Buttons im Scanner-Grid, damit
+  /// Button und Zeilen-Icon optisch zusammengehören.
+  static const Map<ReceivingScanStatus, Color> receivingStatusColors = {
+    ReceivingScanStatus.inStock: statusColorSuccess,
+    ReceivingScanStatus.catalogMatch: infoBlue,
+    ReceivingScanStatus.unknown: statusColorWarning,
+  };
+
+  static const Map<ReceivingScanStatus, Color> receivingStatusTints = {
+    ReceivingScanStatus.inStock: Color(0xFFEAF6ED),
+    ReceivingScanStatus.catalogMatch: Color(0xFFE2EEFC),
+    ReceivingScanStatus.unknown: Color(0xFFF5EDE0),
   };
 }
