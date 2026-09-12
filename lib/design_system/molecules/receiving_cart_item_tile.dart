@@ -43,7 +43,7 @@ class ReceivingCartItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final status = item.scanStatus;
     final color = AppColors.receivingStatusColors[status]!;
-    final isUnknown = status == ReceivingScanStatus.unknown;
+    final needsCompletion = status.needsCompletion;
 
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: AppSpacing.listRowMinHeight),
@@ -93,7 +93,7 @@ class ReceivingCartItemTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.listRowGap),
-            if (isUnknown)
+            if (needsCompletion)
               SizedBox(
                 width: 120,
                 height: AppSpacing.fieldHeight,

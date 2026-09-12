@@ -11,6 +11,8 @@ extension ReceivingScanStatusLabel on ReceivingScanStatus {
     ReceivingScanStatus.catalogMatch => 'Katalogtreffer',
     ReceivingScanStatus.unknown => 'Unbekannt',
   };
+
+  bool get needsCompletion => this != ReceivingScanStatus.inStock;
 }
 
 /// Leitet den Scan-Status aus den vorhandenen Daten ab, statt ihn separat

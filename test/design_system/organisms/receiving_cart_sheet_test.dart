@@ -262,7 +262,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
 
-    await tester.tap(find.text('Unbekannt'));
+    await tester.tap(find.text('Ergänzung nötig'));
     await tester.pumpAndSettle();
 
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));

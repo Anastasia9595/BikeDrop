@@ -13,6 +13,13 @@ class AppTypography {
     letterSpacing: -0.48,
   );
 
+  static const TextStyle listTile = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w700,
+    fontSize: 15,
+    height: 1.5,
+  );
+
   static const TextStyle loginWordmark = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w800,
