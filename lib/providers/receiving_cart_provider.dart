@@ -82,7 +82,10 @@ class ReceivingCartNotifier extends AutoDisposeNotifier<List<ReceivingCartItem>>
 
   /// Ersetzt genau diese eine Zeile (per Objekt-Referenz identifiziert,
   /// nicht per EAN — mehrere "Unbekannt"-Zeilen koennen dieselbe EAN
-  /// tragen) mit einem aufgeloesten Artikel.
+  /// tragen) mit einem aufgeloesten Artikel. Uebernimmt auch dessen Menge,
+  /// damit eine im Formular geaenderte Menge nicht von der (moeglicherweise
+  /// aelteren) Warenkorb-Menge ueberschrieben wird — das Formular ist nach
+  /// dem Speichern die aktuellere Quelle.
   void resolveUnknown(ReceivingCartItem item, Article resolvedArticle) {
     state = [
       for (final current in state)
@@ -90,6 +93,7 @@ class ReceivingCartNotifier extends AutoDisposeNotifier<List<ReceivingCartItem>>
             ? current.copyWith(
                 ean: resolvedArticle.ean ?? current.ean,
                 resolvedArticle: resolvedArticle,
+                quantity: resolvedArticle.quantity,
               )
             : current,
     ];

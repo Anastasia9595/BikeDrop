@@ -57,6 +57,7 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
           catalogArticle: item.catalogData,
           scannedEan: item.ean,
           scannedName: item.suggestedName,
+          initialQuantity: item.quantity,
         ),
       ),
     );

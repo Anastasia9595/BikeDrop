@@ -19,6 +19,7 @@ Future<void> _pump(
   CatalogArticle? catalogArticle,
   String? scannedEan,
   String? scannedName,
+  int? initialQuantity,
 }) {
   return tester.pumpWidget(
     ProviderScope(
@@ -27,6 +28,7 @@ Future<void> _pump(
           catalogArticle: catalogArticle,
           scannedEan: scannedEan,
           scannedName: scannedName,
+          initialQuantity: initialQuantity,
         ),
       ),
     ),
@@ -135,6 +137,24 @@ void main() {
 
       expect(find.text(_catalogArticle.name), findsWidgets);
       expect(find.text('Rücklicht Pulse X1'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'uebernimmt initialQuantity als Startmenge fuer einen neuen Artikel',
+    (tester) async {
+      await _pump(tester, catalogArticle: _catalogArticle, initialQuantity: 5);
+
+      expect(find.text('5'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'startet bei 1, wenn weder Artikel noch initialQuantity gesetzt sind',
+    (tester) async {
+      await _pump(tester, catalogArticle: _catalogArticle);
+
+      expect(find.text('1'), findsOneWidget);
     },
   );
 }

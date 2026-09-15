@@ -6,6 +6,7 @@ import '../core/ean.dart';
 import '../design_system/design_system.dart';
 import '../models/article.dart';
 import '../models/catalogarticle.dart';
+import '../providers/article_form_provider.dart';
 import '../providers/article_repository_provider.dart';
 import '../providers/image_picker_provider.dart';
 
@@ -15,6 +16,7 @@ class ArticleFormScreen extends ConsumerStatefulWidget {
     this.catalogArticle,
     this.scannedEan,
     this.scannedName,
+    this.initialQuantity,
     super.key,
   });
 
@@ -37,6 +39,12 @@ class ArticleFormScreen extends ConsumerStatefulWidget {
   /// Nutzer kann ihn aendern. Wird ignoriert, sobald [article] oder
   /// [catalogArticle] gesetzt ist.
   final String? scannedName;
+
+  /// Startmenge fuer einen neuen Artikel — z. B. die im Wareneingang-
+  /// Warenkorb bereits erfasste Menge, damit sie beim "Anlegen" nicht
+  /// verloren geht und stattdessen wieder bei 1 anfaengt. Wird ignoriert,
+  /// sobald [article] gesetzt ist (dessen Menge hat Vorrang).
+  final int? initialQuantity;
 
   @override
   ConsumerState<ArticleFormScreen> createState() => _ArticleFormScreenState();
@@ -92,7 +100,7 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
 
     _category = article?.category ?? catalog?.category;
     _supplier = article?.supplier ?? catalog?.supplier;
-    _quantity = article?.quantity ?? 1;
+    _quantity = article?.quantity ?? widget.initialQuantity ?? 1;
     _status = article?.status ?? ArticleStatus.inStock;
     _visibleForCustomers = article?.isPublic ?? false;
     _imageSource = article?.imageUrl ?? catalog?.imageUrl;
@@ -185,58 +193,26 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     final category = _category;
     if (category == null) return;
 
-    final now = DateTime.now();
-    // Damit ein getippter UPC-A genauso 13-stellig im Bestand landet wie
-    // derselbe Code ueber den Scanner. _canSave garantiert die Gueltigkeit
-    // bereits, der Fallback ist reine Vorsicht.
-    final raw = _articleNumberController.text.trim();
-    final ean = normalizeScannedEan(raw) ?? raw;
-    final storageLocation = _storageLocationController.text.trim();
-    final existing = widget.article;
-
-    final article =
-        (existing ??
-                Article(
-                  name: '',
-                  category: category,
-                  quantity: 0,
-                  minQuantity: 0,
-                  purchasePrice: 0,
-                  sellingPrice: 0,
-                  status: ArticleStatus.inStock,
-                  createdAt: now,
-                  updatedAt: now,
-                ))
-            .copyWith(
-              ean: ean.isEmpty ? null : ean,
-              name: _nameController.text.trim(),
-              category: category,
-              supplier: _supplier,
-              quantity: _quantity,
-              minQuantity: _minQuantity,
-              maxQuantity: _maxQuantity,
-              purchasePrice:
-                  double.tryParse(_purchasePriceController.text) ?? 0,
-              sellingPrice: double.tryParse(_sellingPriceController.text) ?? 0,
-              storageLocation: storageLocation.isEmpty ? null : storageLocation,
-              status: _status,
-              isPublic: _visibleForCustomers,
-              imageUrl: _imageSource,
-              updatedAt: now,
-            );
-
-    final repository = ref.read(articleRepositoryProvider);
-    if (existing != null) {
-      await repository.updateArticle(article);
-    } else {
-      await repository.createArticle(article);
-    }
-
-    ref.invalidate(filterArticleByName(ref.read(searchQueryProvider)));
-
-    if (mounted) {
-      Navigator.of(context).pop();
-    }
+    await ref
+        .read(articleFormProvider.notifier)
+        .save(
+          ArticleFormSaveRequest(
+            existing: widget.article,
+            rawEan: _articleNumberController.text.trim(),
+            name: _nameController.text.trim(),
+            category: category,
+            supplier: _supplier,
+            quantity: _quantity,
+            minQuantity: _minQuantity,
+            maxQuantity: _maxQuantity,
+            purchasePriceText: _purchasePriceController.text,
+            sellingPriceText: _sellingPriceController.text,
+            storageLocation: _storageLocationController.text.trim(),
+            status: _status,
+            isPublic: _visibleForCustomers,
+            imageUrl: _imageSource,
+          ),
+        );
   }
 
   /// Die bekannten Lieferanten, ergaenzt um den aktuell gesetzten.
@@ -252,6 +228,21 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<Article?>>(articleFormProvider, (previous, next) {
+      next.whenOrNull(
+        data: (article) {
+          if (article != null && mounted) Navigator.of(context).pop();
+        },
+        error: (error, stackTrace) {
+          debugPrint('Artikel konnte nicht gespeichert werden: $error\n$stackTrace');
+          if (mounted) {
+            AppSnackbar.show(context, 'Artikel konnte nicht gespeichert werden');
+          }
+        },
+      );
+    });
+
+    final isSaving = ref.watch(articleFormProvider).isLoading;
     final isEditing = widget.article != null;
 
     return Scaffold(
@@ -400,8 +391,10 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
                   setState(() => _visibleForCustomers = value),
             ),
             AppPrimaryButton(
-              label: isEditing ? 'Änderungen speichern' : 'Artikel speichern',
-              onPressed: _canSave ? _save : null,
+              label: isSaving
+                  ? 'Speichert…'
+                  : (isEditing ? 'Änderungen speichern' : 'Artikel speichern'),
+              onPressed: _canSave && !isSaving ? _save : null,
             ),
           ],
         ),

@@ -40,13 +40,13 @@ class _FakeArticleRepository implements ArticleRepository {
   Future<List<String>> getSuppliers() async => [];
 }
 
-Article _article({required String ean, required String name}) {
+Article _article({required String ean, required String name, int quantity = 1}) {
   final now = DateTime(2026, 1, 1);
   return Article(
     ean: ean,
     name: name,
     category: Category.antrieb,
-    quantity: 1,
+    quantity: quantity,
     minQuantity: 0,
     purchasePrice: 1,
     sellingPrice: 2,
@@ -362,6 +362,38 @@ void main() {
 
     expect(container.read(receivingCartProvider).single.resolvedArticle?.name, 'Neuer Artikel');
   });
+
+  testWidgets(
+    'Anlegen prefills the form with the cart quantity and syncs it back on resolve',
+    (tester) async {
+      final container = await _pump(
+        tester,
+        seed: const [ReceivingCartItem(ean: '978020137962', quantity: 3)],
+        articlesByEan: {
+          '978020137962': _article(
+            ean: '978020137962',
+            name: 'Neuer Artikel',
+            quantity: 7,
+          ),
+        },
+      );
+
+      await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Anlegen'));
+      await tester.pumpAndSettle();
+      // Die Menge aus dem Warenkorb (3) ist im Formular vorbefuellt statt bei 1.
+      expect(find.text('3'), findsOneWidget);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      // Der aus dem Repository geladene Artikel traegt Menge 7 (z. B. weil
+      // im Formular noch geaendert) — der Warenkorb uebernimmt diesen Wert.
+      expect(container.read(receivingCartProvider).single.quantity, 7);
+    },
+  );
 
   testWidgets('Anlegen prefills EAN and the suggested name in the form', (tester) async {
     await _pump(

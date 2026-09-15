@@ -237,4 +237,24 @@ void main() {
     expect(cart[0].resolvedArticle, resolved);
     expect(cart[1].resolvedArticle, isNull);
   });
+
+  test(
+    'resolveUnknown syncs the cart quantity to the resolved article, '
+    'not the previous scan count',
+    () async {
+      final container = _container();
+      addTearDown(container.dispose);
+      final notifier = container.read(receivingCartProvider.notifier);
+
+      notifier.addUnknown('978020137962');
+      final target = container.read(receivingCartProvider).single;
+      final resolved = _ownArticle(ean: '978020137962');
+
+      notifier.resolveUnknown(target, resolved);
+
+      final cart = container.read(receivingCartProvider);
+      expect(cart.single.quantity, resolved.quantity);
+      expect(cart.single.quantity, isNot(1));
+    },
+  );
 }
