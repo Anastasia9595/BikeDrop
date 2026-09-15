@@ -12,6 +12,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.label,
+    this.dotColorBuilder,
     super.key,
   });
 
@@ -20,6 +21,10 @@ class AppSegmentedControl<T> extends StatelessWidget {
   final T value;
   final ValueChanged<T> onChanged;
   final String? label;
+
+  /// Optionaler Status-Punkt pro Segment (z. B. orange/grün). `null` (Default)
+  /// zeigt keine Punkte — unveraendertes Verhalten fuer bestehende Aufrufer.
+  final Color Function(T)? dotColorBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +57,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
                 Expanded(
                   child: AppSegment(
                     label: labelBuilder(option),
+                    dotColor: dotColorBuilder?.call(option),
                     selected: option == value,
                     onTap: option == value ? null : () => onChanged(option),
                   ),
