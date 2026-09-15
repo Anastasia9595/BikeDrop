@@ -6,12 +6,11 @@ import '../../models/receivingcartitem.dart';
 import '../atoms/app_drag_handle.dart';
 import '../atoms/app_icon_button.dart';
 import '../atoms/app_primary_button.dart';
-import '../molecules/list_section_header.dart';
+import '../molecules/app_segmented_control.dart';
 import '../molecules/receiving_cart_item_tile.dart';
 import '../tokens/app_colors.dart';
 import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
-import 'kpi_filter_row.dart';
 
 /// Die Liste bekommt bewusst KEINEN Controller vom Sheet — sie verwaltet
 /// ihre eigene ScrollPosition und bleibt so rein scrollbar. Ziehen auf einem
@@ -37,9 +36,10 @@ class ReceivingCartSheetContent extends StatelessWidget {
   final String summary;
   final Map<ReceivingScanStatus, int> counts;
 
-  /// `null` = kein Filter (beide Abschnitte sichtbar), `true` blendet auf
-  /// "Ergänzung nötig" ein, `false` auf "Vollständige Artikel".
-  final bool? groupFilter;
+  /// `true` blendet auf "Ergänzung nötig" ein, `false` auf "Vollständige
+  /// Artikel". Es ist immer genau eine der beiden Gruppen sichtbar — kein
+  /// "beide" oder "keine".
+  final bool groupFilter;
   final bool expanded;
   final ScrollController scrollController;
   final ValueChanged<bool> onFilterTap;
@@ -54,8 +54,6 @@ class ReceivingCartSheetContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final visible = !expanded
         ? _peekOrder(items).take(2).toList()
-        : groupFilter == null
-        ? items
         : items
               .where((item) => item.scanStatus.needsCompletion == groupFilter)
               .toList();
@@ -68,15 +66,15 @@ class ReceivingCartSheetContent extends StatelessWidget {
         Expanded(
           // Bewusst immer dieselbe CustomScrollView mit demselben [Key] —
           // beim Wechsel Peek <-> voll aendert sich nur die Sliver-Liste
-          // (flach vs. nach Status gruppiert), nicht der Widget-Typ. Wuerde
-          // hier je nach [expanded] zwischen z.B. ListView und
+          // (flach vs. gefiltert bzw. Empty State), nicht der Widget-Typ.
+          // Wuerde hier je nach [expanded] zwischen z.B. ListView und
           // CustomScrollView gewechselt, wuerde Flutter trotz gleichem Key
           // die Scroll-Position verwerfen, weil sich der runtimeType aendert.
           child: CustomScrollView(
             key: const ValueKey('receiving-cart-list'),
             physics: const ClampingScrollPhysics(),
-            slivers: expanded
-                ? _groupedSlivers(visible)
+            slivers: expanded && visible.isEmpty
+                ? [_emptyStateSliver()]
                 : [_itemSliver(visible)],
           ),
         ),
@@ -111,32 +109,16 @@ class ReceivingCartSheetContent extends StatelessWidget {
     ];
   }
 
-  /// Baut die zwei Abschnitte "Ergaenzung noetig" (unknown + catalogMatch)
-  /// und "Vollstaendige Artikel" (inStock) als eigene Sliver-Gruppen. Ein
-  /// leerer Abschnitt faellt komplett weg, statt einen Header ohne Zeilen
-  /// darunter zu zeigen.
-  List<Widget> _groupedSlivers(List<ReceivingCartItem> source) {
-    final needsCompletion = source
-        .where((item) => item.scanStatus.needsCompletion)
-        .toList();
-    final complete = source
-        .where((item) => !item.scanStatus.needsCompletion)
-        .toList();
-
-    return [
-      ..._sectionSlivers('Ergänzung nötig', needsCompletion),
-      ..._sectionSlivers('Vollständige Artikel', complete),
-    ];
-  }
-
-  List<Widget> _sectionSlivers(String title, List<ReceivingCartItem> section) {
-    if (section.isEmpty) return const [];
-    return [
-      SliverToBoxAdapter(
-        child: ListSectionHeader(title: title, count: section.length),
+  Widget _emptyStateSliver() {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: Text(
+          'Keine Artikel in dieser Ansicht.',
+          style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+        ),
       ),
-      _itemSliver(section),
-    ];
+    );
   }
 
   Widget _itemSliver(List<ReceivingCartItem> section) {
@@ -222,27 +204,16 @@ class ReceivingCartSheetContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          KpiFilterRow(
-            entries: [
-              KpiFilterEntry(
-                key: true,
-                label: 'Ergänzung nötig',
-                color: AppColors.receivingStatusColors[ReceivingScanStatus.unknown]!,
-                tint: AppColors.receivingStatusTints[ReceivingScanStatus.unknown]!,
-                count:
-                    (counts[ReceivingScanStatus.unknown] ?? 0) +
-                    (counts[ReceivingScanStatus.catalogMatch] ?? 0),
-              ),
-              KpiFilterEntry(
-                key: false,
-                label: 'Vollständige Artikel',
-                color: AppColors.receivingStatusColors[ReceivingScanStatus.inStock]!,
-                tint: AppColors.receivingStatusTints[ReceivingScanStatus.inStock]!,
-                count: counts[ReceivingScanStatus.inStock] ?? 0,
-              ),
-            ],
-            selectedKey: groupFilter,
-            onEntryTap: (key) => onFilterTap(key as bool),
+          AppSegmentedControl<bool>(
+            options: const [true, false],
+            labelBuilder: (needsCompletion) => needsCompletion
+                ? 'Ergänzung nötig · ${(counts[ReceivingScanStatus.unknown] ?? 0) + (counts[ReceivingScanStatus.catalogMatch] ?? 0)}'
+                : 'Vollständige Artikel · ${counts[ReceivingScanStatus.inStock] ?? 0}',
+            dotColorBuilder: (needsCompletion) => needsCompletion
+                ? AppColors.receivingStatusColors[ReceivingScanStatus.unknown]!
+                : AppColors.receivingStatusColors[ReceivingScanStatus.inStock]!,
+            value: groupFilter,
+            onChanged: onFilterTap,
           ),
         ],
       ),

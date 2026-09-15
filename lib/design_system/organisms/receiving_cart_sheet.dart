@@ -13,7 +13,7 @@ import 'receiving_cart_sheet_content.dart';
 /// Persistentes Bottom Sheet ueber dem Wareneingangs-Scanner: zeigt den
 /// Warenkorb aus [receivingCartProvider]. Leer -> unsichtbar. Sonst startet
 /// es im Peek-Zustand (Vorschau von bis zu 2 Zeilen) und zeigt nach dem
-/// Hochziehen Kopfzeile, Filter-Chips, die volle Liste und den
+/// Hochziehen Kopfzeile, Filter-Segmented-Control, die volle Liste und den
 /// Abschliessen-Button.
 class ReceivingCartSheet extends ConsumerStatefulWidget {
   const ReceivingCartSheet({super.key});
@@ -29,9 +29,9 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
 
   final _controller = DraggableScrollableController();
 
-  /// `null` = kein Filter (beide Abschnitte sichtbar), `true`/`false` blendet
-  /// auf "Ergänzung nötig" bzw. "Vollständige Artikel" ein.
-  bool? _groupFilter;
+  /// `null` = Nutzer hat noch nicht manuell gewaehlt; der Default wird dann
+  /// bei jedem Build aus dem Warenkorb-Inhalt berechnet (siehe [build]).
+  bool? _groupFilterOverride;
 
   @override
   void dispose() {
@@ -85,6 +85,9 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
     final openCount = counts[ReceivingScanStatus.unknown] ?? 0;
     final summary =
         '${items.length} Positionen · $totalQuantity Stk · $openCount offen';
+    final needsCompletionCount =
+        openCount + (counts[ReceivingScanStatus.catalogMatch] ?? 0);
+    final groupFilter = _groupFilterOverride ?? (needsCompletionCount > 0);
 
     return DraggableScrollableSheet(
       controller: _controller,
@@ -111,12 +114,11 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
                 items: items,
                 summary: summary,
                 counts: counts,
-                groupFilter: _groupFilter,
+                groupFilter: groupFilter,
                 expanded: expanded,
                 scrollController: scrollController,
-                onFilterTap: (group) => setState(
-                  () => _groupFilter = _groupFilter == group ? null : group,
-                ),
+                onFilterTap: (group) =>
+                    setState(() => _groupFilterOverride = group),
                 onQuantityChanged: (item, quantity) => ref
                     .read(receivingCartProvider.notifier)
                     .updateQuantity(item, quantity),

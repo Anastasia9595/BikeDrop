@@ -122,7 +122,7 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(DraggableScrollableSheet), findsOneWidget);
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
-    expect(find.byType(KpiFilterRow), findsNothing);
+    expect(find.byType(AppSegmentedControl<bool>), findsNothing);
     expect(find.textContaining('Wareneingang abschließen'), findsNothing);
   });
 
@@ -148,7 +148,7 @@ void main() {
     await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(KpiFilterRow), findsOneWidget);
+    expect(find.byType(AppSegmentedControl<bool>), findsOneWidget);
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(3));
     expect(find.text('Wareneingang abschließen (3 Artikel)'), findsOneWidget);
     expect(find.textContaining('3 Positionen'), findsOneWidget);
@@ -174,7 +174,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.byType(KpiFilterRow), findsOneWidget);
+    expect(find.byType(AppSegmentedControl<bool>), findsOneWidget);
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(3));
   });
 
@@ -196,7 +196,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.byType(KpiFilterRow), findsNothing);
+    expect(find.byType(AppSegmentedControl<bool>), findsNothing);
     expect(find.textContaining('Wareneingang abschließen'), findsNothing);
   });
 
@@ -214,7 +214,7 @@ void main() {
 
     await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
     await tester.pumpAndSettle();
-    expect(find.byType(KpiFilterRow), findsOneWidget);
+    expect(find.byType(AppSegmentedControl<bool>), findsOneWidget);
 
     await tester.dragFrom(
       tester.getCenter(find.byKey(const ValueKey('receiving-cart-drag-handle'))),
@@ -223,7 +223,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    expect(find.byType(KpiFilterRow), findsNothing);
+    expect(find.byType(AppSegmentedControl<bool>), findsNothing);
   });
 
   testWidgets('tapping the collapse icon in the expanded view returns to the peek state', (
@@ -240,34 +240,96 @@ void main() {
 
     await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
     await tester.pumpAndSettle();
-    expect(find.byType(KpiFilterRow), findsOneWidget);
+    expect(find.byType(AppSegmentedControl<bool>), findsOneWidget);
 
     await tester.tap(find.byTooltip('Warenkorb einklappen'));
     await tester.pumpAndSettle();
 
-    expect(find.byType(KpiFilterRow), findsNothing);
+    expect(find.byType(AppSegmentedControl<bool>), findsNothing);
     expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
   });
 
-  testWidgets('tapping a filter chip narrows the expanded list', (tester) async {
-    await _pump(
-      tester,
-      seed: [
-        _known(ean: '1', quantity: 1),
-        const ReceivingCartItem(ean: '978020137962', quantity: 1),
-      ],
-    );
+  testWidgets(
+    'tapping a segment narrows the expanded list to that group',
+    (tester) async {
+      await _pump(
+        tester,
+        seed: [
+          _known(ean: '1', quantity: 1),
+          const ReceivingCartItem(ean: '978020137962', quantity: 1),
+        ],
+      );
 
-    await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
-    await tester.pumpAndSettle();
-    expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
+      await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+      await tester.pumpAndSettle();
+      // Default: "Ergänzung nötig" ist aktiv, weil 1 offener Artikel da ist.
+      expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
+      expect(find.text('Unbekannter Artikel'), findsOneWidget);
 
-    await tester.tap(find.text('Ergänzung nötig'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Vollständige Artikel · 1'));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
-    expect(find.text('Unbekannter Artikel'), findsOneWidget);
-  });
+      expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
+      expect(find.text('Artikel 1'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'defaults to "Vollständige Artikel" when no article needs completion',
+    (tester) async {
+      await _pump(
+        tester,
+        seed: [_known(ean: '1', quantity: 1), _known(ean: '2', quantity: 1)],
+      );
+
+      await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
+      expect(find.text('Vollständige Artikel · 2'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'tapping the already-active segment does not change the list',
+    (tester) async {
+      await _pump(
+        tester,
+        seed: [
+          _known(ean: '1', quantity: 1),
+          const ReceivingCartItem(ean: '978020137962', quantity: 1),
+        ],
+      );
+
+      await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
+      expect(find.text('Unbekannter Artikel'), findsOneWidget);
+
+      await tester.tap(find.text('Ergänzung nötig · 1'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
+      expect(find.text('Unbekannter Artikel'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'switching to a segment with no matching articles shows the empty state',
+    (tester) async {
+      await _pump(tester, seed: [_known(ean: '1', quantity: 1)]);
+
+      await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+      await tester.pumpAndSettle();
+      expect(find.text('Vollständige Artikel · 1'), findsOneWidget);
+
+      await tester.tap(find.text('Ergänzung nötig · 0'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ReceivingCartItemTile), findsNothing);
+      expect(find.text('Keine Artikel in dieser Ansicht.'), findsOneWidget);
+    },
+  );
 
   testWidgets('the quantity stepper updates the cart provider', (tester) async {
     final container = await _pump(tester, seed: [_known(ean: '1', quantity: 1)]);
