@@ -1,5 +1,4 @@
 // test/design_system/atoms/app_segmented_control_test.dart
-import 'package:bikedrop/design_system/atoms/app_segment.dart';
 import 'package:bikedrop/design_system/molecules/app_segmented_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -126,56 +125,5 @@ void main() {
     );
 
     expect(find.text('STATUS'), findsNothing);
-  });
-
-  testWidgets('passes dotColor from dotColorBuilder to each segment', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _wrap(
-        AppSegmentedControl<_Status>(
-          options: _Status.values,
-          labelBuilder: (s) => switch (s) {
-            _Status.imShop => 'Im Shop',
-            _Status.bestellt => 'Bestellt',
-            _Status.fehlt => 'Fehlt',
-          },
-          dotColorBuilder: (s) => switch (s) {
-            _Status.imShop => Colors.green,
-            _Status.bestellt => Colors.orange,
-            _Status.fehlt => Colors.red,
-          },
-          value: _Status.imShop,
-          onChanged: (_) {},
-        ),
-      ),
-    );
-
-    final bestellt = tester.widget<AppSegment>(
-      find.byWidgetPredicate((w) => w is AppSegment && w.label == 'Bestellt'),
-    );
-    expect(bestellt.dotColor, Colors.orange);
-  });
-
-  testWidgets('leaves dotColor null when dotColorBuilder is not set', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _wrap(
-        AppSegmentedControl<_Status>(
-          options: _Status.values,
-          labelBuilder: (s) => s.name,
-          value: _Status.imShop,
-          onChanged: (_) {},
-        ),
-      ),
-    );
-
-    final segment = tester.widget<AppSegment>(
-      find.byWidgetPredicate(
-        (w) => w is AppSegment && w.label == _Status.bestellt.name,
-      ),
-    );
-    expect(segment.dotColor, isNull);
   });
 }

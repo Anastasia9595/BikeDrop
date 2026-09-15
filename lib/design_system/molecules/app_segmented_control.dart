@@ -12,7 +12,6 @@ class AppSegmentedControl<T> extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.label,
-    this.dotColorBuilder,
     this.height = AppSpacing.fieldHeight,
     super.key,
   });
@@ -22,10 +21,6 @@ class AppSegmentedControl<T> extends StatelessWidget {
   final T value;
   final ValueChanged<T> onChanged;
   final String? label;
-
-  /// Optionaler Status-Punkt pro Segment (z. B. orange/grün). `null` (Default)
-  /// zeigt keine Punkte — unveraendertes Verhalten fuer bestehende Aufrufer.
-  final Color Function(T)? dotColorBuilder;
 
   /// Hoehe der Control. Default entspricht der Feldhoehe (z. B. neben
   /// Dropdown/Textfeldern im Artikel-Formular); Aufrufer ausserhalb eines

@@ -6,10 +6,6 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 @widgetbook.UseCase(name: 'Interactive', type: AppSegmentedControl)
 Widget appSegmentedControlInteractive(BuildContext context) {
   final label = context.knobs.string(label: 'Label', initialValue: 'Status');
-  final withDots = context.knobs.boolean(
-    label: 'Mit Status-Punkten',
-    initialValue: false,
-  );
 
   ArticleStatus selected = ArticleStatus.inStock;
 
@@ -22,9 +18,6 @@ Widget appSegmentedControlInteractive(BuildContext context) {
               label: label.isEmpty ? null : label,
               options: ArticleStatus.values,
               labelBuilder: (status) => status.label,
-              dotColorBuilder: withDots
-                  ? (status) => AppColors.statusColors[status]!
-                  : null,
               value: selected,
               onChanged: (status) => setState(() => selected = status),
             ),

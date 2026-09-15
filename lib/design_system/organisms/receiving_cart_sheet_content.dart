@@ -222,9 +222,6 @@ class ReceivingCartSheetContent extends StatelessWidget {
             options: const [true, false],
             labelBuilder: (needsCompletion) =>
                 needsCompletion ? 'Ergänzung nötig' : 'Vollständige Artikel',
-            dotColorBuilder: (needsCompletion) => needsCompletion
-                ? AppColors.receivingStatusColors[ReceivingScanStatus.unknown]!
-                : AppColors.receivingStatusColors[ReceivingScanStatus.inStock]!,
             height: AppSpacing.minTapTarget,
             value: groupFilter,
             onChanged: onFilterTap,

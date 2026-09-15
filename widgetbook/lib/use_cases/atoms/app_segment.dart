@@ -9,14 +9,6 @@ Widget appSegmentDefault(BuildContext context) {
     label: 'Ausgewählt',
     initialValue: false,
   );
-  final withDot = context.knobs.boolean(
-    label: 'Mit Status-Punkt',
-    initialValue: false,
-  );
-  final dotColor = context.knobs.color(
-    label: 'Punktfarbe',
-    initialValue: AppColors.statusColorWarning,
-  );
 
   return Center(
     child: Padding(
@@ -27,7 +19,6 @@ Widget appSegmentDefault(BuildContext context) {
         child: AppSegment(
           label: context.knobs.string(label: 'Label', initialValue: 'Bestellt'),
           selected: selected,
-          dotColor: withDot ? dotColor : null,
           onTap: () {},
         ),
       ),
