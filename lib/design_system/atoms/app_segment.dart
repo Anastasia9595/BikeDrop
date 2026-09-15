@@ -9,7 +9,6 @@ class AppSegment extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
-    this.dotColor,
     super.key,
   });
 
@@ -18,14 +17,6 @@ class AppSegment extends StatelessWidget {
 
   /// `null` schaltet das Segment inaktiv (z. B. das bereits ausgewählte).
   final VoidCallback? onTap;
-
-  /// Optionaler Status-Punkt vor dem Label (z. B. orange/grün). Traegt in
-  /// beiden Zustaenden (ausgewaehlt/nicht ausgewaehlt) die volle Farbe —
-  /// nur Hintergrund/Text des Segments aendern sich bei Auswahl.
-  final Color? dotColor;
-
-  static const double _dotSize = 8;
-  static const double _dotGap = 8;
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +40,6 @@ class AppSegment extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (dotColor != null) ...[
-                Container(
-                  width: _dotSize,
-                  height: _dotSize,
-                  decoration: BoxDecoration(
-                    color: dotColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: _dotGap),
-              ],
               Flexible(
                 child: Text(
                   label,
