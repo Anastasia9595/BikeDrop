@@ -38,7 +38,7 @@ void main() {
     );
 
     final decoration = _container(tester).decoration as BoxDecoration;
-    expect(decoration.color, AppColors.textPrimary);
+    expect(decoration.color, AppColors.accent);
     expect(_text(tester).style?.color, AppColors.white);
   });
 

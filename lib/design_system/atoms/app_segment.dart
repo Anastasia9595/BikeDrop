@@ -42,7 +42,7 @@ class AppSegment extends StatelessWidget {
           duration: const Duration(milliseconds: 150),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? AppColors.textPrimary : Colors.transparent,
+            color: selected ? AppColors.accent : Colors.transparent,
             borderRadius: borderRadius,
           ),
           child: Row(

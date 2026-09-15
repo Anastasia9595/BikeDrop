@@ -82,11 +82,10 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
       for (final status in ReceivingScanStatus.values)
         status: items.where((item) => item.scanStatus == status).length,
     };
-    final openCount = counts[ReceivingScanStatus.unknown] ?? 0;
-    final summary =
-        '${items.length} Positionen · $totalQuantity Stk · $openCount offen';
+    final summary = '${items.length} Positionen · $totalQuantity Stk';
     final needsCompletionCount =
-        openCount + (counts[ReceivingScanStatus.catalogMatch] ?? 0);
+        (counts[ReceivingScanStatus.unknown] ?? 0) +
+        (counts[ReceivingScanStatus.catalogMatch] ?? 0);
     final groupFilter = _groupFilterOverride ?? (needsCompletionCount > 0);
 
     return DraggableScrollableSheet(

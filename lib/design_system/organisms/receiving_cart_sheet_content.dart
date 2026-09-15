@@ -61,7 +61,7 @@ class ReceivingCartSheetContent extends StatelessWidget {
     return Column(
       children: [
         AppDragHandle(scrollController: scrollController),
-        expanded ? _buildExpandedHeader() : _buildPeekHeader(),
+        expanded ? _buildExpandedHeader(visible) : _buildPeekHeader(),
         if (expanded) const Divider(height: 1, color: AppColors.listDivider),
         Expanded(
           // Bewusst immer dieselbe CustomScrollView mit demselben [Key] —
@@ -167,7 +167,12 @@ class ReceivingCartSheetContent extends StatelessWidget {
     );
   }
 
-  Widget _buildExpandedHeader() {
+  Widget _buildExpandedHeader(List<ReceivingCartItem> visible) {
+    final visibleQuantity = visible.fold<int>(
+      0,
+      (sum, item) => sum + item.quantity,
+    );
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenPaddingH,
@@ -197,7 +202,7 @@ class ReceivingCartSheetContent extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            summary,
+            '${visible.length} Positionen · $visibleQuantity Stk',
             style: AppTypography.body.copyWith(
               fontSize: 13,
               color: AppColors.textSecondary,
@@ -206,12 +211,12 @@ class ReceivingCartSheetContent extends StatelessWidget {
           const SizedBox(height: 12),
           AppSegmentedControl<bool>(
             options: const [true, false],
-            labelBuilder: (needsCompletion) => needsCompletion
-                ? 'Ergänzung nötig · ${(counts[ReceivingScanStatus.unknown] ?? 0) + (counts[ReceivingScanStatus.catalogMatch] ?? 0)}'
-                : 'Vollständige Artikel · ${counts[ReceivingScanStatus.inStock] ?? 0}',
+            labelBuilder: (needsCompletion) =>
+                needsCompletion ? 'Ergänzung nötig' : 'Vollständige Artikel',
             dotColorBuilder: (needsCompletion) => needsCompletion
                 ? AppColors.receivingStatusColors[ReceivingScanStatus.unknown]!
                 : AppColors.receivingStatusColors[ReceivingScanStatus.inStock]!,
+            height: AppSpacing.minTapTarget,
             value: groupFilter,
             onChanged: onFilterTap,
           ),

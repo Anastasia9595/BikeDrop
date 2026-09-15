@@ -266,7 +266,7 @@ void main() {
       expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
       expect(find.text('Unbekannter Artikel'), findsOneWidget);
 
-      await tester.tap(find.text('Vollständige Artikel · 1'));
+      await tester.tap(find.text('Vollständige Artikel'));
       await tester.pumpAndSettle();
 
       expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
@@ -286,7 +286,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(ReceivingCartItemTile), findsNWidgets(2));
-      expect(find.text('Vollständige Artikel · 2'), findsOneWidget);
+      expect(find.text('Vollständige Artikel'), findsOneWidget);
     },
   );
 
@@ -306,7 +306,7 @@ void main() {
       expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
       expect(find.text('Unbekannter Artikel'), findsOneWidget);
 
-      await tester.tap(find.text('Ergänzung nötig · 1'));
+      await tester.tap(find.text('Ergänzung nötig'));
       await tester.pumpAndSettle();
 
       expect(find.byType(ReceivingCartItemTile), findsNWidgets(1));
@@ -321,9 +321,9 @@ void main() {
 
       await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
       await tester.pumpAndSettle();
-      expect(find.text('Vollständige Artikel · 1'), findsOneWidget);
+      expect(find.text('Vollständige Artikel'), findsOneWidget);
 
-      await tester.tap(find.text('Ergänzung nötig · 0'));
+      await tester.tap(find.text('Ergänzung nötig'));
       await tester.pumpAndSettle();
 
       expect(find.byType(ReceivingCartItemTile), findsNothing);

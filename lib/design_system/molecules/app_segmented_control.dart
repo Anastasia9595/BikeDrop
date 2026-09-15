@@ -13,6 +13,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
     required this.onChanged,
     this.label,
     this.dotColorBuilder,
+    this.height = AppSpacing.fieldHeight,
     super.key,
   });
 
@@ -25,6 +26,12 @@ class AppSegmentedControl<T> extends StatelessWidget {
   /// Optionaler Status-Punkt pro Segment (z. B. orange/grün). `null` (Default)
   /// zeigt keine Punkte — unveraendertes Verhalten fuer bestehende Aufrufer.
   final Color Function(T)? dotColorBuilder;
+
+  /// Hoehe der Control. Default entspricht der Feldhoehe (z. B. neben
+  /// Dropdown/Textfeldern im Artikel-Formular); Aufrufer ausserhalb eines
+  /// Formularkontexts (z. B. ein kompakter Filter) koennen einen kleineren
+  /// Wert uebergeben.
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +48,7 @@ class AppSegmentedControl<T> extends StatelessWidget {
           const SizedBox(height: AppSpacing.fieldLabelGap),
         ],
         Container(
-          height: AppSpacing.fieldHeight,
+          height: height,
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: AppColors.surface,
