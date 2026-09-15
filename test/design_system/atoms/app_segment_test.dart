@@ -12,6 +12,15 @@ AnimatedContainer _container(WidgetTester tester) =>
 
 Text _text(WidgetTester tester) => tester.widget<Text>(find.text('Bestellt'));
 
+Container _dot(WidgetTester tester) => tester.widget<Container>(
+  find.byWidgetPredicate(
+    (w) =>
+        w is Container &&
+        w.decoration is BoxDecoration &&
+        (w.decoration! as BoxDecoration).shape == BoxShape.circle,
+  ),
+);
+
 void main() {
   testWidgets('renders the label', (tester) async {
     await tester.pumpWidget(
@@ -61,5 +70,53 @@ void main() {
     await tester.tap(find.text('Bestellt'));
 
     expect(tapped, isTrue);
+  });
+
+  testWidgets('renders a colored dot when dotColor is set', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        AppSegment(
+          label: 'Bestellt',
+          selected: false,
+          dotColor: Colors.orange,
+          onTap: () {},
+        ),
+      ),
+    );
+
+    final decoration = _dot(tester).decoration! as BoxDecoration;
+    expect(decoration.color, Colors.orange);
+  });
+
+  testWidgets('renders no dot when dotColor is not set', (tester) async {
+    await tester.pumpWidget(
+      _wrap(AppSegment(label: 'Bestellt', selected: false, onTap: () {})),
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (w) =>
+            w is Container &&
+            w.decoration is BoxDecoration &&
+            (w.decoration! as BoxDecoration).shape == BoxShape.circle,
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('keeps the dot fully colored when selected', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        AppSegment(
+          label: 'Bestellt',
+          selected: true,
+          dotColor: Colors.orange,
+          onTap: null,
+        ),
+      ),
+    );
+
+    final decoration = _dot(tester).decoration! as BoxDecoration;
+    expect(decoration.color, Colors.orange);
   });
 }
