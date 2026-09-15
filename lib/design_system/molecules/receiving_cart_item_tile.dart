@@ -134,14 +134,23 @@ class ReceivingCartItemTile extends StatelessWidget {
                 ),
               )
             else
-              SizedBox(
-                width: 120,
-                child: QuantityStepper(
-                  label: 'Menge',
-                  showLabel: false,
-                  quantity: item.quantity,
-                  min: 1,
-                  onChanged: onQuantityChanged,
+              // IntrinsicWidth statt eines starren SizedBox: die 120px sind
+              // nur eine Mindestbreite fuer einstellige Mengen, ab zweistelligen
+              // Zahlen (z. B. "10") wird die Box automatisch breiter, statt
+              // dass die Ziffern im Text umbrechen (siehe QuantityStepper.
+              // Der interne Zahlen-Bereich ist per Expanded gebunden und
+              // braucht deshalb selbst eine begrenzte statt unbegrenzte
+              // Breite von aussen).
+              IntrinsicWidth(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 120),
+                  child: QuantityStepper(
+                    label: 'Menge',
+                    showLabel: false,
+                    quantity: item.quantity,
+                    min: 1,
+                    onChanged: onQuantityChanged,
+                  ),
                 ),
               ),
           ],

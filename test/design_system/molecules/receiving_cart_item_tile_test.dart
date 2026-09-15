@@ -131,6 +131,31 @@ void main() {
     expect(find.text('Anlegen'), findsOneWidget);
   });
 
+  testWidgets(
+    'stays at the 120px minimum width for a single-digit quantity',
+    (tester) async {
+      await tester.pumpWidget(
+        _wrap(ReceivingCartItem(ean: '4711234567899', quantity: 3, resolvedArticle: _article())),
+      );
+
+      expect(tester.getSize(find.byType(QuantityStepper)).width, 120);
+    },
+  );
+
+  testWidgets(
+    'grows wider than the 120px minimum for a two-digit quantity instead '
+    'of wrapping the number onto two lines',
+    (tester) async {
+      await tester.pumpWidget(
+        _wrap(ReceivingCartItem(ean: '4711234567899', quantity: 10, resolvedArticle: _article())),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('10'), findsOneWidget);
+      expect(tester.getSize(find.byType(QuantityStepper)).width, greaterThan(120));
+    },
+  );
+
   testWidgets('reports a tap on Anlegen', (tester) async {
     var tapped = false;
     await tester.pumpWidget(

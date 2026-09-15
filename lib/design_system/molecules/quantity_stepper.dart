@@ -151,6 +151,8 @@ class _QuantityStepperState extends State<QuantityStepper> {
                           )
                           : Text(
                             '${widget.quantity}',
+                            maxLines: 1,
+                            softWrap: false,
                             style: AppTypography.listNumber.copyWith(
                               color: AppColors.textPrimary,
                             ),
