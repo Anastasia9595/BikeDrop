@@ -64,7 +64,6 @@ class AppSegmentedControl<T> extends StatelessWidget {
                 Expanded(
                   child: AppSegment(
                     label: labelBuilder(option),
-                    dotColor: dotColorBuilder?.call(option),
                     selected: option == value,
                     onTap: option == value ? null : () => onChanged(option),
                   ),
