@@ -50,14 +50,27 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
   void _toggleExpanded(bool expanded) =>
       _controller.jumpTo(expanded ? _minSize : _maxSize);
 
+  /// Zaehlt, wie viele ANDERE Zeilen ausser [item] noch "Anlegen" brauchen —
+  /// steuert, ob das Formular den "Speichern & weiter"-Button anbietet.
+  int _remainingToComplete(ReceivingCartItem item) {
+    return ref
+        .read(receivingCartProvider)
+        .where(
+          (other) =>
+              !identical(other, item) && other.scanStatus.needsCompletion,
+        )
+        .length;
+  }
+
   Future<void> _openAnlegenForm(ReceivingCartItem item) async {
-    await Navigator.of(context).push<void>(
+    final continueNext = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (_) => ArticleFormScreen(
           catalogArticle: item.catalogData,
           scannedEan: item.ean,
           scannedName: item.suggestedName,
           initialQuantity: item.quantity,
+          remainingToComplete: _remainingToComplete(item),
         ),
       ),
     );
@@ -67,6 +80,18 @@ class _ReceivingCartSheetState extends ConsumerState<ReceivingCartSheet> {
         .getArticleByEan(item.ean);
     if (resolved != null) {
       ref.read(receivingCartProvider.notifier).resolveUnknown(item, resolved);
+    }
+    if (!mounted || continueNext != true) return;
+
+    // "Speichern & weiter" gedrueckt: direkt mit der naechsten noch offenen
+    // Position weitermachen, statt den Nutzer zurueck zur Liste zu schicken
+    // und erneut auf "Anlegen" tippen zu lassen.
+    final next = ref
+        .read(receivingCartProvider)
+        .where((candidate) => candidate.scanStatus.needsCompletion)
+        .firstOrNull;
+    if (next != null) {
+      await _openAnlegenForm(next);
     }
   }
 

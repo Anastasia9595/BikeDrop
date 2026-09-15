@@ -29,10 +29,13 @@ class _FakeArticleRepository implements ArticleRepository {
   Future<Article?> getArticleById(String id) => throw UnimplementedError();
   @override
   Future<List<Article>> searchArticlesByName(String query) => throw UnimplementedError();
+  // Speichert wie das echte Repository, ohne echte Persistenz — noetig,
+  // damit das "Speichern & weiter"-Formular tatsaechlich poppen kann
+  // (der Provider wartet auf ein AsyncData-Ergebnis dieser Aufrufe).
   @override
-  Future<Article> createArticle(Article article) => throw UnimplementedError();
+  Future<Article> createArticle(Article article) async => article;
   @override
-  Future<Article> updateArticle(Article article) => throw UnimplementedError();
+  Future<Article> updateArticle(Article article) async => article;
   @override
   Future<Article> changeQuantity(String id, int newQuantity) => throw UnimplementedError();
   @override
@@ -55,6 +58,22 @@ Article _article({required String ean, required String name, int quantity = 1}) 
     createdAt: now,
     updatedAt: now,
   );
+}
+
+/// Fuellt Mindestbestand/Einkaufspreis/Verkaufspreis — die einzigen
+/// Pflichtfelder, die ein per Katalog-Match vorausgefuelltes Anlegen-
+/// Formular noch braucht, um `_canSave` zu erfuellen.
+Future<void> _fillRequiredNumbers(WidgetTester tester) async {
+  for (final label in ['Mindestbestand', 'Einkaufspreis', 'Verkaufspreis']) {
+    await tester.enterText(
+      find.descendant(
+        of: find.widgetWithText(AppTextField, label.toUpperCase()),
+        matching: find.byType(TextField),
+      ),
+      '1',
+    );
+  }
+  await tester.pump();
 }
 
 Future<ProviderContainer> _pump(
@@ -393,6 +412,88 @@ void main() {
       // Der aus dem Repository geladene Artikel traegt Menge 7 (z. B. weil
       // im Formular noch geaendert) — der Warenkorb uebernimmt diesen Wert.
       expect(container.read(receivingCartProvider).single.quantity, 7);
+    },
+  );
+
+  testWidgets(
+    'Anlegen shows only the single Speichern button for the last open item',
+    (tester) async {
+      await _pump(
+        tester,
+        seed: const [ReceivingCartItem(ean: '978020137962', quantity: 1)],
+      );
+
+      await tester.tap(find.text('Anlegen'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Speichern & weiter'), findsNothing);
+      expect(find.byType(AppSecondaryButton), findsNothing);
+      expect(find.text('Artikel speichern'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    '"Speichern & weiter" saves the current item and jumps straight into '
+    'the next open item\'s form instead of returning to the cart',
+    (tester) async {
+      final container = await _pump(
+        tester,
+        seed: const [
+          ReceivingCartItem(
+            ean: '978020137962',
+            quantity: 1,
+            catalogData: CatalogArticle(
+              ean: '978020137962',
+              name: 'Erster Artikel',
+              category: Category.antrieb,
+            ),
+          ),
+          ReceivingCartItem(
+            ean: '4090123456781',
+            quantity: 1,
+            catalogData: CatalogArticle(
+              ean: '4090123456781',
+              name: 'Zweiter Artikel',
+              category: Category.antrieb,
+            ),
+          ),
+        ],
+        articlesByEan: {
+          '978020137962': _article(ean: '978020137962', name: 'Erster Artikel'),
+          '4090123456781': _article(ean: '4090123456781', name: 'Zweiter Artikel'),
+        },
+      );
+
+      await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Anlegen').first);
+      await tester.pumpAndSettle();
+      expect(find.text('Erster Artikel'), findsOneWidget);
+      expect(find.text('Speichern & weiter (1 offen)'), findsOneWidget);
+
+      await _fillRequiredNumbers(tester);
+      await tester.ensureVisible(find.text('Speichern & weiter (1 offen)'));
+      await tester.tap(find.text('Speichern & weiter (1 offen)'));
+      await tester.pumpAndSettle();
+
+      // Direkt im Formular fuer den zweiten Artikel gelandet — kein
+      // Zwischenstopp am Warenkorb, und da es der letzte offene ist, gibt
+      // es dort nur noch den normalen Speichern-Button.
+      expect(find.text('Zweiter Artikel'), findsOneWidget);
+      expect(find.textContaining('Speichern & weiter'), findsNothing);
+      expect(find.text('Artikel speichern'), findsOneWidget);
+
+      await _fillRequiredNumbers(tester);
+      await tester.ensureVisible(find.text('Artikel speichern'));
+      await tester.tap(find.text('Artikel speichern'));
+      await tester.pumpAndSettle();
+
+      // Nach dem letzten Speichern wieder zurueck im Warenkorb, beide
+      // Positionen aufgeloest.
+      final cart = container.read(receivingCartProvider);
+      expect(cart[0].resolvedArticle?.name, 'Erster Artikel');
+      expect(cart[1].resolvedArticle?.name, 'Zweiter Artikel');
     },
   );
 

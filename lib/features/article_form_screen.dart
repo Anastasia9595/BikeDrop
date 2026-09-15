@@ -17,6 +17,7 @@ class ArticleFormScreen extends ConsumerStatefulWidget {
     this.scannedEan,
     this.scannedName,
     this.initialQuantity,
+    this.remainingToComplete = 0,
     super.key,
   });
 
@@ -46,6 +47,14 @@ class ArticleFormScreen extends ConsumerStatefulWidget {
   /// sobald [article] gesetzt ist (dessen Menge hat Vorrang).
   final int? initialQuantity;
 
+  /// Anzahl weiterer Wareneingang-Positionen, die nach dieser noch
+  /// "Anlegen" brauchen (ohne diese hier mitzuzaehlen). 0 (Default) heisst:
+  /// kein Wareneingang-Kontext bzw. letzte offene Position — dann gibt es
+  /// nur den normalen Speichern-Button. Groesser als 0 blendet zusaetzlich
+  /// "Speichern & weiter" (springt direkt zur naechsten offenen Position)
+  /// neben "Speichern & zurück zum Warenkorb" ein.
+  final int remainingToComplete;
+
   @override
   ConsumerState<ArticleFormScreen> createState() => _ArticleFormScreenState();
 }
@@ -68,6 +77,13 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
   /// Verweis auf das Artikelbild: entweder die gespeicherte URL oder,
   /// nach einer frischen Aufnahme, der lokale Pfad der Bilddatei.
   late String? _imageSource;
+
+  /// Welcher der beiden Buttons zuletzt gedrueckt wurde — wird erst beim
+  /// erfolgreichen Speichern (siehe `ref.listen` in [build]) ausgewertet,
+  /// um zu entscheiden, mit welchem Ergebnis das Formular sich schliesst.
+  /// Bleibt `null` beim normalen Einzel-Speichern-Button (kein Wareneingang-
+  /// Kontext) — dort ist das Pop-Ergebnis irrelevant fuer den Aufrufer.
+  bool? _pendingContinue;
 
   @override
   void initState() {
@@ -189,10 +205,11 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
       _hasNumber(_sellingPriceController) &&
       _maxQuantityError == null;
 
-  Future<void> _save() async {
+  Future<void> _save({bool? continueNext}) async {
     final category = _category;
     if (category == null) return;
 
+    _pendingContinue = continueNext;
     await ref
         .read(articleFormProvider.notifier)
         .save(
@@ -231,7 +248,9 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
     ref.listen<AsyncValue<Article?>>(articleFormProvider, (previous, next) {
       next.whenOrNull(
         data: (article) {
-          if (article != null && mounted) Navigator.of(context).pop();
+          if (article != null && mounted) {
+            Navigator.of(context).pop(_pendingContinue);
+          }
         },
         error: (error, stackTrace) {
           debugPrint('Artikel konnte nicht gespeichert werden: $error\n$stackTrace');
@@ -390,12 +409,28 @@ class _ArticleFormScreenState extends ConsumerState<ArticleFormScreen> {
               onChanged: (value) =>
                   setState(() => _visibleForCustomers = value),
             ),
-            AppPrimaryButton(
-              label: isSaving
-                  ? 'Speichert…'
-                  : (isEditing ? 'Änderungen speichern' : 'Artikel speichern'),
-              onPressed: _canSave && !isSaving ? _save : null,
-            ),
+            if (widget.remainingToComplete > 0) ...[
+              AppPrimaryButton(
+                label: isSaving
+                    ? 'Speichert…'
+                    : 'Speichern & weiter (${widget.remainingToComplete} offen)',
+                onPressed: _canSave && !isSaving
+                    ? () => _save(continueNext: true)
+                    : null,
+              ),
+              AppSecondaryButton(
+                label: 'Speichern & zurück zum Warenkorb',
+                onPressed: _canSave && !isSaving
+                    ? () => _save(continueNext: false)
+                    : null,
+              ),
+            ] else
+              AppPrimaryButton(
+                label: isSaving
+                    ? 'Speichert…'
+                    : (isEditing ? 'Änderungen speichern' : 'Artikel speichern'),
+                onPressed: _canSave && !isSaving ? () => _save() : null,
+              ),
           ],
         ),
       ),
