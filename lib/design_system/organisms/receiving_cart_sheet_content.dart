@@ -90,7 +90,16 @@ class ReceivingCartSheetContent extends StatelessWidget {
             ),
             child: AppPrimaryButton(
               label: 'Wareneingang abschließen (${items.length} Artikel)',
-              onPressed: (counts[ReceivingScanStatus.unknown] ?? 0) > 0
+              // "Ergänzung nötig" umfasst sowohl unbekannte als auch
+              // Katalogtreffer-Zeilen (siehe ReceivingScanStatus.needsCompletion)
+              // — beide brauchen noch "Anlegen", bevor der Wareneingang
+              // abgeschlossen werden kann. Nur auf `unknown` zu pruefen liess
+              // den Button faelschlich aktiv werden, sobald keine unbekannten,
+              // aber noch Katalogtreffer-Zeilen offen waren.
+              onPressed:
+                  (counts[ReceivingScanStatus.unknown] ?? 0) +
+                          (counts[ReceivingScanStatus.catalogMatch] ?? 0) >
+                      0
                   ? null
                   : () => Navigator.of(context).pop(),
             ),

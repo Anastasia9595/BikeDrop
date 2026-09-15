@@ -1,6 +1,7 @@
 import 'package:bikedrop/design_system/design_system.dart';
 import 'package:bikedrop/interface/article_interface.dart';
 import 'package:bikedrop/models/article.dart';
+import 'package:bikedrop/models/catalogarticle.dart';
 import 'package:bikedrop/models/receivingcartitem.dart';
 import 'package:bikedrop/providers/article_repository_provider.dart';
 import 'package:bikedrop/providers/receiving_cart_provider.dart';
@@ -441,6 +442,34 @@ void main() {
     final button = tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton));
     expect(button.onPressed, isNotNull);
   });
+
+  testWidgets(
+    'Wareneingang abschließen stays disabled for an unresolved catalog match, '
+    'even with zero unknown items',
+    (tester) async {
+      await _pump(
+        tester,
+        seed: [
+          _known(ean: '1', quantity: 1),
+          const ReceivingCartItem(
+            ean: '4029876501233',
+            quantity: 1,
+            catalogData: CatalogArticle(
+              ean: '4029876501233',
+              name: 'Abus Bordo 6000 Faltschloss 90cm',
+              category: Category.zubehoer,
+            ),
+          ),
+        ],
+      );
+
+      await tester.tap(find.byTooltip('Warenkorb ganz anzeigen'));
+      await tester.pumpAndSettle();
+
+      final button = tester.widget<AppPrimaryButton>(find.byType(AppPrimaryButton));
+      expect(button.onPressed, isNull);
+    },
+  );
 
   testWidgets(
     'Wareneingang abschließen becomes enabled after the last unknown item is resolved',
